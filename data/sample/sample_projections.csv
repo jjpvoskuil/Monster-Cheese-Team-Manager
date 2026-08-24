@@ -1,0 +1,16 @@
+name,position,team,games,pass_yards,pass_td,pass_int,rush_yards,rush_td,receptions,rec_yards,rec_td,fumbles_lost,fg_made,xp_made,def_sacks,def_int,def_fumble_rec,def_td,points_allowed_per_game,yards_allowed_per_game
+Josh Allen,QB,BUF,17,4200,32,12,550,7,0,0,0,4,0,0,0,0,0,0,0,0
+Patrick Mahomes,QB,KC,17,4300,28,10,300,3,0,0,0,3,0,0,0,0,0,0,0,0
+Christian McCaffrey,RB,SF,16,0,0,0,1300,12,55,450,3,3,0,0,0,0,0,0,0,0
+Bijan Robinson,RB,ATL,17,0,0,0,1100,9,45,350,2,2,0,0,0,0,0,0,0,0
+Breece Hall,RB,NYJ,17,0,0,0,1050,8,50,400,2,2,0,0,0,0,0,0,0,0
+CeeDee Lamb,WR,DAL,17,0,0,0,20,0,105,1400,9,1,0,0,0,0,0,0,0,0
+Tyreek Hill,WR,MIA,17,0,0,0,40,1,90,1250,8,1,0,0,0,0,0,0,0,0
+Ja'Marr Chase,WR,CIN,17,0,0,0,0,0,95,1300,10,1,0,0,0,0,0,0,0,0
+Travis Kelce,TE,KC,16,0,0,0,0,0,80,900,6,1,0,0,0,0,0,0,0,0
+Sam LaPorta,TE,DET,17,0,0,0,0,0,70,750,6,1,0,0,0,0,0,0,0,0
+Justin Tucker,K,BAL,17,0,0,0,0,0,0,0,0,0,32,35,0,0,0,0,0,0
+Harrison Butker,K,KC,17,0,0,0,0,0,0,0,0,0,29,38,0,0,0,0,0,0
+San Francisco,DST,SF,17,0,0,0,0,0,0,0,0,0,0,0,48,16,10,3,18.5,315
+Baltimore,DST,BAL,17,0,0,0,0,0,0,0,0,0,0,0,45,14,9,2,19.0,320
+Dallas,DST,DAL,17,0,0,0,0,0,0,0,0,0,0,0,42,15,8,3,20.5,330

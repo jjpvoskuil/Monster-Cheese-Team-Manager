@@ -1,0 +1,285 @@
+# Maniac Football League — Monster Cheese
+#
+# SOURCE OF TRUTH for all league/roster/scoring rules used by this app.
+# Everything in src/ reads from this file. Edit config, not code, when a
+# league setting changes.
+#
+# Captured directly from the live CBS rules page (logged-in session):
+#   https://maniacfl.football.cbssports.com/rules
+# Captured: 2026-08-24, by Claude (Cowork session), re-verifying and
+# superseding an earlier capture from a prior session. Re-check this page
+# before trusting anything here deep into draft prep — commissioners can
+# change settings.
+
+metadata:
+  source_url: "https://maniacfl.football.cbssports.com/rules"
+  captured_at: "2026-08-24"
+  notes: >
+    Defensive Points-Against and Yards-Allowed tables are transcribed
+    EXACTLY as CBS renders them, including their apparent gaps (e.g. PA=1
+    has no listed tier). This was independently re-verified on 2026-08-24
+    and is NOT a text-extraction artifact — the CBS page itself only lists
+    3 tiers for each of these two tables. Values outside a listed tier are
+    treated as 0 bonus/penalty points by this app. Recommend the league
+    commissioner confirm whether more tiers exist in the CBS admin scoring
+    editor (not visible from a regular manager's rules-page view).
+
+league:
+  name: "Maniac Football League"
+  team_name: "Monster Cheese"
+  url: "https://maniacfl.football.cbssports.com"
+  teams: 10
+  divisions: 2
+  entry_fee_usd: 175.00
+
+draft:
+  format: "Live Draft"
+  order_type: "Snake"
+  date_time: "2026-08-30T14:30:00-04:00"  # 8/30/26 2:30pm ET
+  rounds: 22
+  seconds_per_pick: 70
+  autopick_on_expire: true  # "draft robot" fills any team that lets the clock expire
+
+roster:
+  # Active starting lineup slots (12 total), from the league Constitution
+  # (the "Roster Limits" ACTIVE MIN/MAX table on the rules page is an
+  # aggregate view of these same slots and does not name them individually).
+  starters:
+    - slot: QB
+      count: 1
+      eligible: [QB]
+    - slot: RB
+      count: 3
+      eligible: [RB]
+    - slot: WR_TE_FLEX
+      count: 3
+      eligible: [WR, TE]
+    - slot: TE
+      count: 1
+      eligible: [TE]
+    - slot: K
+      count: 1
+      eligible: [K]
+    - slot: SUPERFLEX
+      count: 1
+      eligible: [QB, RB, WR, TE]
+      # ASSUMPTION: CBS's constitution literally says "Any position Player"
+      # for this slot. Standard fantasy convention (and the only way K/DST
+      # here would make strategic sense) is offensive skill positions only.
+      # Treating as QB/RB/WR/TE. Flag to re-confirm if it matters late.
+    - slot: FLEX
+      count: 1
+      eligible: [RB, WR, TE, K]
+    - slot: DST
+      count: 1
+      eligible: [DST]
+  total_starters: 12
+  bench_min: 0
+  bench_max: 15
+  roster_total_min: 12
+  roster_total_max: 27
+
+  # Aggregate active-roster min/max per position, as CBS's "Roster Limits"
+  # table reports it (informational cross-check against the slot list above)
+  position_active_limits:
+    QB: {min: 1, max: 2}
+    RB: {min: 3, max: 5}
+    TE: {min: 1, max: 1}
+    WR_TE: {min: 3, max: 5}
+    K: {min: 1, max: 3}
+    DST: {min: 1, max: 1}
+
+  validation:
+    illegal_roster_score: 0  # "Illegal rosters score zero points in standings"
+    # CBS Constitution text (verbatim, genuinely ambiguous — see interpretation
+    # below): "You must start a combination of 3 WR's/TE's plus an additional
+    # TE ... Thus if you only start 2 wr's and a TE your roster is not legal
+    # ... the website could not be configured to show this as an illegal
+    # line-up."
+    # INTERPRETATION (matches examples given: 2 WR + 2 TE = legal,
+    # 2 WR + 1 TE = illegal): across the 4 combined WR/TE-eligible starting
+    # slots (the 3-player WR_TE_FLEX group + the 1 dedicated TE slot), at
+    # least 2 of those 4 players must be TEs. CBS's own roster-legality
+    # checker does NOT enforce this (explicitly stated on the rules page),
+    # so this app must enforce it itself in any lineup-legality check.
+    min_te_across_te_eligible_slots: 2
+    te_eligible_slot_names: [WR_TE_FLEX, TE]
+
+scoring:
+  # All yardage/reception/points-allowed/yards-allowed tables below are
+  # TIERED SCORING: a player's total in that stat for a single game maps to
+  # a single points value from the matching tier (not a flat per-unit rate).
+  # Tiers are listed [min, max, points]. A value falling in the gap between
+  # two tiers, or below the lowest tier, scores 0 for that table. A value
+  # above the highest listed tier is out of the range CBS's UI showed us;
+  # src/scoring.py extrapolates using the trailing tier's point-per-unit
+  # slope (documented there as an estimate) rather than treating it as 0,
+  # since real single-game performances can exceed these tops.
+
+  passing:
+    td_base: 6
+    td_long_bonus: {min_yards: 26, max_yards: 100, bonus: 2}  # "PaTD of 26 to 100 Yds"
+    interception_thrown: -3
+    two_point_conversion: 2
+    yardage_tiers:
+      - [150, 174, 2]
+      - [175, 199, 4]
+      - [200, 224, 6]
+      - [225, 249, 8]
+      - [250, 274, 10]
+      - [275, 299, 12]
+      - [300, 324, 14]
+      - [325, 349, 16]
+      - [350, 374, 18]
+      - [375, 399, 20]
+      - [400, 424, 22]
+      - [425, 449, 24]
+      - [450, 474, 26]
+      - [475, 499, 28]
+      - [500, 524, 30]
+      - [525, 549, 32]
+      - [550, 574, 34]
+      - [575, 599, 36]
+      - [600, 624, 38]
+
+  rushing:
+    td_base: 6
+    td_long_bonus: {min_yards: 11, max_yards: 100, bonus: 2}  # "RuTD of 11 to 100 Yds"
+    two_point_conversion: 2
+    yardage_tiers:
+      - [20, 29, 2]
+      - [30, 49, 3]
+      - [50, 74, 5]
+      - [75, 99, 7]
+      - [100, 124, 9]
+      - [125, 149, 11]
+      - [150, 174, 13]
+      - [175, 199, 15]
+      - [200, 224, 17]
+      - [225, 249, 19]
+      - [250, 274, 21]
+      - [275, 299, 23]
+      - [300, 324, 25]
+      - [325, 349, 27]
+      - [350, 374, 29]
+      - [375, 399, 31]
+
+  receiving:
+    td_base: 7
+    td_long_bonus: {min_yards: 26, max_yards: 100, bonus: 2}  # "ReTD of 26 to 100 Yds"
+    two_point_conversion: 2
+    yardage_tiers:
+      - [20, 29, 2]
+      - [30, 49, 3]
+      - [50, 74, 4]
+      - [75, 99, 6]
+      - [100, 124, 8]
+      - [125, 149, 10]
+      - [150, 174, 12]
+      - [175, 199, 14]
+      - [200, 224, 16]
+      - [225, 249, 18]
+      - [250, 274, 20]
+      - [275, 299, 22]
+      - [300, 324, 24]
+      - [325, 349, 26]
+      - [350, 374, 28]
+      - [375, 399, 30]
+    reception_tiers:
+      - [2, 3, 1]
+      - [4, 5, 2]
+      - [6, 7, 3]
+      - [8, 9, 4]
+      - [10, 11, 5]
+      - [12, 13, 6]
+      - [14, 15, 7]
+      - [16, 17, 8]
+      - [18, 19, 9]
+      - [20, 21, 10]
+      - [22, 23, 11]
+
+  kicking:
+    fg_base: 3
+    fg_distance_bonus_tiers:
+      - [40, 49, 1]
+      - [50, 59, 2]
+      - [60, 100, 3]
+    extra_point: 1
+    missed_extra_point: -1
+
+  fumbles:
+    fumble_lost: -1  # "Including ST plays"
+    offensive_fumble_recovery_td: 6  # OFRTD
+    fumble_recovery_two_point: 2     # Fum2PK / Fum2PT
+
+  individual_special_teams:
+    # Individual (non-DST) return TDs — rare, but a WR/RB/etc. can score these
+    kick_return_td: 6
+    punt_return_td: 6
+
+  defense_special_teams:
+    sack: 1
+    interception: 2
+    fumble_recovery: 2  # DFR
+    defensive_st_td: 6  # DTD - total defensive/ST TD
+    blocked_field_goal: 1
+    blocked_punt: 1
+    blocked_extra_point: 1
+    safety: 2
+    st_two_point_return: 2
+    st_one_point_safety: 2
+    points_against_tiers:
+      # NOTE: verbatim from CBS — only 3 tiers exist on the page. See
+      # metadata.notes above. PA=1 and PA>=14 currently score 0 bonus.
+      - [0, 0, 15]
+      - [2, 6, 5]
+      - [7, 13, 2]
+    yards_allowed_tiers:
+      # NOTE: verbatim from CBS — only 3 tiers exist on the page. See
+      # metadata.notes above. Yards allowed >250 currently scores 0 bonus.
+      - [0, 100, 10]
+      - [101, 175, 5]
+      - [176, 250, 2]
+
+# NOT real league rules — tunable estimates this app uses to approximate
+# scoring from season-total projections that don't carry per-play distance
+# or per-game distribution (projection sources give season totals, not
+# which TDs were long or how production was distributed across games).
+# Tune here as better data becomes available; keep out of src/ so these
+# stay easy to find and adjust without touching code.
+estimation_assumptions:
+  games_per_season: 17  # NFL regular season length; used to convert season totals to per-game averages
+  long_td_share:
+    # assumed share of TDs of each type that clear the long-bonus yardage
+    # threshold (26yd for pass/rec, 11yd for rush)
+    passing: 0.30
+    rushing: 0.50
+    receiving: 0.30
+  fg_distance_distribution:
+    # assumed share of a kicker's made FGs landing in each bonus distance
+    # bucket; remainder assumed under 40 yds (no distance bonus)
+    "40_49": 0.28
+    "50_59": 0.10
+    "60_plus": 0.01
+  flex_position_splits:
+    # How league-wide demand for each multi-eligible starting slot is
+    # assumed to split across positions, for the value-over-replacement
+    # model in src/projections.py. Real draft behavior will vary; this is
+    # a starting assumption, not a prediction. Must sum to 1.0 per slot.
+    WR_TE_FLEX:
+      WR: 0.75
+      TE: 0.25
+    FLEX:
+      RB: 0.40
+      WR: 0.40
+      TE: 0.15
+      K: 0.05
+    SUPERFLEX:
+      # Weighted toward QB: this league's passing yardage/TD bonuses are
+      # rich (up to 38 pts for 600+ pass yards, TD bonus for 26+ yd
+      # scores), which typically makes QB the highest-value superflex fill
+      # even before accounting for QB scarcity relative to demand.
+      QB: 0.55
+      RB: 0.20
+      WR: 0.20
+      TE: 0.05
