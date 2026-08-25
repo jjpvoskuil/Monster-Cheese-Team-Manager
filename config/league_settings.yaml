@@ -37,6 +37,17 @@ draft:
   order_type: "Snake"
   date_time: "2026-08-30T14:30:00-04:00"  # 8/30/26 2:30pm ET
   rounds: 22
+  team_order:  # round-1 snake order, refreshed by scripts/fetch_draft_order.py
+    - "Mississippi Swamp Ass"
+    - "Aces High"
+    - "THE DEMONS"
+    - "Pimp Daddy"
+    - "Legion of Doom"
+    - "Mojo"
+    - "Salty Dogs"
+    - "Monster Cheese"
+    - "Buckhorns"
+    - "Ball Busters"
   seconds_per_pick: 70
   autopick_on_expire: true  # "draft robot" fills any team that lets the clock expire
 

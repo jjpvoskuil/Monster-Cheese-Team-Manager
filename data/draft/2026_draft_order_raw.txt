@@ -1,0 +1,283 @@
+Source: https://maniacfl.football.cbssports.com/draft/results/2026:Pre-season:MFL%20Draft%202026/
+Captured: 2026-08-25, via authenticated browser session (Claude in Chrome), by Claude (Cowork session)
+Status at capture time: NOT STARTED (this is draft ORDER, not results — PLAYER column was empty for every pick)
+
+---- raw page text (get_page_text) below, trimmed to the draft results table ----
+
+Draft Results
+
+ADD/DROP
+
+TRADES
+WAIVERS
+NOT STARTED
+DRAFTS
+2026 - MFL DRAFT 2026
+SORT BY
+ROUND
+ROUND 1
+PICK TEAM PLAYER
+1 Mississippi Swamp Ass
+2 Aces High
+3 THE DEMONS
+4 Pimp Daddy
+5 Legion of Doom
+6 Mojo
+7 Salty Dogs
+8 Monster Cheese
+9 Buckhorns
+10 Ball Busters
+ROUND 2
+PICK TEAM PLAYER
+1 Ball Busters
+2 Buckhorns
+3 Monster Cheese
+4 Salty Dogs
+5 Mojo
+6 Legion of Doom
+7 Pimp Daddy
+8 THE DEMONS
+9 Aces High
+10 Mississippi Swamp Ass
+ROUND 3
+PICK TEAM PLAYER
+1 Mississippi Swamp Ass
+2 Aces High
+3 THE DEMONS
+4 Pimp Daddy
+5 Legion of Doom
+6 Mojo
+7 Salty Dogs
+8 Monster Cheese
+9 Buckhorns
+10 Ball Busters
+ROUND 4
+PICK TEAM PLAYER
+1 Ball Busters
+2 Buckhorns
+3 Monster Cheese
+4 Salty Dogs
+5 Mojo
+6 Legion of Doom
+7 Pimp Daddy
+8 THE DEMONS
+9 Aces High
+10 Mississippi Swamp Ass
+ROUND 5
+PICK TEAM PLAYER
+1 Mississippi Swamp Ass
+2 Aces High
+3 THE DEMONS
+4 Pimp Daddy
+5 Legion of Doom
+6 Mojo
+7 Salty Dogs
+8 Monster Cheese
+9 Buckhorns
+10 Ball Busters
+ROUND 6
+PICK TEAM PLAYER
+1 Ball Busters
+2 Buckhorns
+3 Monster Cheese
+4 Salty Dogs
+5 Mojo
+6 Legion of Doom
+7 Pimp Daddy
+8 THE DEMONS
+9 Aces High
+10 Mississippi Swamp Ass
+ROUND 7
+PICK TEAM PLAYER
+1 Mississippi Swamp Ass
+2 Aces High
+3 THE DEMONS
+4 Pimp Daddy
+5 Legion of Doom
+6 Mojo
+7 Salty Dogs
+8 Monster Cheese
+9 Buckhorns
+10 Ball Busters
+ROUND 8
+PICK TEAM PLAYER
+1 Ball Busters
+2 Buckhorns
+3 Monster Cheese
+4 Salty Dogs
+5 Mojo
+6 Legion of Doom
+7 Pimp Daddy
+8 THE DEMONS
+9 Aces High
+10 Mississippi Swamp Ass
+ROUND 9
+PICK TEAM PLAYER
+1 Mississippi Swamp Ass
+2 Aces High
+3 THE DEMONS
+4 Pimp Daddy
+5 Legion of Doom
+6 Mojo
+7 Salty Dogs
+8 Monster Cheese
+9 Buckhorns
+10 Ball Busters
+ROUND 10
+PICK TEAM PLAYER
+1 Ball Busters
+2 Buckhorns
+3 Monster Cheese
+4 Salty Dogs
+5 Mojo
+6 Legion of Doom
+7 Pimp Daddy
+8 THE DEMONS
+9 Aces High
+10 Mississippi Swamp Ass
+ROUND 11
+PICK TEAM PLAYER
+1 Mississippi Swamp Ass
+2 Aces High
+3 THE DEMONS
+4 Pimp Daddy
+5 Legion of Doom
+6 Mojo
+7 Salty Dogs
+8 Monster Cheese
+9 Buckhorns
+10 Ball Busters
+ROUND 12
+PICK TEAM PLAYER
+1 Ball Busters
+2 Buckhorns
+3 Monster Cheese
+4 Salty Dogs
+5 Mojo
+6 Legion of Doom
+7 Pimp Daddy
+8 THE DEMONS
+9 Aces High
+10 Mississippi Swamp Ass
+ROUND 13
+PICK TEAM PLAYER
+1 Mississippi Swamp Ass
+2 Aces High
+3 THE DEMONS
+4 Pimp Daddy
+5 Legion of Doom
+6 Mojo
+7 Salty Dogs
+8 Monster Cheese
+9 Buckhorns
+10 Ball Busters
+ROUND 14
+PICK TEAM PLAYER
+1 Ball Busters
+2 Buckhorns
+3 Monster Cheese
+4 Salty Dogs
+5 Mojo
+6 Legion of Doom
+7 Pimp Daddy
+8 THE DEMONS
+9 Aces High
+10 Mississippi Swamp Ass
+ROUND 15
+PICK TEAM PLAYER
+1 Mississippi Swamp Ass
+2 Aces High
+3 THE DEMONS
+4 Pimp Daddy
+5 Legion of Doom
+6 Mojo
+7 Salty Dogs
+8 Monster Cheese
+9 Buckhorns
+10 Ball Busters
+ROUND 16
+PICK TEAM PLAYER
+1 Ball Busters
+2 Buckhorns
+3 Monster Cheese
+4 Salty Dogs
+5 Mojo
+6 Legion of Doom
+7 Pimp Daddy
+8 THE DEMONS
+9 Aces High
+10 Mississippi Swamp Ass
+ROUND 17
+PICK TEAM PLAYER
+1 Mississippi Swamp Ass
+2 Aces High
+3 THE DEMONS
+4 Pimp Daddy
+5 Legion of Doom
+6 Mojo
+7 Salty Dogs
+8 Monster Cheese
+9 Buckhorns
+10 Ball Busters
+ROUND 18
+PICK TEAM PLAYER
+1 Ball Busters
+2 Buckhorns
+3 Monster Cheese
+4 Salty Dogs
+5 Mojo
+6 Legion of Doom
+7 Pimp Daddy
+8 THE DEMONS
+9 Aces High
+10 Mississippi Swamp Ass
+ROUND 19
+PICK TEAM PLAYER
+1 Mississippi Swamp Ass
+2 Aces High
+3 THE DEMONS
+4 Pimp Daddy
+5 Legion of Doom
+6 Mojo
+7 Salty Dogs
+8 Monster Cheese
+9 Buckhorns
+10 Ball Busters
+ROUND 20
+PICK TEAM PLAYER
+1 Ball Busters
+2 Buckhorns
+3 Monster Cheese
+4 Salty Dogs
+5 Mojo
+6 Legion of Doom
+7 Pimp Daddy
+8 THE DEMONS
+9 Aces High
+10 Mississippi Swamp Ass
+ROUND 21
+PICK TEAM PLAYER
+1 Mississippi Swamp Ass
+2 Aces High
+3 THE DEMONS
+4 Pimp Daddy
+5 Legion of Doom
+6 Mojo
+7 Salty Dogs
+8 Monster Cheese
+9 Buckhorns
+10 Ball Busters
+ROUND 22
+PICK TEAM PLAYER
+1 Ball Busters
+2 Buckhorns
+3 Monster Cheese
+4 Salty Dogs
+5 Mojo
+6 Legion of Doom
+7 Pimp Daddy
+8 THE DEMONS
+9 Aces High
+10 Mississippi Swamp Ass
+* auto-pick
+** queued pick

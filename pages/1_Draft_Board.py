@@ -74,9 +74,16 @@ def load_players() -> tuple[pd.DataFrame, bool]:
 
 
 config = get_config()
-teams = [config["league"]["team_name"]] + [f"Team {i}" for i in range(1, config["league"]["teams"])]
-# Real team names aren't known until draft day rosters are set on CBS;
-# placeholder opponent names can be renamed in the sidebar below.
+real_team_order = config.get("draft", {}).get("team_order") or []
+using_real_team_order = bool(real_team_order) and config["league"]["team_name"] in real_team_order
+if using_real_team_order:
+    teams = real_team_order
+else:
+    # No real draft order captured yet for this season — run
+    # scripts/fetch_draft_order.py (see its docstring) once CBS has
+    # published the order. Placeholder opponent names can be renamed in
+    # the sidebar below in the meantime.
+    teams = [config["league"]["team_name"]] + [f"Team {i}" for i in range(1, config["league"]["teams"])]
 if "team_names" not in st.session_state:
     st.session_state.team_names = teams
 
@@ -157,6 +164,16 @@ if is_sample:
         "⚠️ Using **data/sample/** — this is last season's (2025) placeholder "
         "data, not real 2026 projections. Add real files to `data/projections/` "
         "before relying on these rankings for draft-day decisions.",
+        icon="⚠️",
+    )
+
+if not using_real_team_order:
+    st.warning(
+        "⚠️ No real draft order found in `config/league_settings.yaml` — using "
+        "placeholder team names (Team 1, Team 2, ...). Run "
+        "`scripts/fetch_draft_order.py` against a saved copy of the CBS "
+        "draft-results page once this season's order is published (see that "
+        "script's docstring), or rename opponents manually in the sidebar.",
         icon="⚠️",
     )
 

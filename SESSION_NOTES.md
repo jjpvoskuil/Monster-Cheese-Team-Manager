@@ -23,7 +23,11 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
 - Repo has the full Phase 1 scaffold: scoring engine, projections/VOR,
   draft state tracking, the Streamlit Draft Board UI, config, tests, and
   real 2026 CBS projection data (415 players).
-- `pytest` — 19/19 passing.
+- Real 2026 draft order is in `config/league_settings.yaml` under
+  `draft.team_order` (10 teams, confirmed standard snake, 22 rounds).
+  Monster Cheese drafts 8th overall in round 1. The Draft Board now uses
+  this instead of placeholder "Team 1/2/3" names.
+- `pytest` — 28/28 passing.
 - Deployed to Streamlit Cloud; user confirmed the Draft Board loads
   correctly as of 2026-08-25.
 - Known gaps (not blocking): FantasyPros/ESPN blending not done (CBS-only
@@ -31,7 +35,8 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   manual pick entry is the reliable path; defensive PA/yards-allowed
   tables (only 3 tiers each on CBS's page) not yet re-confirmed with the
   commissioner; no full UI click-through of the Draft Board has been done
-  beyond a direct pipeline check.
+  beyond a direct pipeline check; parsing an in-progress/completed draft
+  (PLAYER column populated) is not built — only the pre-draft order.
 
 ## Git push access — read this if `git push` 403s
 
@@ -53,6 +58,47 @@ carry their own Authorization header. Ask the user for a fresh PAT each
 time; don't assume an old one from the log below is still valid.
 
 ## Log
+
+### 2026-08-25 — Pulled real 2026 draft order, wired into the Draft Board
+User asked for the draft order/teams from
+`https://maniacfl.football.cbssports.com/draft/results/2026:Pre-season:MFL%20Draft%202026/`
+(needs a logged-in session; also blocked by robots.txt for plain fetch,
+so used Claude in Chrome against the user's real browser session).
+22 rounds x 10 teams, standard snake, draft not yet started. Round 1
+order: Mississippi Swamp Ass, Aces High, THE DEMONS, Pimp Daddy, Legion
+of Doom, Mojo, Salty Dogs, **Monster Cheese**, Buckhorns, Ball Busters.
+
+Built this as a reusable pipeline, not a one-off, since the user asked
+for something that "autopopulates" in future years:
+- `src/data_sources/draft_order.py` — `draft_results_url(year)` builds
+  the CBS URL from a template (verified it reproduces the exact known-
+  good 2026 URL); `parse_draft_order_text()` parses a saved page-text
+  capture into a structured order and validates it's a standard
+  alternating snake (flags it in `notes` if not, since
+  `src/draft_state.py`'s `DraftState.team_for_pick()` assumes one).
+- `scripts/fetch_draft_order.py` — CLI that runs the parser against a
+  saved text file and writes `data/draft/<year>_draft_order.json`, plus
+  `--update-config` to patch `draft.team_order` in
+  `config/league_settings.yaml` in place (targeted text substitution,
+  not a full YAML round-trip, so the file's comments survive).
+- Important limitation, not automatable away: CBS requires login and
+  blocks robots.txt, so there's no way to fetch this with plain
+  `requests` code. The yearly workflow is: get the URL from
+  `draft_results_url()`, visit it in a logged-in browser (Claude in
+  Chrome or the user's own), grab the page text, save it, then run the
+  script on that file. Full docstrings in both files above walk through
+  this.
+- `pages/1_Draft_Board.py` now reads `draft.team_order` from config
+  instead of placeholder team names, with a fallback + on-page warning
+  if it's ever missing (e.g. before a future year's order is captured).
+- Tests in `tests/test_draft_order.py` (9 new, 28/28 total passing)
+  cover the real 2026 capture, URL building, snake validation, and — the
+  part that actually matters — that the parsed order drives
+  `DraftState.team_for_pick()` to the correct team for every single pick
+  across all 22 rounds, not just round 1.
+- Raw captured page text saved at
+  `data/draft/2026_draft_order_raw.txt` for audit/reproducibility;
+  parsed output at `data/draft/2026_draft_order.json`.
 
 ### 2026-08-25 — Session notes moved into the repo
 Previously this log lived as a doc in the attached Claude Project
