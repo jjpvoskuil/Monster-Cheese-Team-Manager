@@ -27,16 +27,30 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   `draft.team_order` (10 teams, confirmed standard snake, 22 rounds).
   Monster Cheese drafts 8th overall in round 1. The Draft Board now uses
   this instead of placeholder "Team 1/2/3" names.
-- `pytest` — 28/28 passing.
+- Three projection sources now ingested and blendable: CBS (415 players,
+  all rostered), FFToday (264 players, ~50/skill-position + all 32 DSTs),
+  FantasyPros (60 players, top-10/position only — free-tier cap). New
+  `pages/2_Projections.py` page lets you view each source individually,
+  set per-source weights (0 to exclude, single non-zero to isolate one
+  source), and see the blended stat line — this is the same
+  `blend_projections`/`build_draft_board` pipeline the Draft Board uses,
+  just exposed directly. FFToday and FantasyPros each have a "Refresh from
+  web" button (live re-fetch); CBS does not (requires a logged-in
+  session — re-pull manually, see below).
+- `pytest` — 46/46 passing.
 - Deployed to Streamlit Cloud; user confirmed the Draft Board loads
   correctly as of 2026-08-25.
-- Known gaps (not blocking): FantasyPros/ESPN blending not done (CBS-only
-  for now); `src/data_sources/cbs.py` live draft sync is still a stub,
-  manual pick entry is the reliable path; defensive PA/yards-allowed
-  tables (only 3 tiers each on CBS's page) not yet re-confirmed with the
-  commissioner; no full UI click-through of the Draft Board has been done
-  beyond a direct pipeline check; parsing an in-progress/completed draft
-  (PLAYER column populated) is not built — only the pre-draft order.
+- Known gaps (not blocking): ESPN blending not done (would be a 4th
+  source — see notes below); `src/data_sources/cbs.py` live draft sync is
+  still a stub, manual pick entry is the reliable path; defensive
+  PA/yards-allowed tables (only 3 tiers each on CBS's page) not yet
+  re-confirmed with the commissioner; no full UI click-through of the
+  Draft Board or Projections page has been done beyond direct pipeline
+  checks and Streamlit's `AppTest` harness (see lesson below); parsing an
+  in-progress/completed draft (PLAYER column populated) is not built —
+  only the pre-draft order; FantasyPros' live-refresh-via-`requests` path
+  is UNVERIFIED (this dev sandbox has no general internet egress to test
+  against fantasypros.com — see entry below).
 
 ## Git push access — read this if `git push` 403s
 
@@ -58,6 +72,127 @@ carry their own Authorization header. Ask the user for a fresh PAT each
 time; don't assume an old one from the log below is still valid.
 
 ## Log
+
+### 2026-08-25 — Three-source projection ingestion (CBS + FFToday + FantasyPros), new Projections page, live refresh
+The app's rankings are only as good as the stat projections feeding the
+scoring engine, so the user asked for 3 free sources to average/weight
+together instead of relying on CBS alone.
+
+**Sources researched and their real limitations:**
+- **CBS** (already had this) — full player pool, but requires a logged-in
+  session and blocks robots.txt, so it can never be live-refreshed by the
+  deployed app. Re-pull is manual: visit the CBS projections URL in a
+  logged-in browser, capture the page, re-run the ingestion by hand (same
+  pattern as the draft-order pull below).
+- **FFToday** — no login required, full free depth (~50 players per skill
+  position, all 32 DSTs), and it's a plain server-rendered page — a bare
+  `requests.get()` works, no browser needed. This is the strongest 3rd
+  source. Live refresh confirmed to fail *only* because this dev sandbox
+  has no general internet egress (proxy 403, not a fftoday.com error) —
+  the refresh button's error handling was verified against this exact
+  failure via Streamlit's `AppTest` harness, and it surfaces cleanly
+  instead of crashing the page. Should work once deployed somewhere with
+  normal internet access (Streamlit Cloud).
+- **FantasyPros** — free/anonymous view hard-caps every position table at
+  the top 10 players; the print view and any deeper page redirect to a
+  sign-in wall (confirmed by navigating there directly). Went looking for
+  a 4th free full-pool source to replace it per the user's request:
+  Footballguys and FTN are both subscription-only for projections,
+  NFL.com's own fantasy-projections tool is defunct (redirects to a dead
+  ESPN-merged page — a `WebFetch` hallucination initially reported this
+  page as working with fake data, see lesson below), and ESPN's Mike Clay
+  projections are only published as a PDF/article, not a
+  scrapeable table — not built this session, flagged as a future
+  candidate if someone wants to hand-transcribe it. Decision: kept
+  FantasyPros as a partial/supplementary source (top-10 coverage is
+  exactly where 3-source agreement matters most for early picks) rather
+  than blocking on a 4th source that doesn't cleanly exist for free.
+
+**Lesson (important, cost real time this session): don't trust `WebFetch`
+on JavaScript-rendered pages.** It silently fabricated confident,
+precisely-formatted, entirely wrong data twice — once for FantasyPros'
+QB page (returned FFToday's real numbers relabeled as FantasyPros), once
+for the defunct NFL.com projections page (invented a fake "1-25 of 1036
+results" table). Neither errored out; both looked plausible. Caught by
+cross-referencing against direct browser DOM extraction. Going forward:
+use Claude in Chrome (`navigate` + `javascript_tool` DOM extraction, or
+`get_page_text` for server-rendered pages) for any site where WebFetch's
+output can't be independently verified, never WebFetch alone.
+
+**Built:**
+- `src/data_sources/team_names.py` — `canonical_dst_name()`. CBS names
+  DSTs by short city ("Houston", "L.A. Rams"); FFToday and FantasyPros
+  both use full "City Nickname" ("Houston Texans"). Without normalizing,
+  `blend_projections()`'s join on `name_key` would silently treat the same
+  DST as unrelated rows across sources. Maps all 32 teams' full names to
+  CBS's short form; unknown names pass through unchanged rather than
+  raising, so a future team rename doesn't crash ingestion.
+- `src/data_sources/fftoday.py` — `parse_position_text()` (parses either a
+  live fetch's extracted text or a saved `get_page_text` capture, same
+  format) and `fetch_position()`/`fetch_all()` (live HTTP fetch via
+  `requests` + BeautifulSoup text extraction). Handles the DST unit
+  mismatch: FFToday's `PA` is a season total (divided by 17 games to match
+  CBS's per-game convention) while its `PaYd/G`/`RuYd/G` are already
+  per-game (summed, not divided).
+- `src/data_sources/fantasypros.py` — `parse_position_rows()` (parses the
+  row-array table data captured via `javascript_tool` DOM extraction) and
+  `fetch_position()`/`fetch_all()` (attempted live fetch via `requests` +
+  `pandas.read_html`, **UNVERIFIED** — no XHR/JSON API was found via
+  `read_network_requests`, suggesting but not proving the table is
+  server-rendered; this sandbox can't test outbound requests to
+  fantasypros.com at all, so this path needs real-world confirmation once
+  deployed). Same DST season-total→per-game conversion as FFToday (`PA`
+  and `YDS AGN` both divided by 17).
+- `pages/2_Projections.py` — new page. Per-source weight sliders (0 to
+  exclude a source, any single non-zero weight to view one source alone),
+  a player-lookup showing each source's raw line side-by-side plus the
+  blended result, a full sortable/filterable blended board, and a
+  "Refresh from web" button per live-capable source (FFToday,
+  FantasyPros) that re-fetches, overwrites that source's CSV, and clears
+  the Streamlit cache so the new data shows immediately. CBS has no
+  refresh button — a caption explains why.
+- `scripts/fetch_fftoday.py` / `scripts/fetch_fantasypros.py` — CLI
+  wrappers (`--live` or `--from-capture <path>`) for manual/future refresh
+  runs outside the Streamlit UI, mirroring `scripts/fetch_draft_order.py`.
+- Seed data written: `data/projections/fftoday_2026.csv` (264 rows),
+  `data/projections/fantasypros_2026.csv` (60 rows), both auto-picked-up
+  by the existing `_data_files()`/`load_many()` pipeline. Raw captures
+  kept for audit at `data/projections/raw/`.
+
+**Bug caught and fixed during verification:** FFToday's parser extracted
+the team-code token (e.g. "BUF") to validate row structure but never
+actually stored it in the output row — every skill-position player from
+FFToday had a blank `nfl_team`. Caught by running the new Projections page
+through `streamlit.testing.v1.AppTest` (see lesson below) and noticing
+Josh Allen's FFToday row showed `NaN` for team. Fixed, added a regression
+test (`test_nfl_team_populated_for_all_skill_positions`), rebuilt the CSV.
+
+**Lesson: `streamlit.testing.v1.AppTest` catches real bugs an HTTP-200
+check can't, without needing a browser.** It runs a page's actual script
+in-process and lets you inspect rendered widgets/dataframes/exceptions
+directly — this is how the missing-`nfl_team` bug above was caught, and
+how the refresh button's error path (network failure -> `st.error`, not a
+crash) was verified. Use this instead of (or in addition to) `curl`-ing a
+running `streamlit run` process, which only proves the initial HTML shell
+loads — Streamlit runs each page's script over a websocket after that,
+so `curl` never actually executes the page code.
+
+**Verified end-to-end:** all 3 sources load and blend correctly
+(`load_many` → `blend_projections` → `score_and_rank`); spot-checked Josh
+Allen, Jahmyr Gibbs, Trey McBride, Brandon Aubrey, and the Houston DST
+join and blend correctly across all 3 sources with the exact values from
+each raw capture; 46/46 tests passing (17 new: `test_fftoday.py`,
+`test_fantasypros.py`, `test_team_names.py`); both `pages/1_Draft_Board.py`
+and `pages/2_Projections.py` run clean under `AppTest` with no exceptions,
+including exercising the refresh button's failure path.
+
+**Not verified (can't be, from this sandbox):** whether FantasyPros'
+live-refresh via `requests`/`pandas.read_html` actually works — needs
+confirmation from a real deployment with internet access. If it turns out
+the page needs JS rendering after all, `fetch_position()` raises a clear
+`ValueError` rather than silently returning wrong data — fall back to a
+fresh Claude-in-Chrome capture + `scripts/fetch_fantasypros.py
+--from-capture` in that case.
 
 ### 2026-08-25 — Pulled real 2026 draft order, wired into the Draft Board
 User asked for the draft order/teams from

@@ -1,0 +1,291 @@
+Source: https://www.fftoday.com/rankings/playerproj.php?PosID={10=QB,20=RB,30=WR,40=TE,80=K,99=DEF}&LeagueID=
+Captured: 2026-08-25, via Claude in Chrome get_page_text (server-rendered HTML, no login needed for base stats)
+Note: full free-tier lists (no paywall cutoff) -- QB/RB/WR/TE each ~50 players, K ~31, DEF all 32 teams.
+
+==== QB (PosID=10) ====
+Chg Player Tm Bye Cmp Att Yds TD INT Att Yds TD FPts
+
+Josh Allen BUF 7 326 479 3,787 26 9 113 567 12 384.2
+Drake Maye NE 11 348 505 4,140 29 9 96 433 3 342.9
+Lamar Jackson BAL 13 304 475 3,704 26 8 127 646 3 334.8
+Jayden Daniels WAS 7 327 496 3,770 23 11 119 642 4 331.0
+Jalen Hurts PHI 10 321 494 3,556 23 7 111 456 8 327.8
+Bo Nix DEN 10 338 527 3,850 27 12 82 362 4 322.2
+Joe Burrow CIN 6 390 581 4,128 33 10 61 182 1 321.3
+Brock Purdy SF 8 377 555 4,159 26 13 65 286 3 317.0
+Caleb Williams CHI 10 333 538 3,871 27 8 88 412 2 316.0
+Dak Prescott DAL 14 381 577 4,329 30 10 45 161 1 315.3
+Jaxson Dart NYG 8 331 517 3,570 20 9 103 564 6 315.2
+Justin Herbert LAC 7 352 534 3,952 25 11 74 427 2 312.8
+Trevor Lawrence JAC 7 335 541 3,948 25 11 67 301 4 312.0
+Jared Goff DET 6 383 572 4,459 32 10 23 50 0 311.4
+Tyler Shough NO 8 362 549 3,951 22 10 94 377 4 307.7
+Patrick Mahomes KC 5 350 547 3,831 26 11 57 315 3 306.7
+Kyler Murray MIN 6 346 525 3,672 23 12 85 494 3 306.3
+Matthew Stafford LAR 11 359 544 4,242 33 9 17 22 0 303.9
+Baker Mayfield TB 10 353 543 3,750 24 12 60 366 1 288.6
+Malik Willis MIA 6 319 515 3,450 15 10 124 657 4 287.7
+Sam Darnold SEA 11 337 510 4,130 26 13 40 125 1 287.7
+Jordan Love GB 11 343 528 3,856 26 10 43 185 1 282.7
+Daniel Jones IND 13 329 492 3,688 21 12 73 278 3 277.3
+Bryce Young CAR 5 336 524 3,355 22 10 55 229 3 263.1
+C.J. Stroud HOU 8 339 529 3,759 21 10 51 218 1 262.2
+Geno Smith NYJ 13 351 540 3,619 21 14 56 157 1 250.5
+Cam Ward TEN 9 349 572 3,662 19 11 49 207 1 249.2
+Aaron Rodgers PIT 9 354 537 3,649 23 8 29 80 0 246.0
+Jacoby Brissett ARI 14 338 521 3,645 19 10 43 178 1 245.6
+Fernando Mendoza LV 13 264 426 2,979 15 10 48 217 1 206.9
+Tua Tagovailoa ATL 11 243 369 2,544 13 7 18 42 0 158.0
+Deshaun Watson CLE 11 184 288 2,045 10 7 47 189 1 146.7
+Shedeur Sanders CLE 11 156 268 1,798 10 8 32 182 1 136.1
+Michael Penix Jr. ATL 11 136 219 1,555 8 4 15 46 0 98.8
+Kirk Cousins LV 13 75 121 844 6 5 3 7 0 58.5
+Carson Beck ARI 14 40 63 449 3 2 7 24 0 32.4
+Jameis Winston NYG 8 20 35 277 2 2 2 8 0 19.9
+Riley Leonard IND 13 23 37 259 2 1 2 9 0 19.3
+Quinn Ewers MIA 6 21 32 226 2 1 4 12 0 18.2
+J.J. McCarthy MIN 6 24 41 286 1 1 4 18 0 17.2
+Justin Fields KC 5 22 35 237 1 1 4 19 0 15.4
+Tyrod Taylor GB 11 18 30 211 1 1 2 9 0 13.3
+Joe Milton III DAL 14 15 24 177 1 1 4 22 0 13.3
+Davis Mills HOU 8 20 32 221 1 1 2 4 0 13.2
+Tyson Bagent CHI 10 17 26 195 1 0 2 6 0 12.4
+Will Howard PIT 9 16 26 186 1 1 2 7 0 12.1
+Kenny Pickett CAR 5 16 25 185 1 1 3 6 0 12.0
+Cade Klubnik NYJ 13 16 25 177 1 1 2 9 0 12.0
+Kyle Allen BUF 7 16 26 181 1 1 2 6 0 11.8
+Mac Jones SF 8 15 22 168 1 0 2 5 0 11.2
+
+==== RB (PosID=20) ====
+Chg Player Tm Bye Att Yds TD Rec Yds TD FPts
+
+Jahmyr Gibbs DET 6 279 1,422 12 72 572 4 331.4
+Bijan Robinson ATL 11 280 1,402 9 84 707 3 324.9
+Christian McCaffrey SF 8 279 1,144 9 82 715 4 304.9
+Jonathan Taylor IND 13 299 1,436 12 36 289 1 268.5
+James Cook BUF 7 275 1,377 11 32 275 2 259.2
+Derrick Henry BAL 13 321 1,572 12 16 144 0 251.6
+Omarion Hampton LAC 7 257 1,129 9 52 366 2 241.5
+Saquon Barkley PHI 10 281 1,236 9 42 307 2 241.3
+De'Von Achane MIA 6 228 1,161 6 56 411 3 239.2
+Chase Brown CIN 6 242 1,066 7 55 377 4 237.8
+Kenneth Walker KC 5 262 1,177 9 42 322 2 236.9
+Ashton Jeanty LV 13 271 1,137 7 56 406 2 236.3
+Jeremiyah Love ARI 14 246 1,082 7 56 417 2 231.9
+Kyren Williams LAR 11 249 1,171 10 34 245 2 230.6
+Josh Jacobs GB 11 282 1,155 10 35 277 1 226.7
+Breece Hall NYJ 13 258 1,162 5 47 403 2 222.0
+Javonte Williams DAL 14 245 1,126 10 33 217 1 216.8
+Cam Skattebo NYG 8 262 1,048 8 44 346 1 215.4
+Bucky Irving TB 10 261 1,045 7 39 315 2 209.5
+Bhayshul Tuten JAC 7 257 1,055 7 38 288 2 207.3
+Travis Etienne NO 8 246 1,082 5 44 327 2 204.9
+D'Andre Swift CHI 10 233 1,049 7 39 316 1 204.0
+Quinshon Judkins CLE 11 275 1,098 7 30 205 1 193.3
+David Montgomery HOU 8 217 935 7 34 244 1 182.9
+Tony Pollard TEN 9 242 1,065 5 32 227 1 181.2
+Jaylen Warren PIT 9 190 854 5 41 329 2 180.8
+TreVeyon Henderson NE 11 182 856 7 34 257 1 176.3
+Rhamondre Stevenson NE 11 163 735 7 40 302 1 171.7
+Jadarian Price SEA 11 195 837 7 31 226 1 169.8
+J.K. Dobbins DEN 10 206 988 7 16 104 1 165.2
+Chuba Hubbard CAR 5 192 767 6 34 258 1 161.5
+Rico Dowdle PIT 9 186 801 5 30 203 1 151.4
+Rachaad White WAS 7 131 539 5 42 310 2 147.9
+Jacory Croskey-Merritt WAS 7 179 788 7 12 84 0 135.2
+Jonathon Brooks CAR 5 158 646 4 32 229 1 133.5
+Aaron Jones MIN 6 143 602 3 37 268 1 129.5
+RJ Harvey DEN 10 96 373 3 44 326 3 127.9
+Kyle Monangai CHI 10 176 775 4 20 162 0 127.7
+Blake Corum LAR 11 159 745 6 13 89 0 125.9
+Jordan Mason MIN 6 189 831 5 12 62 0 125.3
+Kenneth Gainwell TB 10 100 439 3 37 275 2 119.9
+Alvin Kamara NO 8 113 428 2 34 235 2 107.3
+Woody Marks HOU 8 135 527 2 27 214 1 105.6
+Zach Charbonnet SEA 11 128 537 3 19 135 1 100.7
+Tyjae Spears TEN 9 86 344 2 38 255 1 96.9
+Dylan Sampson CLE 11 61 245 1 40 316 2 94.1
+Chris Rodriguez Jr. JAC 7 129 556 4 10 76 0 92.2
+Tyrone Tracy Jr. NYG 8 90 380 2 28 215 1 91.5
+Isiah Pacheco DET 6 122 489 3 20 139 0 90.8
+Ty Johnson BUF 7 52 212 1 29 270 2 80.7
+
+==== WR (PosID=30) ====
+Chg Player Tm Bye Rec Yds TD Att Yds TD FPts
+
+Puka Nacua LAR 11 116 1,561 9 10 72 1 281.3
+Ja'Marr Chase CIN 6 116 1,474 11 2 11 0 272.5
+Amon-Ra St. Brown DET 6 119 1,377 10 4 14 0 258.6
+Jaxon Smith-Njigba SEA 11 105 1,521 8 5 30 0 255.6
+Drake London ATL 11 99 1,312 7 0 0 0 222.7
+Justin Jefferson MIN 6 95 1,288 7 0 0 0 218.3
+CeeDee Lamb DAL 14 87 1,177 8 0 0 0 209.2
+Chris Olave NO 8 97 1,147 7 0 0 0 205.2
+Rashee Rice KC 5 96 1,117 7 0 0 0 201.7
+A.J. Brown NE 11 86 1,155 7 0 0 0 200.5
+Nico Collins HOU 8 79 1,186 7 0 0 0 200.1
+Garrett Wilson NYJ 13 100 1,155 5 0 0 0 195.5
+Zay Flowers BAL 13 79 1,117 6 10 59 0 193.1
+Malik Nabers NYG 8 81 1,077 7 0 0 0 190.2
+DeVonta Smith PHI 10 83 1,122 6 0 0 0 189.7
+George Pickens DAL 14 74 1,102 7 0 0 0 189.2
+Jameson Williams DET 6 66 1,088 7 8 42 0 188.0
+Davante Adams LAR 11 70 911 10 0 0 0 186.1
+Emeka Egbuka TB 10 78 1,046 7 0 0 0 185.6
+Tetairoa McMillan CAR 5 78 1,081 6 0 0 0 183.1
+Christian Watson GB 11 65 982 7 0 0 0 172.7
+Mike Evans SF 8 69 955 7 0 0 0 172.0
+D.J. Moore BUF 7 71 955 6 8 45 0 171.5
+Tee Higgins CIN 6 65 906 8 0 0 0 171.1
+Jaylen Waddle DEN 10 72 987 6 0 0 0 170.7
+Ladd McConkey LAC 7 76 956 6 0 0 0 169.6
+Rome Odunze CHI 10 65 945 7 0 0 0 169.0
+Luther Burden III CHI 10 70 926 6 6 33 0 166.9
+DK Metcalf PIT 9 67 944 6 0 0 0 163.9
+Terry McLaurin WAS 7 65 937 6 0 0 0 162.2
+Marvin Harrison Jr. ARI 14 64 933 6 0 0 0 161.3
+Courtland Sutton DEN 10 63 848 7 0 0 0 158.3
+Michael Pittman Jr. PIT 9 76 877 5 0 0 0 155.7
+Alec Pierce IND 13 60 917 5 0 0 0 151.7
+Jayden Reed GB 11 66 815 5 11 68 0 151.3
+Carnell Tate TEN 9 65 867 5 0 0 0 149.2
+Jakobi Meyers JAC 7 67 782 5 3 19 0 143.6
+Parker Washington JAC 7 62 814 5 0 0 0 142.4
+Chris Godwin TB 10 68 779 5 0 0 0 141.9
+Xavier Worthy KC 5 57 735 4 12 76 1 139.6
+Brian Thomas Jr. JAC 7 56 812 5 0 0 0 139.2
+Michael Wilson ARI 14 66 822 4 0 0 0 139.2
+Stefon Diggs WAS 7 62 766 5 0 0 0 137.6
+Khalil Shakir BUF 7 72 766 4 0 0 0 136.6
+Jordan Addison MIN 6 55 769 5 3 19 0 136.3
+Wan'Dale Robinson TEN 9 77 796 3 0 0 0 136.1
+Romeo Doubs NE 11 58 759 5 0 0 0 134.9
+Quentin Johnston LAC 7 50 707 6 0 0 0 131.7
+Josh Downs IND 13 68 707 4 0 0 0 128.7
+Matthew Golden GB 11 54 702 5 0 0 0 127.2
+
+==== TE (PosID=40) ====
+Chg Player Tm Bye Rec Yds TD FPts
+
+Brock Bowers LV 13 103 1,088 7 202.3
+Trey McBride ARI 14 104 1,049 7 198.9
+Colston Loveland CHI 10 73 848 6 157.3
+Tyler Warren IND 13 78 836 5 152.6
+Harold Fannin Jr. CLE 11 77 801 5 148.6
+Kyle Pitts ATL 11 76 856 4 147.6
+Travis Kelce KC 5 73 771 4 137.6
+Sam LaPorta DET 6 61 745 5 135.0
+Mark Andrews BAL 13 61 645 6 131.0
+Tucker Kraft GB 11 57 724 5 130.9
+Dallas Goedert PHI 10 58 625 6 127.5
+Jake Ferguson DAL 14 71 585 5 124.0
+George Kittle SF 8 57 655 5 124.0
+Dalton Kincaid BUF 7 52 645 5 120.5
+Hunter Henry NE 11 55 624 5 119.9
+Isaiah Likely NYG 8 56 656 4 117.6
+Dalton Schultz HOU 8 67 646 3 116.1
+Juwan Johnson NO 8 60 676 3 115.6
+Pat Freiermuth PIT 9 53 566 5 113.1
+Greg Dulcich MIA 6 54 606 4 111.6
+Brenton Strange JAC 7 51 571 4 106.6
+T.J. Hockenson MIN 6 59 568 3 104.3
+AJ Barner SEA 11 54 504 4 101.4
+Terrance Ferguson LAR 11 40 470 5 97.0
+Cade Otton TB 10 53 525 3 97.0
+Chigoziem Okonkwo WAS 7 54 519 3 96.9
+Evan Engram DEN 10 57 484 3 94.9
+Mike Gesicki CIN 6 43 450 4 90.5
+Gunnar Helm TEN 9 45 455 3 86.0
+Mason Taylor NYJ 13 50 481 2 85.1
+Michael Mayer LV 13 43 420 3 81.5
+David Njoku LAC 7 45 369 3 77.4
+Kenyon Sadiq NYJ 13 39 455 2 77.0
+Oronde Gadsden LAC 7 34 414 3 76.4
+Darren Waller CAR 5 35 337 4 75.2
+Cole Kmet CHI 10 35 374 3 72.9
+Colby Parkinson LAR 11 33 321 3 66.6
+Dawson Knox BUF 7 26 329 3 63.9
+Darnell Washington PIT 9 26 299 2 54.9
+Theo Johnson NYG 8 24 282 2 52.2
+Jake Tonges SF 8 25 265 2 51.0
+Noah Fant NO 8 27 255 2 51.0
+Austin Hooper ATL 11 22 245 2 47.5
+Luke Musgrave GB 11 28 269 1 46.9
+Noah Gray KC 5 22 234 2 46.4
+Tyler Higbee LAR 11 20 236 2 45.6
+Elijah Arroyo SEA 11 23 216 2 45.1
+Josh Oliver MIN 6 17 188 2 39.3
+Tommy Tremble CAR 5 22 215 1 38.5
+Charlie Kolar LAC 7 21 209 1 37.4
+
+==== K (PosID=80) ====
+Chg Player Tm Bye FGM FGA FG% EPM EPA FPts
+
+Brandon Aubrey DAL 14 35 40 87.5% 45 46 150.0
+Cameron Dicker LAC 7 35 39 89.7% 41 41 146.0
+Ka'imi Fairbairn HOU 8 34 38 89.5% 36 37 138.0
+Jason Myers SEA 11 32 37 86.5% 42 43 138.0
+Wil Lutz DEN 10 29 32 90.6% 46 46 133.0
+Chase McLaughlin TB 10 31 35 88.6% 38 39 131.0
+Harrison Butker KC 5 30 35 85.7% 40 42 130.0
+Eddy Pineiro SF 8 30 34 88.2% 40 42 130.0
+Tyler Bass BUF 7 25 30 83.3% 51 54 126.0
+Tyler Loop BAL 13 27 31 87.1% 44 46 125.0
+Jake Bates DET 6 26 31 83.9% 47 49 125.0
+Cam Little JAC 7 28 31 90.3% 41 42 125.0
+Will Reichard MIN 6 29 32 90.6% 38 39 125.0
+Andres Borregales NE 11 26 31 83.9% 46 48 124.0
+Cairo Santos CHI 10 28 32 87.5% 40 41 124.0
+Trey Smack GB 11 28 33 84.8% 40 42 124.0
+Blake Grupe IND 13 28 33 84.8% 39 41 123.0
+Evan McPherson CIN 6 26 30 86.7% 43 45 121.0
+Chris Boswell PIT 9 28 33 84.8% 36 37 120.0
+Harrison Mevis LAR 11 23 25 92.0% 51 53 120.0
+Charlie Smyth NO 8 28 33 84.8% 36 38 120.0
+Jake Elliott PHI 10 25 30 83.3% 45 46 120.0
+Ben Sauls NYG 8 26 30 86.7% 41 42 119.0
+Chad Ryland ARI 14 26 32 81.3% 34 35 112.0
+Drew Stevens WAS 7 24 30 80.0% 40 43 112.0
+Riley Patterson MIA 6 27 31 87.1% 30 32 111.0
+Ryan Fitzgerald CAR 5 25 29 86.2% 35 37 110.0
+Nick Folk ATL 11 24 26 92.3% 37 37 109.0
+Matt Gay LV 13 26 32 81.3% 31 32 109.0
+Joey Slye TEN 9 26 32 81.3% 28 30 106.0
+Cade York NYJ 13 24 30 80.0% 30 33 102.0
+Andre Szmyt CLE 11 23 26 88.5% 32 33 101.0
+
+==== DEF (PosID=99) ====
+Chg Team Bye Sack FR INT DefTD PA PaYd/G RuYd/G S KickTD FPts
+
+Houston Texans 8 48 10 16 3 325 220.9 107.5 1 1 126.0
+Denver Broncos 10 61 8 12 2 326 230.5 109.4 1 1 121.0
+Pittsburgh Steelers 9 44 12 16 2 359 259.1 118.0 0 1 118.0
+Minnesota Vikings 6 48 11 14 2 346 229.2 117.9 0 1 116.0
+Seattle Seahawks 11 46 6 14 3 313 229.1 111.0 1 1 112.0
+Los Angeles Chargers 7 47 9 17 1 350 216.6 116.2 0 1 111.0
+Buffalo Bills 7 40 11 17 2 367 213.8 134.1 1 0 110.0
+Jacksonville Jaguars 7 37 10 16 2 388 264.8 117.3 0 1 107.0
+Los Angeles Rams 11 44 8 13 2 368 242.9 122.3 1 1 106.0
+Philadelphia Eagles 10 42 10 12 2 317 218.9 122.3 0 1 104.0
+Detroit Lions 6 45 8 14 1 388 259.8 119.1 1 1 103.0
+New England Patriots 11 37 9 9 2 355 221.8 121.4 1 2 99.0
+Baltimore Ravens 13 45 8 13 1 374 256.7 106.1 0 1 99.0
+Cincinnati Bengals 6 38 10 14 1 429 249.4 134.6 0 1 98.0
+Cleveland Browns 11 45 8 12 2 412 215.9 124.1 0 0 97.0
+Green Bay Packers 11 41 10 11 1 356 223.1 123.9 0 1 95.0
+New Orleans Saints 8 42 8 12 2 390 228.6 132.5 0 0 94.0
+Chicago Bears 10 36 9 14 1 399 246.6 143.4 0 1 94.0
+Tampa Bay Buccaneers 10 41 11 11 1 396 263.8 104.8 1 0 93.0
+Indianapolis Colts 13 38 9 15 1 415 260.4 124.9 0 0 92.0
+New York Giants 8 41 9 10 1 390 238.4 135.4 0 1 91.0
+Dallas Cowboys 14 43 7 11 1 430 252.5 136.2 0 1 91.0
+Atlanta Falcons 11 40 7 11 2 412 236.9 131.9 1 0 90.0
+Washington Commanders 7 42 8 7 1 422 249.4 145.0 1 1 86.0
+Tennessee Titans 9 40 7 8 1 466 256.6 128.2 1 1 84.0
+Kansas City Chiefs 5 41 7 11 1 327 243.4 113.7 0 0 83.0
+Arizona Cardinals 14 36 8 11 1 427 242.5 135.9 1 0 82.0
+San Francisco 49ers 8 37 7 11 1 395 242.8 122.3 0 0 79.0
+Carolina Panthers 5 35 7 11 1 405 230.6 140.3 0 0 77.0
+New York Jets 13 37 7 8 0 435 246.6 137.9 1 1 75.0
+Las Vegas Raiders 13 37 6 9 1 431 229.1 124.7 1 0 75.0
+Miami Dolphins 6 37 8 9 0 417 240.0 136.1 0 0 71.0
