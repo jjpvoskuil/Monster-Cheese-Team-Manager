@@ -92,7 +92,25 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   see its docstring. Still needs: confirmation of the DST/K live-room
   cell format (not observed yet in a mock draft), and an actual
   draft-day dry run.
-- `pytest` — 114/114 passing.
+- **Suggested pick (2026-08-25)**: `src/pick_suggestion.py` powers a new
+  "🎯 Suggested pick" panel on the Draft Board, right above the player
+  grid. Recommends a POSITION (not a single player) by combining three
+  normalized 0-1 signals into a weighted composite: best-available VOR at
+  that position (45%), how much MY roster still needs it — reusing
+  `src/roster_needs.py`'s slot-filling logic against my own picks instead
+  of an opponent's (30%), and run-risk scarcity from
+  `src/draft_tendencies.py`'s historical predictions vs. tier-1 players
+  remaining (25%, gracefully drops to 0 if `draft_history.csv` is
+  missing). Shows the recommendation + a "why" breakdown table for every
+  position, then the top 3 available players at either the recommended
+  position or any position you override to via a dropdown — with a
+  "Draft this player" button per player (enabled only when it's actually
+  your turn; the panel itself is always visible and previews your next
+  turn's recommendation even while others are picking). The tier-gap
+  override control moved up the page (now sits right before this panel,
+  since both it and the player grid below now share one `available_tiered`
+  computation). 14 new tests in `tests/test_pick_suggestion.py`.
+- `pytest` — 128/128 passing.
 - Deployed to Streamlit Cloud; user confirmed the Draft Board loads
   correctly as of 2026-08-25.
 - Known gaps (not blocking): ESPN blending not done (would be a 4th
@@ -131,6 +149,82 @@ carry their own Authorization header. Ask the user for a fresh PAT each
 time; don't assume an old one from the log below is still valid.
 
 ## Log
+
+### 2026-08-25 — Suggested pick panel: recommend a position + top 3 players, live during the draft
+League manager's ask, right after the live-sync work above landed: "add a
+suggest pick area that updates as picks progress through the draft...
+look at draft tendencies, my roster spots filled, roster spots filled for
+a starting lineup, available players in tiers and the projected points...
+suggest the next position to pick and the top 3 players available."
+Also wanted to draft straight from that shortlist or off the full grid,
+and to override the suggested position and see that position's own best
+players/value instead.
+
+**Design decision: recommend a POSITION first, then shortlist players for
+it** — matches the request literally, and keeps the "why" explainable
+(three named signals per position) rather than a single opaque per-player
+score. New `src/pick_suggestion.py`:
+- **Value** — best available player's VOR at each position. VOR is
+  already cross-position comparable by construction (see
+  `src/projections.py`), so "best available VOR per position" is a fair
+  apples-to-apples signal with no extra normalization needed at the raw
+  level.
+- **Need** — reuses `src/roster_needs.py`'s greedy slot-filling logic
+  (originally built to infer OPPONENTS' needs for the Draft Tendencies
+  page) against `draft_state.my_roster()` instead — no new roster-need
+  code, just a new caller (`my_position_need()`).
+- **Scarcity** — `src/draft_tendencies.py`'s `predict_position_counts()`
+  for the window between now and my next turn, divided by how many
+  tier-1 players are left at that position right now (tier comes straight
+  off whatever `compute_tiers()` output the Draft Board is already
+  showing, including the user's own tier-gap override — the suggestion
+  always matches what's on screen). New `picks_before_my_next_turn()`
+  helper: when it's my pick RIGHT NOW, the relevant horizon isn't "0
+  picks until my turn" (trivially true) — it's the round-trip to my
+  NEXT turn, since that's what determines whether a position survives if
+  I take something else now. When it's not my pick, this matches
+  `DraftState.picks_until_my_turn()`.
+
+Each raw signal is normalized 0-1 (divided by its own max across the
+positions being compared, so a demand-weight scale and a VOR-points scale
+and a picks-per-remaining-tier-1-player ratio don't fight for arbitrary
+dominance) then combined as **45% value + 30% need + 25% scarcity** —
+documented, tunable constants in the same style as this app's other
+heuristic knobs (superflex splits, tier max-spread-fraction). Verified
+with a synthetic test where value and need are tied between two
+positions and only scarcity differs — confirms scarcity alone can flip
+the recommendation, not just nudge a already-decided one
+(`test_suggest_position_scarcity_can_flip_the_recommendation`). Degrades
+cleanly with no `draft_history.csv` (scarcity contributes 0 to every
+position, ranking falls back to value+need) and reports `None` with a
+clear reason when the draft is complete or no players remain.
+
+`pages/1_Draft_Board.py`: new "🎯 Suggested pick" section, positioned
+above the player grid (the tier-gap-override control moved up the page
+to sit right before it, since both the suggestion engine and the grid
+below now share one `available_tiered` computation instead of computing
+it twice). Shows the recommendation with its reasoning sentence, an
+expander breaking down every position's value/need/scarcity numbers, a
+position-override dropdown (any position, not just the recommendation),
+and the top-3-players-for-that-position as cards with a "Draft this
+player" button each. Buttons log straight to `draft_state` via the
+existing `log_pick_on_the_clock()` and are disabled unless it's actually
+your turn — but the recommendation text itself stays visible and updates
+even when it's not your turn yet, previewing what it'll suggest once
+your turn comes back around (this is what "updates as picks progress"
+means in practice: every rerun re-reads the live `DraftState`, so a live
+-synced pick landing mid-draft changes the recommendation on the very
+next page refresh, no separate wiring needed).
+
+Verified via `AppTest` against the REAL 2026 player pool and the real
+league's snake order (not synthetic fixtures) in three states: not-my
+-turn (recommendation shown as a preview, all 3 draft buttons correctly
+disabled), my-turn (buttons enabled, clicking one correctly logged a real
+player — Jahmyr Gibbs — to `DraftState` and persisted it), and the
+position-override dropdown (switching to TE correctly relabeled the
+shown players and captioned that it was overriding the RB recommendation).
+14 new tests in `tests/test_pick_suggestion.py`; 128/128 total passing.
+All 4 Streamlit pages re-verified clean.
 
 ### 2026-08-25 — Live CBS draft sync built and verified against a real mock draft (Phase 1 of live-draft-day support)
 User's ask, after the tiering/tendencies work above: "when we are running

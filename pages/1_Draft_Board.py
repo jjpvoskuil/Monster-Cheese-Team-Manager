@@ -16,9 +16,11 @@ from datetime import datetime, timezone
 import pandas as pd
 import streamlit as st
 
+from src.data_sources.draft_history import load_draft_history
 from src.data_sources.manual_import import load_many
 from src.draft_state import DraftState
 from src.live_sync import read_sync_status
+from src.pick_suggestion import suggest_position, top_available_players
 from src.projections import build_draft_board, compute_tiers
 from src.scoring import load_config
 from src.tier_display import add_tier_divider_rows
@@ -34,6 +36,7 @@ REAL_DATA_DIR = os.path.join(ROOT, "data", "projections")
 SAMPLE_DATA_DIR = os.path.join(ROOT, "data", "sample")
 DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
 LIVE_SYNC_STATUS_FILE = os.path.join(ROOT, "data", "live_sync_status.json")
+DRAFT_HISTORY_CSV = os.path.join(ROOT, "data", "draft_history", "draft_history.csv")
 
 
 def _data_files(data_dir: str) -> list[str]:
@@ -78,6 +81,21 @@ def load_players() -> tuple[pd.DataFrame, bool]:
         df, _ = get_ranked_players(SAMPLE_DATA_DIR, mtimes)
         return df, True
     return pd.DataFrame(), False
+
+
+@st.cache_data
+def get_history(_mtime: float) -> pd.DataFrame:
+    return load_draft_history(DRAFT_HISTORY_CSV)
+
+
+def load_draft_history_df() -> pd.DataFrame:
+    """Historical draft-history CSV, for the suggested-pick page's
+    scarcity/run-risk signal. Not an error if it's missing — the
+    suggestion just falls back to value+need only (see
+    src/pick_suggestion.py's suggest_position() docstring)."""
+    if not os.path.exists(DRAFT_HISTORY_CSV):
+        return pd.DataFrame()
+    return get_history(os.path.getmtime(DRAFT_HISTORY_CSV))
 
 
 config = get_config()
@@ -215,15 +233,6 @@ if not using_real_team_order:
 drafted = draft_state.drafted_player_names()
 available = players_df[~players_df["name"].isin(drafted)].copy()
 
-filt_col1, filt_col2, filt_col3 = st.columns([2, 2, 1])
-with filt_col1:
-    search = st.text_input("Search player", "")
-with filt_col2:
-    positions = sorted(available["position"].unique().tolist())
-    pos_filter = st.multiselect("Position", positions, default=[])
-with filt_col3:
-    sort_by = st.selectbox("Sort by", ["vor_rank", "overall_rank", "position_rank"], index=0)
-
 tier_col1, tier_col2 = st.columns([1, 3])
 with tier_col1:
     tier_gap_input = st.number_input(
@@ -236,11 +245,118 @@ with tier_col1:
 with tier_col2:
     st.caption(
         "Tier breaks are shown as divider rows when filtered to a single "
-        "position (tiers are relative to that position's own point scale)."
+        "position below, and drive the suggested-pick scarcity signal above."
     )
 
 gap_threshold = tier_gap_input if tier_gap_input > 0 else None
 available_tiered = compute_tiers(available, gap_threshold=gap_threshold)
+
+# ---------------------------------------------------------------------
+# Suggested pick — recommends a position from need + available value +
+# historical run risk, and lets you draft straight from its shortlist or
+# browse any other position's best-available players instead.
+# ---------------------------------------------------------------------
+
+st.divider()
+st.subheader("🎯 Suggested pick")
+
+if draft_state.is_draft_complete:
+    st.success("Draft complete!")
+elif available_tiered.empty:
+    st.info("No players available to suggest from.")
+else:
+    history = load_draft_history_df()
+    suggestion = suggest_position(available_tiered, draft_state, config, history=history)
+
+    if suggestion.recommended_position is None:
+        st.info(suggestion.reasoning or "No suggestion available.")
+    else:
+        if draft_state.is_my_pick:
+            st.success(suggestion.reasoning)
+        else:
+            st.info(
+                f"Preview for your next turn ({draft_state.picks_until_my_turn()} "
+                f"pick(s) away): {suggestion.reasoning}"
+            )
+
+        with st.expander("Why? Compare every position"):
+            breakdown_df = pd.DataFrame([
+                {
+                    "Position": s.position,
+                    "Composite": round(s.composite, 3),
+                    "Best available VOR": round(s.value_raw, 1),
+                    "Roster need": round(s.need_raw, 2),
+                    "Predicted picks before your turn": round(s.predicted_picks, 1),
+                    "Tier-1 remaining": s.remaining_top_tier,
+                    "Total remaining": s.remaining_players,
+                }
+                for s in suggestion.all_scores
+            ])
+            st.dataframe(breakdown_df, hide_index=True, use_container_width=True)
+            st.caption(
+                "Composite = 45% best-available VOR + 30% your unfilled-starter"
+                "-slot need + 25% run-risk scarcity (predicted picks at this "
+                "position before your turn, vs. tier-1 players left), each "
+                "normalized 0-1 across positions before weighting."
+            )
+
+        position_options = [s.position for s in suggestion.all_scores]
+        default_idx = position_options.index(suggestion.recommended_position)
+        chosen_position = st.selectbox(
+            "Top players for position",
+            options=position_options,
+            index=default_idx,
+            help="Defaults to the recommended position — change this to see "
+                 "the best available players/value at any other position.",
+            key="suggestion_position_override",
+        )
+        if chosen_position != suggestion.recommended_position:
+            st.caption(
+                f"Showing **{chosen_position}** (overriding the recommended "
+                f"**{suggestion.recommended_position}**)."
+            )
+
+        top_players = top_available_players(available_tiered, chosen_position, n=3)
+        if top_players.empty:
+            st.caption(f"No {chosen_position} left on the board.")
+        else:
+            cols = st.columns(len(top_players))
+            for col, (_, row) in zip(cols, top_players.iterrows()):
+                with col:
+                    st.markdown(f"**{row['name']}**")
+                    st.caption(
+                        f"{row['position']} · {row['nfl_team']} · Tier {int(row['tier'])}"
+                    )
+                    st.caption(
+                        f"VOR {row['vor']:.1f} (rank #{int(row['vor_rank'])}) · "
+                        f"{row['score_total']:.1f} proj pts"
+                    )
+                    if st.button(
+                        "Draft this player",
+                        key=f"suggest_draft_{row['name']}",
+                        use_container_width=True,
+                        disabled=not draft_state.is_my_pick,
+                    ):
+                        pick = draft_state.log_pick_on_the_clock(
+                            row["name"], position=row["position"], nfl_team=row["nfl_team"]
+                        )
+                        st.toast(
+                            f"Logged: {pick.team} took {pick.player_name} "
+                            f"(Rd {pick.round}, Pick {pick.overall_pick})"
+                        )
+                        st.rerun()
+        if not draft_state.is_my_pick:
+            st.caption("Draft buttons enable when it's your turn.")
+
+st.divider()
+filt_col1, filt_col2, filt_col3 = st.columns([2, 2, 1])
+with filt_col1:
+    search = st.text_input("Search player", "")
+with filt_col2:
+    positions = sorted(available["position"].unique().tolist())
+    pos_filter = st.multiselect("Position", positions, default=[])
+with filt_col3:
+    sort_by = st.selectbox("Sort by", ["vor_rank", "overall_rank", "position_rank"], index=0)
 
 view = available_tiered
 if search:
