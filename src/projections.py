@@ -23,6 +23,7 @@ import pandas as pd
 
 from .data_sources.manual_import import CANONICAL_COLUMNS
 from .scoring import ScoringEngine
+from .tiering import jenks_auto_labels
 
 _STAT_COLUMNS = [c for c in CANONICAL_COLUMNS if c not in ("name", "position", "nfl_team", "games")]
 
@@ -128,31 +129,53 @@ def compute_tiers(
     board: pd.DataFrame,
     metric: str = "score_total",
     gap_threshold: Optional[float] = None,
-    k: float = 1.0,
+    max_tiers: int = 15,
+    max_spread_fraction: float = 0.08,
 ) -> pd.DataFrame:
     """Group players within each position into tiers -- clusters of
     roughly-equivalent value separated by a meaningful point drop-off, the
     way draft analysts talk about "tier 1 RBs" vs "tier 2 RBs."
 
-    Adds two columns:
+    Adds three columns:
       - tier: 1-indexed rank of the tier within that position (1 = best).
-      - tier_gap: the point drop from the previous-ranked player at the
-        same position that triggered a new tier (0.0 for a player who
-        isn't a tier boundary, including every position's #1 player).
+      - tier_gap: the point drop from the immediately preceding player at
+        the same position (0.0 for a player who isn't a tier boundary,
+        including every position's #1 player) -- shown for context; in
+        manual mode this can be smaller than gap_threshold itself, see
+        below.
+      - tier_max_spread: the point range (top player's score minus bottom
+        player's score) within that player's own tier. Manual mode
+        guarantees this never exceeds gap_threshold; automatic mode has no
+        such guarantee (it's optimizing overall variance, not a single
+        tier's width) but it's included so you can see it either way.
 
     Two ways to pick where a tier boundary falls:
-      - gap_threshold (points, e.g. 10.0): manual override -- start a new
-        tier whenever the drop to the next player exceeds this many
-        points. This is the "all players in a tier are within N points"
-        mode a user can dial in directly.
-      - gap_threshold=None (default): automatic "natural break" detection.
-        For each position, computes the point-drop between every pair of
-        consecutive players (sorted by metric, descending) and flags a
-        drop as a tier boundary when it's a statistical outlier relative
-        to that position's other drops: drop > mean(drops) + k*std(drops).
-        This adapts to each position's own scoring scale automatically
-        (kickers cluster far tighter than QBs in this league) rather than
-        using one fixed point value across every position.
+      - gap_threshold (points, e.g. 10.0): manual override. A tier holds
+        every player within `gap_threshold` points of THAT TIER'S TOP
+        SCORER -- not just within gap_threshold of the previous player.
+        (An earlier version only checked the previous player, which let a
+        chain of small sub-threshold gaps drift a tier arbitrarily wide --
+        e.g. ten consecutive 3-point gaps summing to 30 points, none of
+        which individually exceeded a 10-point threshold. Comparing every
+        candidate against the tier's leading player instead of its
+        immediate neighbor is what actually enforces "every player in a
+        tier is within N points of each other.") A new tier starts the
+        moment a player would fall more than gap_threshold points below
+        their tier's leader.
+      - gap_threshold=None (default): automatic "natural break" detection
+        via Jenks natural breaks (see src/tiering.py) -- finds the
+        partition into k classes that minimizes within-class variance,
+        growing k only as far as needed so that no single tier spans more
+        than max_spread_fraction of that position's own top-to-bottom
+        point range (default 8%), capped at max_tiers classes. This
+        adapts to each position's own scoring scale automatically (kickers
+        cluster far tighter than QBs) and directly bounds tier width
+        instead of inferring it indirectly from gap statistics -- see
+        src/tiering.py's module docstring for why two earlier gap-based
+        designs (a global mean+stdev threshold, then a local
+        recursive-outlier variant) each looked reasonable but still
+        produced too-wide tiers for a large, gradually-declining position
+        pool like QB.
 
     metric defaults to "score_total" (raw projected points) rather than
     "vor". Within a single position these produce identical tier
@@ -168,6 +191,7 @@ def compute_tiers(
     out = board.copy()
     out["tier"] = 1
     out["tier_gap"] = 0.0
+    out["tier_max_spread"] = 0.0
     if out.empty:
         return out
 
@@ -178,28 +202,40 @@ def compute_tiers(
         if n <= 1:
             continue
 
-        drops = -np.diff(scores)  # drops[i] = scores[i] - scores[i+1], i.e. the gap AFTER player i
         if gap_threshold is not None:
-            threshold = gap_threshold
+            tiers = np.ones(n, dtype=int)
+            gaps = np.zeros(n, dtype=float)
+            tier_num = 1
+            anchor = scores[0]  # top scorer of the current tier
+            for i in range(1, n):
+                if anchor - scores[i] > gap_threshold:
+                    tier_num += 1
+                    anchor = scores[i]
+                    gaps[i] = scores[i - 1] - scores[i]
+                tiers[i] = tier_num
         else:
-            mean_drop = drops.mean()
-            std_drop = drops.std(ddof=0)
-            # A tiny epsilon keeps a perfectly uniform ladder of drops (std=0)
-            # from flagging every single gap as "significant" -- with no
-            # variance at all there's no natural break to find, so treat the
-            # whole position as one tier rather than n singleton tiers.
-            threshold = mean_drop + k * std_drop + 1e-9
+            # Jenks operates ascending; scores here are sorted descending
+            # (best first), so reverse for the fit and invert the labels
+            # back so tier 1 = highest scores.
+            labels_desc, _k, _widest = jenks_auto_labels(
+                scores[::-1], max_classes=max_tiers, max_spread_fraction=max_spread_fraction,
+            )
+            labels = labels_desc[::-1]
+            chosen_max = labels.max()
+            tiers = (chosen_max - labels + 1).astype(int)
+            gaps = np.zeros(n, dtype=float)
+            for i in range(1, n):
+                if tiers[i] != tiers[i - 1]:
+                    gaps[i] = scores[i - 1] - scores[i]
 
-        tiers = np.ones(n, dtype=int)
-        gaps = np.zeros(n, dtype=float)
-        tier_num = 1
-        for i in range(1, n):
-            gap = scores[i - 1] - scores[i]
-            if gap > threshold:
-                tier_num += 1
-                gaps[i] = gap
-            tiers[i] = tier_num
+        spreads = np.zeros(n, dtype=float)
+        for tier_val in np.unique(tiers):
+            mask = tiers == tier_val
+            tier_scores = scores[mask]
+            spreads[mask] = tier_scores.max() - tier_scores.min()
+
         out.loc[idx, "tier"] = tiers
         out.loc[idx, "tier_gap"] = gaps
+        out.loc[idx, "tier_max_spread"] = spreads
 
     return out

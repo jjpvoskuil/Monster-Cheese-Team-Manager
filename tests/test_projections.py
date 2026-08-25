@@ -37,19 +37,29 @@ def test_manual_gap_threshold_zero_puts_every_player_in_own_tier():
 
 
 def test_automatic_detection_flags_a_clear_outlier_drop():
-    # A tight cluster of 3, a big cliff, then a tight cluster of 3.
+    # A tight cluster of 3 (internal spread 10, 100->90), a big 40-pt
+    # cliff, then a tight cluster of 3 (internal spread 10, 50->40). Total
+    # range is 60, so a 20% spread cap (=12) comfortably fits each
+    # cluster's own 10-pt spread while rejecting the 40-pt cliff, so Jenks
+    # should land on exactly this clean 2-way split.
     board = _board("RB", [100, 95, 90, 50, 45, 40])
-    out = compute_tiers(board)  # gap_threshold=None -> automatic
+    out = compute_tiers(board, max_spread_fraction=0.20)  # cap = 12
     out = out.sort_values("score_total", ascending=False)
     assert out["tier"].tolist() == [1, 1, 1, 2, 2, 2]
 
 
-def test_uniform_ladder_stays_one_tier_when_automatic():
-    """No real 'natural break' exists when every gap is identical -- should
-    not fragment into a tier per player."""
-    board = _board("K", [100, 90, 80, 70, 60])
-    out = compute_tiers(board)
-    assert out["tier"].nunique() == 1
+def test_automatic_tiers_never_exceed_the_spread_cap():
+    """The defining guarantee of the spread-cap Jenks method: no
+    automatically-chosen tier should span more than max_spread_fraction of
+    the position's total point range (unless max_tiers caps it first)."""
+    board = _board("K", [100, 90, 80, 70, 60])  # range 40, uniform 10-pt steps
+    out = compute_tiers(board, max_spread_fraction=0.08, max_tiers=15)  # cap = 3.2
+    for _tier, group in out.groupby("tier"):
+        spread = group["score_total"].max() - group["score_total"].min()
+        assert spread <= 3.2 + 1e-9
+    # a 10-pt-step ladder can't satisfy a 3.2-pt cap without every player
+    # getting its own tier
+    assert out["tier"].nunique() == 5
 
 
 def test_tiers_computed_independently_per_position():
@@ -81,6 +91,36 @@ def test_tiering_by_score_total_matches_tiering_by_vor():
     by_points = compute_tiers(board, metric="score_total", gap_threshold=15.0)
     by_vor = compute_tiers(board, metric="vor", gap_threshold=15.0)
     assert by_points.sort_index()["tier"].tolist() == by_vor.sort_index()["tier"].tolist()
+
+
+def test_automatic_tiers_on_real_data_are_not_absurdly_wide():
+    """Regression for the league-manager's 'tiers seem too wide' feedback:
+    on the real 2026 QB pool, the old gap-based automatic methods put 30
+    QBs (spanning 218 points) in a single top tier, because a large,
+    gradually-declining pool has no single standout gap for a gap-based
+    detector to key on. The spread-cap Jenks method must keep every
+    automatic tier within its configured fraction of that position's own
+    point range, regardless of pool shape."""
+    from src.data_sources.manual_import import load_many
+    from src.projections import build_draft_board
+
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    df = load_many([
+        (os.path.join(root, "data", "projections", "cbs_2026.csv"), "cbs"),
+        (os.path.join(root, "data", "projections", "fantasypros_2026.csv"), "fantasypros"),
+        (os.path.join(root, "data", "projections", "fftoday_2026.csv"), "fftoday"),
+    ])
+    with open(CONFIG_PATH) as f:
+        config = yaml.safe_load(f)
+    board = build_draft_board(df, config)
+    tiered = compute_tiers(board)  # defaults: automatic, max_spread_fraction=0.08
+
+    for pos, group in tiered.groupby("position"):
+        pos_range = group["score_total"].max() - group["score_total"].min()
+        cap = pos_range * 0.08
+        for _tier, tier_group in group.groupby("tier"):
+            spread = tier_group["score_total"].max() - tier_group["score_total"].min()
+            assert spread <= cap + 1e-6, f"{pos} tier spread {spread:.1f} exceeds cap {cap:.1f}"
 
 
 def test_superflex_demand_is_now_overwhelmingly_qb():

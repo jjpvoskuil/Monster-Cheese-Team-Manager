@@ -46,14 +46,19 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   raises QB's replacement level and lowers early-QB VOR accordingly.
 - Both the Draft Board and Projections pages now compute position tiers
   (`src/projections.py`'s `compute_tiers()`) — same-position players
-  clustered by point drop-off, either auto-detected per position (a
-  statistically significant gap relative to that position's own score
-  gaps) or a manual points-gap override the user can dial in (e.g. "10" =
-  every player within 10 pts of each other is one tier). Tier divider rows
-  render in the player grid when the view is filtered to a single
-  position. See the dated log entry below for the Arrow-serialization bug
-  this caught and fixed along the way.
-- `pytest` — 58/58 passing.
+  clustered by point drop-off. Manual override (points, e.g. "10") is an
+  anchor-based spread cap: every player in a tier is within that many
+  points of the TIER'S TOP SCORER (not just the previous player — an
+  earlier version compared only to the previous player and let a chain of
+  small gaps drift a tier arbitrarily wide, e.g. an override of 10 still
+  producing a tier spanning 54+ points; fixed 2026-08-25). Automatic mode
+  (`src/tiering.py`) uses Jenks natural breaks with the class count chosen
+  so no tier exceeds ~8% of that position's own point range — see that
+  module's docstring for why two earlier gap-statistic-based designs both
+  looked reasonable but still produced a 30-player/218-point top QB tier.
+  Tier divider rows render in the player grid when filtered to a single
+  position.
+- `pytest` — 66/66 passing.
 - Deployed to Streamlit Cloud; user confirmed the Draft Board loads
   correctly as of 2026-08-25.
 - Known gaps (not blocking): ESPN blending not done (would be a 4th
@@ -88,6 +93,61 @@ carry their own Authorization header. Ask the user for a fresh PAT each
 time; don't assume an old one from the log below is still valid.
 
 ## Log
+
+### 2026-08-25 — Fixed two real tiering bugs the league manager caught by using it: manual override drifting wide, automatic method too coarse
+Follow-up to the tiering feature shipped earlier the same day (next log
+entry down). The manager tried it immediately and found two real problems:
+
+**Bug 1 — manual override drifted wider than the number entered.** Typing
+"10" for QBs produced a tier spanning 780.8 to 726.3 (54 points). Root
+cause: the original manual-mode logic only compared each player to the
+*immediately preceding* player, not to the tier's top scorer -- a chain of
+small sub-threshold gaps (several 3-8 point drops in a row) could
+accumulate into a much wider total spread without any single step ever
+exceeding 10. Fixed in `compute_tiers()` (`src/projections.py`) by
+switching to an anchor-based check: each candidate is compared against the
+*current tier's leading player's* score, not the previous row. New
+`tier_max_spread` column added so the guarantee (no tier's spread exceeds
+the override value) is directly visible and directly tested
+(`test_manual_gap_threshold_creates_expected_tiers`, and the real-data
+guarantee is exercised via `test_automatic_tiers_on_real_data_are_not_
+absurdly_wide` for the automatic side).
+
+**Bug 2 — the automatic method was still "too wide"** (the manager's own
+words) even after replacing the original mean+stdev approach with Jenks
+natural breaks earlier that day: QB's top tier held 30 players spanning
+218 points. Root cause, found by testing against the real 2026 data rather
+than trusting the small synthetic unit tests: a target-GVF stopping rule
+(grow the class count until it explains a target % of variance) behaves
+very differently depending on pool size and shape. For a large,
+*gradually*-declining pool like QB (no single standout cliff, just a long
+smooth slope), the global variance-reduction budget kept getting spent
+elsewhere (a genuine late-list outlier) before the algorithm ever
+revisited splitting the smooth top cluster further. A second attempt
+(recursive local-outlier-gap splitting, to avoid the "global stat skewed
+by one huge gap" problem) fixed the small-pool over-fragmentation this
+caused but reintroduced the QB problem from the opposite direction: a
+smooth gradual slope has no single local outlier gap to trigger a split at
+all, however wide the cumulative range gets.
+
+Both failure modes shared a root cause: neither approach ever directly
+asked "how wide is this tier allowed to get" -- both inferred an answer
+indirectly from gap statistics. Rewrote `jenks_auto_labels()`
+(`src/tiering.py`) a third time to ask that question directly: grow the
+Jenks class count only as far as needed so no resulting tier spans more
+than `max_spread_fraction` (default 0.08, i.e. 8%) of that position's own
+top-to-bottom point range, capped at `max_tiers` (default 15) as a safety
+valve. Verified against real 2026 data across all 6 positions -- QB's
+worst-case tier dropped from 30 players/218 points to a 5-7 player/
+30-60 point range; RB/WR/TE/K/DST all produce similarly reasonable,
+non-fragmented tiers. `src/tiering.py`'s module docstring keeps the full
+story of why the first two designs each looked right until tested against
+real data, specifically so a future session doesn't re-attempt either one
+without knowing it was already tried and rejected.
+
+Verified: 66/66 tests passing (11 new/changed); both pages re-run under
+`AppTest` with the exact reported scenario (QB filter + manual override of
+10) confirming every tier's spread is now bounded correctly.
 
 ### 2026-08-25 — Superflex-heavy QB demand assumption + position tiering (auto + manual override)
 Two related requests from the league manager after reviewing Josh Allen's
