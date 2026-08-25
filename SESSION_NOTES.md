@@ -183,8 +183,7 @@ actual values by hand against a synthetic roster. Real-data sanity check:
 round 1 averages 4.75 QB + 4.75 RB (superflex-heavy league, matches the
 2026-08-25 VOR work above), K/DST cluster in rounds 16-20 as expected.
 33 new tests (`test_draft_history.py`, `test_draft_tendencies.py`,
-`test_roster_needs.py`), 89/89 total passing. Not yet pushed — see next
-step in this same session if this entry is still here.
+`test_roster_needs.py`), 89/89 total passing. Pushed as `8a926cb`.
 
 ### 2026-08-25 — Fixed two real tiering bugs the league manager caught by using it: manual override drifting wide, automatic method too coarse
 Follow-up to the tiering feature shipped earlier the same day (next log
