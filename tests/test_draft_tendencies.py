@@ -7,6 +7,8 @@ from src.draft_tendencies import (
     cumulative_counts_by_pick,
     next_run_positions,
     predict_position_counts,
+    round_preserve_sum,
+    round_table_preserve_row_sums,
     teams_per_round,
 )
 
@@ -102,3 +104,66 @@ def test_empty_dataframe_returns_empty_results_without_raising():
     assert cumulative_counts_by_pick(empty).empty
     assert predict_position_counts(empty, None, 1, 10).empty
     assert next_run_positions(empty, None, 1, 10) == []
+
+
+def test_round_preserve_sum_matches_naive_rounding_when_it_already_works():
+    values = pd.Series({"QB": 4.0, "RB": 4.0, "WR": 2.0})
+    out = round_preserve_sum(values, target=10)
+    assert out.to_dict() == {"QB": 4, "RB": 4, "WR": 2}
+    assert out.sum() == 10
+
+
+def test_round_preserve_sum_fixes_the_case_where_naive_rounding_would_miss_the_target():
+    # round(3.4)=3, round(3.4)=3, round(3.2)=3 -> naive sum is 9, not 10.
+    # Largest-remainder method must still land on exactly 10, handing the
+    # extra pick to the largest fractional remainder (both 3.4s tie at
+    # 0.4 > 0.2, so one of the two 3.4s gets bumped to 4).
+    values = pd.Series({"QB": 3.4, "RB": 3.4, "WR": 3.2})
+    out = round_preserve_sum(values, target=10)
+    assert out.sum() == 10
+    assert out["WR"] == 3  # smallest remainder, doesn't get the extra pick
+    assert set(out.tolist()) == {3, 4}
+
+
+def test_round_preserve_sum_handles_the_real_reported_case():
+    # The actual values reported: 4.75 QB / 4.75 RB / 0.5 WR (round 1,
+    # all years averaged) must round to integers summing to 10.
+    values = pd.Series({"QB": 4.75, "RB": 4.75, "WR": 0.5})
+    out = round_preserve_sum(values, target=10)
+    assert out.sum() == 10
+    assert set(out.tolist()) <= {0, 1, 4, 5}
+
+
+def test_round_preserve_sum_all_zero_values():
+    values = pd.Series({"QB": 0.0, "RB": 0.0})
+    out = round_preserve_sum(values, target=0)
+    assert out.to_dict() == {"QB": 0, "RB": 0}
+
+
+def test_round_table_preserve_row_sums_every_row_sums_to_target():
+    df = _synthetic_history()
+    table = counts_by_round(df)
+    rounded = round_table_preserve_row_sums(table, target=2)  # 2 teams/round in the synthetic data
+    assert (rounded.sum(axis=1) == 2).all()
+    assert rounded.values.dtype.kind == "i"
+
+
+def test_round_table_preserve_row_sums_empty_table():
+    assert round_table_preserve_row_sums(pd.DataFrame(), target=10).empty
+
+
+def test_real_history_rounded_by_round_table_always_sums_to_teams_per_round():
+    """Integration check against the actual captured 2022-2025 data: every
+    round, for every selectable subset of years, should round to exactly
+    teams_per_round players after apportionment."""
+    import os
+    from src.data_sources.draft_history import load_draft_history
+
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    df = load_draft_history(os.path.join(root, "data", "draft_history", "draft_history.csv"))
+    n = teams_per_round(df)
+
+    for years in (None, [2025], [2024, 2025], [2022, 2023, 2024, 2025]):
+        table = counts_by_round(df, years=years)
+        rounded = round_table_preserve_row_sums(table, target=n)
+        assert (rounded.sum(axis=1) == n).all(), f"years={years} broke row-sum={n}"

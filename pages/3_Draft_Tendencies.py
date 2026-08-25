@@ -25,6 +25,8 @@ from src.draft_tendencies import (
     counts_by_round,
     next_run_positions,
     predict_position_counts,
+    round_preserve_sum,
+    round_table_preserve_row_sums,
     teams_per_round,
 )
 from src.roster_needs import aggregate_opponent_demand, opponent_needs_before_next_pick
@@ -137,8 +139,10 @@ by_round = counts_by_round(history, years=selected_years)
 if by_round.empty:
     st.info("No data for the selected years.")
 else:
-    st.dataframe(by_round.round(2), use_container_width=True)
-    st.bar_chart(by_round)
+    by_round_int = round_table_preserve_row_sums(by_round, teams_n)
+    st.dataframe(by_round_int, use_container_width=True)
+    st.caption(f"Each round's row sums to exactly {teams_n} (rounded from the raw historical average).")
+    st.bar_chart(by_round_int)
 
 # ---------------------------------------------------------------------
 # Section 2: live "what's likely next" prediction
@@ -153,17 +157,19 @@ predicted = predict_position_counts(history, selected_years, predict_from, picks
 if predicted.empty:
     st.info("No prediction available (no historical data for the selected years).")
 else:
+    predicted_int = round_preserve_sum(predicted, picks_ahead)
     hot = next_run_positions(history, selected_years, predict_from, picks_ahead, top_n=2)
     if hot:
         st.info(
             f"**Likely run in the next {rounds_ahead} round(s):** "
-            f"{' / '.join(hot)} — historically {predicted[hot].round(1).to_dict()} "
+            f"{' / '.join(hot)} — historically {predicted_int[hot].to_dict()} "
             f"players taken in this pick window. Positions NOT in this list have "
             f"historically been safe to wait on for a round or two."
         )
-    pred_df = predicted.rename("Expected # drafted").round(2).to_frame()
+    pred_df = predicted_int.rename("Expected # drafted").to_frame()
     st.dataframe(pred_df, use_container_width=True)
-    st.bar_chart(predicted)
+    st.caption(f"Sums to exactly {picks_ahead} — the number of picks in the next {rounds_ahead} round(s).")
+    st.bar_chart(predicted_int)
 
 # ---------------------------------------------------------------------
 # Section 3: opponent roster needs before your next pick

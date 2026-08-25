@@ -46,6 +46,55 @@ def teams_per_round(df: pd.DataFrame) -> int:
     return int(df["pick_in_round"].max())
 
 
+def round_preserve_sum(values: pd.Series, target: int) -> pd.Series:
+    """Round every value to the nearest integer using the largest
+    -remainder method (a.k.a. Hamilton apportionment), so the rounded
+    values sum to EXACTLY `target` -- unlike rounding each value
+    independently (`round(4.75)=5, round(4.75)=5, round(0.5)=0` sums to
+    10 by luck, but plenty of other splits don't, e.g.
+    `round(3.4)+round(3.4)+round(3.2)=3+3+3=9`, one short of 10).
+
+    Method: take each value's floor, then hand out the few remaining
+    "whole picks" (target - sum of floors) one at a time to whichever
+    values have the largest fractional remainder -- the values closest
+    to rounding up "deserve" the extra pick first.
+    """
+    if len(values) == 0:
+        return values.astype(int)
+
+    floors = values.apply(lambda v: int(v // 1) if v == v else 0)  # v==v guards NaN
+    remainder = target - int(floors.sum())
+
+    if remainder > 0:
+        fracs = (values - floors).sort_values(ascending=False)
+        bump_idx = fracs.index[:remainder]
+        result = floors.copy()
+        result.loc[bump_idx] += 1
+    elif remainder < 0:
+        # target is smaller than the sum of floors (only possible if
+        # `target` was passed smaller than the values' own sum) -- take
+        # picks back from the smallest fractional remainders first.
+        fracs = (values - floors).sort_values(ascending=True)
+        take_idx = fracs.index[: -remainder]
+        result = floors.copy()
+        result.loc[take_idx] -= 1
+    else:
+        result = floors.copy()
+
+    return result.astype(int)
+
+
+def round_table_preserve_row_sums(table: pd.DataFrame, target: int) -> pd.DataFrame:
+    """Apply `round_preserve_sum` to every row of a position-count table
+    (e.g. counts_by_round's output), so each row still adds up to
+    `target` (a draft round always has exactly `target` = teams_per_round
+    picks, even though the historical average can land on fractions like
+    4.75 QB / 4.75 RB / 0.5 WR)."""
+    if table.empty:
+        return table
+    return table.apply(lambda row: round_preserve_sum(row, target), axis=1)
+
+
 def counts_by_round(df: pd.DataFrame, years: list[int] | None = None) -> pd.DataFrame:
     """Average number of each position drafted per round, across the
     selected years. Index = round (1..max), columns = KNOWN_POSITIONS
