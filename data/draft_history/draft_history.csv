@@ -1,0 +1,881 @@
+year,round,pick_in_round,overall_pick,team,player_name,position,positions,nfl_team,is_auto_pick,is_skipped
+2022,1,1,1,Mississippi Swamp Ass,Josh Allen,QB,QB,BUF,False,False
+2022,1,2,2,THE DEMONS,Jonathan Taylor,RB,RB,IND,False,False
+2022,1,3,3,Salty Dogs,Christian McCaffrey,RB,RB,SF,False,False
+2022,1,4,4,Monster Cheese,Dalvin Cook,RB,RB,,False,False
+2022,1,5,5,Aces High,Patrick Mahomes,QB,QB,KC,False,False
+2022,1,6,6,Ball Busters,Tom Brady,QB,QB,,False,False
+2022,1,7,7,Buckhorns,Austin Ekeler,RB,RB,WAS,False,False
+2022,1,8,8,WARPIGS,Justin Herbert,QB,QB,LAC,False,False
+2022,1,9,9,Mojo,Derrick Henry,RB,RB,BAL,False,False
+2022,1,10,10,Shakedown Posse L.O.D.,Najee Harris,RB,RB,NYG,False,False
+2022,2,1,11,Shakedown Posse L.O.D.,Joe Mixon,RB,RB,HOU,False,False
+2022,2,2,12,Mojo,Lamar Jackson,QB,QB,BAL,False,False
+2022,2,3,13,WARPIGS,Cooper Kupp,WR,WR,SEA,False,False
+2022,2,4,14,Buckhorns,Aaron Rodgers,QB,QB,PIT,False,False
+2022,2,5,15,Ball Busters,Alvin Kamara,RB,RB,NO,False,False
+2022,2,6,16,Aces High,Justin Jefferson,WR,WR,MIN,False,False
+2022,2,7,17,Monster Cheese,Javonte Williams,RB,RB,DAL,False,False
+2022,2,8,18,Salty Dogs,Ja'Marr Chase,WR,WR,CIN,False,False
+2022,2,9,19,THE DEMONS,Matthew Stafford,QB,QB,LAR,False,False
+2022,2,10,20,Mississippi Swamp Ass,Nick Chubb,RB,RB,HOU,False,False
+2022,3,1,21,Mississippi Swamp Ass,Travis Kelce,TE,TE,KC,False,False
+2022,3,2,22,THE DEMONS,Dak Prescott,QB,QB,DAL,False,False
+2022,3,3,23,Salty Dogs,Davante Adams,WR,WR,LAR,False,False
+2022,3,4,24,Monster Cheese,Joe Burrow,QB,QB,CIN,False,False
+2022,3,5,25,Aces High,Aaron Jones,RB,RB,MIN,False,False
+2022,3,6,26,Ball Busters,Mike Evans,WR,WR,SF,False,False
+2022,3,7,27,Buckhorns,James Conner,RB,RB,ARI,False,False
+2022,3,8,28,WARPIGS,Ezekiel Elliott,RB,RB,,False,False
+2022,3,9,29,Mojo,Kirk Cousins,QB,QB,LV,False,False
+2022,3,10,30,Shakedown Posse L.O.D.,Kyler Murray,QB,QB,MIN,False,False
+2022,4,1,31,Shakedown Posse L.O.D.,Russell Wilson,QB,QB,NYG,False,False
+2022,4,2,32,Mojo,Mark Andrews,TE,TE,BAL,False,False
+2022,4,3,33,WARPIGS,Leonard Fournette,RB,RB,,False,False
+2022,4,4,34,Buckhorns,Jalen Hurts,QB,QB,PHI,False,False
+2022,4,5,35,Ball Busters,Derek Carr,QB,QB,NO,False,False
+2022,4,6,36,Aces High,Matt Ryan,QB,QB,,False,False
+2022,4,7,37,Monster Cheese,CeeDee Lamb,WR,WR,DAL,False,False
+2022,4,8,38,Salty Dogs,D'Andre Swift,RB,RB,CHI,False,False
+2022,4,9,39,THE DEMONS,Stefon Diggs,WR,WR,WAS,False,False
+2022,4,10,40,Mississippi Swamp Ass,Deebo Samuel,WR,WR,SF,False,False
+2022,5,1,41,Mississippi Swamp Ass,Saquon Barkley,RB,RB,PHI,False,False
+2022,5,2,42,THE DEMONS,Tyreek Hill,WR,WR,MIA,False,False
+2022,5,3,43,Salty Dogs,Trey Lance,QB,QB,LAC,False,False
+2022,5,4,44,Monster Cheese,Breece Hall,RB,RB,NYJ,False,False
+2022,5,5,45,Aces High,Michael Pittman,WR,WR,PIT,False,False
+2022,5,6,46,Ball Busters,A.J. Brown,WR,WR,NE,False,False
+2022,5,7,47,Buckhorns,Josh Jacobs,RB,RB,GB,False,False
+2022,5,8,48,WARPIGS,Mike Williams,WR,WR,LAC,False,False
+2022,5,9,49,Mojo,J.K. Dobbins,RB,RB,DEN,False,False
+2022,5,10,50,Shakedown Posse L.O.D.,David Montgomery,RB,RB,HOU,False,False
+2022,6,1,51,Shakedown Posse L.O.D.,Keenan Allen,WR,WR,IND,False,False
+2022,6,2,52,Mojo,Tee Higgins,WR,WR,CIN,False,False
+2022,6,3,53,WARPIGS,Courtland Sutton,WR,WR,DEN,False,False
+2022,6,4,54,Buckhorns,Trevor Lawrence,QB,QB,JAC,False,False
+2022,6,5,55,Ball Busters,Damien Harris,RB,RB,,False,False
+2022,6,6,56,Aces High,Dameon Pierce,RB,RB,PHI,False,False
+2022,6,7,57,Monster Cheese,Tua Tagovailoa,QB,QB,ATL,False,False
+2022,6,8,58,Salty Dogs,Jameis Winston,QB,QB,NYG,False,False
+2022,6,9,59,THE DEMONS,Cam Akers,RB,RB,SEA,False,False
+2022,6,10,60,Mississippi Swamp Ass,Clyde Edwards-Helaire,RB,RB,KC,False,False
+2022,7,1,61,Mississippi Swamp Ass,Justin Fields,QB,QB,KC,False,False
+2022,7,2,62,THE DEMONS,Antonio Gibson,RB,RB,NE,False,False
+2022,7,3,63,Salty Dogs,AJ Dillon,RB,RB,CAR,False,False
+2022,7,4,64,Monster Cheese,DJ Moore,WR,WR,BUF,False,False
+2022,7,5,65,Aces High,Kyle Pitts,TE,TE,ATL,False,False
+2022,7,6,66,Ball Busters,Dallas Goedert,TE,TE,PHI,False,False
+2022,7,7,67,Buckhorns,Elijah Mitchell,RB,RB,PHI,False,False
+2022,7,8,68,WARPIGS,Tony Pollard,RB,RB,TEN,False,False
+2022,7,9,69,Mojo,Rashaad Penny,RB,RB,,False,False
+2022,7,10,70,Shakedown Posse L.O.D.,Jaylen Waddle,WR,WR,DEN,False,False
+2022,8,1,71,Shakedown Posse L.O.D.,Marquise Brown,WR,WR,PHI,False,False
+2022,8,2,72,Mojo,Chris Godwin,WR,WR,TB,False,False
+2022,8,3,73,WARPIGS,Devin Singletary,RB,RB,NYG,False,False
+2022,8,4,74,Buckhorns,DK Metcalf,WR,WR,PIT,False,False
+2022,8,5,75,Ball Busters,Miles Sanders,RB,RB,DAL,False,False
+2022,8,6,76,Aces High,Chase Edmonds,RB,RB,WAS,False,False
+2022,8,7,77,Monster Cheese,Gabe Davis,WR,WR,BUF,False,False
+2022,8,8,78,Salty Dogs,Adam Thielen,WR,WR,PIT,False,False
+2022,8,9,79,THE DEMONS,Travis Etienne,RB,RB,NO,False,False
+2022,8,10,80,Mississippi Swamp Ass,Elijah Moore,WR,WR,PHI,False,False
+2022,9,1,81,Mississippi Swamp Ass,Darren Waller,TE,TE,CAR,False,False
+2022,9,2,82,THE DEMONS,Kareem Hunt,RB,RB,KC,False,False
+2022,9,3,83,Salty Dogs,George Kittle,TE,TE,SF,False,False
+2022,9,4,84,Monster Cheese,Rhamondre Stevenson,RB,RB,NE,False,False
+2022,9,5,85,Aces High,Allen Robinson,WR,WR,DET,False,False
+2022,9,6,86,Ball Busters,Darnell Mooney,WR,WR,NYG,False,False
+2022,9,7,87,Buckhorns,DeVonta Smith,WR,WR,PHI,False,False
+2022,9,8,88,WARPIGS,Baker Mayfield,QB,QB,TB,False,False
+2022,9,9,89,Mojo,James Robinson,RB,RB,,False,False
+2022,9,10,90,Shakedown Posse L.O.D.,Jerry Jeudy,WR,WR,CLE,False,False
+2022,10,1,91,Shakedown Posse L.O.D.,Diontae Johnson,WR,WR,CLE,False,False
+2022,10,2,92,Mojo,Terry McLaurin,WR,WR,WAS,False,False
+2022,10,3,93,WARPIGS,Brian Robinson Jr.,RB,RB,ATL,False,False
+2022,10,4,94,Buckhorns,Brandin Cooks,WR,WR,BUF,False,False
+2022,10,5,95,Ball Busters,Marcus Mariota,QB,QB,WAS,False,False
+2022,10,6,96,Aces High,Daniel Jones,QB,QB,IND,False,False
+2022,10,7,97,Monster Cheese,Mac Jones,QB,QB,SF,False,False
+2022,10,8,98,Salty Dogs,Cordarrelle Patterson,RB,RB,PIT,False,False
+2022,10,9,99,THE DEMONS,Ryan Tannehill,QB,QB,,False,False
+2022,10,10,100,Mississippi Swamp Ass,Rashod Bateman,WR,WR,BAL,False,False
+2022,11,1,101,Mississippi Swamp Ass,Allen Lazard,WR,WR,NYJ,False,False
+2022,11,2,102,THE DEMONS,Hunter Renfrow,WR,WR,CAR,False,False
+2022,11,3,103,Salty Dogs,Carson Wentz,QB,QB,MIN,False,False
+2022,11,4,104,Monster Cheese,Dawson Knox,TE,TE,BUF,False,False
+2022,11,5,105,Aces High,JuJu Smith-Schuster,WR,WR,NYG,False,False
+2022,11,6,106,Ball Busters,Mike Gesicki,TE,TE,CIN,False,False
+2022,11,7,107,Buckhorns,Jared Goff,QB,QB,DET,False,False
+2022,11,8,108,WARPIGS,Davis Mills,QB,QB,HOU,False,False
+2022,11,9,109,Mojo,Dalton Schultz,TE,TE,HOU,False,False
+2022,11,10,110,Shakedown Posse L.O.D.,James Cook,RB,RB,BUF,False,False
+2022,12,1,111,Shakedown Posse L.O.D.,Deshaun Watson,QB,QB,CLE,False,False
+2022,12,2,112,Mojo,Kenneth Walker III,RB,RB,KC,False,False
+2022,12,3,113,WARPIGS,Pat Freiermuth,TE,TE,PIT,False,False
+2022,12,4,114,Buckhorns,Amari Cooper,WR,WR,LV,False,False
+2022,12,5,115,Ball Busters,Melvin Gordon,RB,RB,,False,False
+2022,12,6,116,Aces High,DeAndre Hopkins,WR,WR,BAL,False,False
+2022,12,7,117,Monster Cheese,Tyler Allgeier,RB,RB,ARI,False,False
+2022,12,8,118,Salty Dogs,Kenneth Gainwell,RB,RB,TB,False,False
+2022,12,9,119,THE DEMONS,T.J. Hockenson,TE,TE,MIN,False,False
+2022,12,10,120,Mississippi Swamp Ass,Amon-Ra St. Brown,WR,WR,DET,False,False
+2022,13,1,121,Mississippi Swamp Ass,Darrell Henderson Jr.,RB,RB,,False,False
+2022,13,2,122,THE DEMONS,Zach Ertz,TE,TE,WAS,False,False
+2022,13,3,123,Salty Dogs,Christian Kirk,WR,WR,SF,False,False
+2022,13,4,124,Monster Cheese,Rachaad White,RB,RB,WAS,False,False
+2022,13,5,125,Aces High,Isiah Pacheco,RB,RB,DET,False,False
+2022,13,6,126,Ball Busters,Michael Thomas,WR,WR,,False,False
+2022,13,7,127,Buckhorns,Tyler Lockett,WR,WR,LV,False,False
+2022,13,8,128,WARPIGS,Chris Olave,WR,WR,NO,False,False
+2022,13,9,129,Mojo,Tyler Bass,K,K,BUF,False,False
+2022,13,10,130,Shakedown Posse L.O.D.,Raheem Mostert,RB,RB,LV,False,False
+2022,14,1,131,Shakedown Posse L.O.D.,Cole Kmet,TE,TE,CHI,False,False
+2022,14,2,132,Mojo,Mitch Trubisky,QB,QB,TEN,False,False
+2022,14,3,133,WARPIGS,Zamir White,RB,RB,SF,False,False
+2022,14,4,134,Buckhorns,Damien Williams,RB,RB,,False,False
+2022,14,5,135,Ball Busters,Jamaal Williams,RB,RB,NO,False,False
+2022,14,6,136,Aces High,Marlon Mack,RB,RB,,False,False
+2022,14,7,137,Monster Cheese,Alexander Mattison,RB,RB,MIA,False,False
+2022,14,8,138,Salty Dogs,Robert Woods,WR,WR,PIT,False,False
+2022,14,9,139,THE DEMONS,DeVante Parker,WR,WR,,False,False
+2022,14,10,140,Mississippi Swamp Ass,Zach Wilson,QB,QB,NO,False,False
+2022,15,1,141,Mississippi Swamp Ass,Darrel Williams,RB,RB,,False,False
+2022,15,2,142,THE DEMONS,Julio Jones,WR,WR,,False,False
+2022,15,3,143,Salty Dogs,Hunter Henry,TE,TE,NE,False,False
+2022,15,4,144,Monster Cheese,Skyy Moore,WR,WR,GB,False,False
+2022,15,5,145,Aces High,Evan Engram,TE,TE,DEN,False,False
+2022,15,6,146,Ball Busters,Geno Smith,QB,QB,NYJ,False,False
+2022,15,7,147,Buckhorns,David Njoku,TE,TE,LAC,False,False
+2022,15,8,148,WARPIGS,Justin Tucker,K,K,BAL,False,False
+2022,15,9,149,Mojo,Drake London,WR,WR,ATL,False,False
+2022,15,10,150,Shakedown Posse L.O.D.,Jacoby Brissett,QB,QB,ARI,False,False
+2022,16,1,151,Shakedown Posse L.O.D.,Hassan Haskins,RB,RB,NE,False,False
+2022,16,2,152,Mojo,Bills,DST,DST,BUF,False,False
+2022,16,3,153,WARPIGS,Gerald Everett,TE,TE,CHI,False,False
+2022,16,4,154,Buckhorns,Evan McPherson,K,K,CIN,False,False
+2022,16,5,155,Ball Busters,Treylon Burks,WR,WR,WAS,False,False
+2022,16,6,156,Aces High,Khalil Herbert,RB,RB,SF,False,False
+2022,16,7,157,Monster Cheese,Jahan Dotson,WR,WR,ATL,False,False
+2022,16,8,158,Salty Dogs,Saints,DST,DST,NO,False,False
+2022,16,9,159,THE DEMONS,Michael Carter,RB,RB,TEN,False,False
+2022,16,10,160,Mississippi Swamp Ass,Cowboys,DST,DST,DAL,False,False
+2022,17,1,161,Mississippi Swamp Ass,Rodrigo Blankenship,K,K,,False,False
+2022,17,2,162,THE DEMONS,Buccaneers,DST,DST,TB,False,False
+2022,17,3,163,Salty Dogs,Packers,DST,DST,GB,False,False
+2022,17,4,164,Monster Cheese,Steelers,DST,DST,PIT,False,False
+2022,17,5,165,Aces High,Colts,DST,DST,IND,False,False
+2022,17,6,166,Ball Busters,Harrison Butker,K,K,KC,False,False
+2022,17,7,167,Buckhorns,Matt Gay,K,K,LV,False,False
+2022,17,8,168,WARPIGS,Rams,DST,DST,LAR,False,False
+2022,17,9,169,Mojo,Nyheim Miller-Hines,RB,RB,NO,False,False
+2022,17,10,170,Shakedown Posse L.O.D.,49ers,DST,DST,SF,False,False
+2022,18,1,171,Shakedown Posse L.O.D.,Daniel Carlson,K,K,LV,False,False
+2022,18,2,172,Mojo,Isaiah Spiller,RB,RB,LV,False,False
+2022,18,3,173,WARPIGS,Robbie Gould,K,K,,False,False
+2022,18,4,174,Buckhorns,Vikings,DST,DST,MIN,False,False
+2022,18,5,175,Ball Busters,Bears,DST,DST,CHI,False,False
+2022,18,6,176,Aces High,Ryan Succop,K,K,,False,False
+2022,18,7,177,Monster Cheese,Greg Joseph,K,K,LV,False,False
+2022,18,8,178,Salty Dogs,Dustin Hopkins,K,K,CLE,False,False
+2022,18,9,179,THE DEMONS,Matt Prater,K,K,BUF,False,False
+2022,18,10,180,Mississippi Swamp Ass,Ronald Jones,RB,RB,,False,False
+2022,19,1,181,Mississippi Swamp Ass,Giants,DST,DST,NYG,False,False
+2022,19,2,182,THE DEMONS,Jason Sanders,K,K,NYJ,False,False
+2022,19,3,183,Salty Dogs,Nick Folk,K,K,ATL,False,False
+2022,19,4,184,Monster Cheese,Patriots,DST,DST,NE,False,False
+2022,19,5,185,Aces High,Chargers,DST,DST,LAC,False,False
+2022,19,6,186,Ball Busters,Younghoe Koo,K,K,NYJ,False,False
+2022,19,7,187,Buckhorns,Austin Hooper,TE,TE,ATL,True,False
+2022,19,8,188,WARPIGS,George Pickens,WR,WR,DAL,False,False
+2022,19,9,189,Mojo,Brett Maher,K,K,,False,False
+2022,19,10,190,Shakedown Posse L.O.D.,Brandon McManus,K,K,GB,False,False
+2022,20,1,191,Shakedown Posse L.O.D.,Ravens,DST,DST,BAL,False,False
+2022,20,2,192,Mojo,Chiefs,DST,DST,KC,False,False
+2022,20,3,193,WARPIGS,Browns,DST,DST,CLE,False,False
+2022,20,4,194,Buckhorns,Irv Smith,TE,TE,HOU,True,False
+2022,20,5,195,Ball Busters,Broncos,DST,DST,DEN,False,False
+2022,20,6,196,Aces High,Chris Boswell,K,K,PIT,False,False
+2022,20,7,197,Monster Cheese,Jake Elliott,K,K,PHI,False,False
+2022,20,8,198,Salty Dogs,Kadarius Toney,WR,WR,,False,False
+2022,20,9,199,THE DEMONS,Dolphins,DST,DST,MIA,False,False
+2022,20,10,200,Mississippi Swamp Ass,Austin Seibert,K,K,WAS,False,False
+2022,21,1,201,Shakedown Posse L.O.D.,Michael Gallup,WR,WR,WAS,False,False
+2022,21,2,202,Mojo,Chase Claypool,WR,WR,,False,False
+2022,21,3,203,WARPIGS,K.J. Osborn,WR,WR,TEN,False,False
+2022,21,4,204,Buckhorns,,,,,False,True
+2022,21,5,205,Ball Busters,Donovan Peoples-Jones,WR,WR,NO,False,False
+2022,21,6,206,Aces High,Kenny Pickett,QB,QB,CAR,False,False
+2022,21,7,207,Monster Cheese,Brandon Aiyuk,WR,WR,SF,False,False
+2022,21,8,208,Salty Dogs,Rondale Moore,WR,WR,,False,False
+2022,21,9,209,THE DEMONS,Mark Ingram,RB,RB,,False,False
+2022,21,10,210,Mississippi Swamp Ass,Marquez Valdes-Scantling,WR,WR,DAL,False,False
+2022,22,1,211,Mississippi Swamp Ass,Sony Michel,RB,RB,,False,False
+2022,22,2,212,THE DEMONS,J.D. McKissic,RB,RB,,False,False
+2022,22,3,213,Salty Dogs,Tyler Boyd,WR,WR,TEN,False,False
+2022,22,4,214,Monster Cheese,Romeo Doubs,WR,WR,NE,False,False
+2022,22,5,215,Aces High,Mecole Hardman,WR,WR,BUF,False,False
+2022,22,6,216,Ball Busters,Noah Fant,TE,TE,NO,False,False
+2022,22,7,217,Buckhorns,,,,,False,True
+2022,22,8,218,WARPIGS,Jalen Tolbert,WR,WR,MIA,False,False
+2022,22,9,219,Mojo,Tyrion Davis-Price,RB,RB,GB,False,False
+2022,22,10,220,Shakedown Posse L.O.D.,Garrett Wilson,WR,WR,NYJ,False,False
+2023,1,1,1,Salty Dogs,Patrick Mahomes,QB,QB,KC,False,False
+2023,1,2,2,Rocket City Trash Pandas,Christian McCaffrey,RB,RB,SF,False,False
+2023,1,3,3,Legion of Doom,Josh Allen,QB,QB,BUF,False,False
+2023,1,4,4,THE DEMONS,Joe Burrow,QB,QB,CIN,False,False
+2023,1,5,5,Diver Down,Jalen Hurts,QB,QB,PHI,False,False
+2023,1,6,6,Monster Cheese,Bijan Robinson,RB,RB,ATL,False,False
+2023,1,7,7,Mississippi Swamp Ass,Austin Ekeler,RB,RB,WAS,False,False
+2023,1,8,8,Mojo,Justin Herbert,QB,QB,LAC,False,False
+2023,1,9,9,Aces High,Ja'Marr Chase,WR,WR,CIN,False,False
+2023,1,10,10,Buckhorns,Nick Chubb,RB,RB,HOU,False,False
+2023,2,1,11,Buckhorns,Derrick Henry,RB,RB,BAL,False,False
+2023,2,2,12,Aces High,Justin Jefferson,WR,WR,MIN,False,False
+2023,2,3,13,Mojo,Travis Kelce,TE,TE,KC,False,False
+2023,2,4,14,Mississippi Swamp Ass,Saquon Barkley,RB,RB,PHI,False,False
+2023,2,5,15,Monster Cheese,Trevor Lawrence,QB,QB,JAC,False,False
+2023,2,6,16,Diver Down,Lamar Jackson,QB,QB,BAL,False,False
+2023,2,7,17,THE DEMONS,Justin Fields,QB,QB,KC,False,False
+2023,2,8,18,Legion of Doom,Tony Pollard,RB,RB,TEN,False,False
+2023,2,9,19,Rocket City Trash Pandas,Tyreek Hill,WR,WR,MIA,False,False
+2023,2,10,20,Salty Dogs,Stefon Diggs,WR,WR,WAS,False,False
+2023,3,1,21,Salty Dogs,Tua Tagovailoa,QB,QB,ATL,False,False
+2023,3,2,22,Rocket City Trash Pandas,Kirk Cousins,QB,QB,LV,False,False
+2023,3,3,23,Legion of Doom,Josh Jacobs,RB,RB,GB,False,False
+2023,3,4,24,THE DEMONS,Davante Adams,WR,WR,LAR,False,False
+2023,3,5,25,Diver Down,Cooper Kupp,WR,WR,SEA,False,False
+2023,3,6,26,Monster Cheese,Najee Harris,RB,RB,NYG,False,False
+2023,3,7,27,Mississippi Swamp Ass,DJ Moore,WR,WR,BUF,False,False
+2023,3,8,28,Mojo,Jonathan Taylor,RB,RB,IND,False,False
+2023,3,9,29,Aces High,Deshaun Watson,QB,QB,CLE,False,False
+2023,3,10,30,Buckhorns,Jared Goff,QB,QB,DET,False,False
+2023,4,1,31,Buckhorns,Aaron Rodgers,QB,QB,PIT,False,False
+2023,4,2,32,Aces High,Joe Mixon,RB,RB,HOU,False,False
+2023,4,3,33,Mojo,A.J. Brown,WR,WR,NE,False,False
+2023,4,4,34,Mississippi Swamp Ass,Dak Prescott,QB,QB,DAL,False,False
+2023,4,5,35,Monster Cheese,Daniel Jones,QB,QB,IND,False,False
+2023,4,6,36,Diver Down,Aaron Jones,RB,RB,MIN,False,False
+2023,4,7,37,THE DEMONS,Travis Etienne,RB,RB,NO,False,False
+2023,4,8,38,Legion of Doom,CeeDee Lamb,WR,WR,DAL,False,False
+2023,4,9,39,Rocket City Trash Pandas,Dameon Pierce,RB,RB,PHI,False,False
+2023,4,10,40,Salty Dogs,Jahmyr Gibbs,RB,RB,DET,False,False
+2023,5,1,41,Salty Dogs,Rhamondre Stevenson,RB,RB,NE,False,False
+2023,5,2,42,Rocket City Trash Pandas,Garrett Wilson,WR,WR,NYJ,False,False
+2023,5,3,43,Legion of Doom,Geno Smith,QB,QB,NYJ,False,False
+2023,5,4,44,THE DEMONS,Brian Robinson Jr.,RB,RB,ATL,False,False
+2023,5,5,45,Diver Down,J.K. Dobbins,RB,RB,DEN,False,False
+2023,5,6,46,Monster Cheese,Amon-Ra St. Brown,WR,WR,DET,False,False
+2023,5,7,47,Mississippi Swamp Ass,Jordan Love,QB,QB,GB,False,False
+2023,5,8,48,Mojo,Kenneth Walker III,RB,RB,KC,False,False
+2023,5,9,49,Aces High,Brock Purdy,QB,QB,SF,False,False
+2023,5,10,50,Buckhorns,Christian Watson,WR,WR,GB,False,False
+2023,6,1,51,Buckhorns,Miles Sanders,RB,RB,DAL,False,False
+2023,6,2,52,Aces High,Mark Andrews,TE,TE,BAL,False,False
+2023,6,3,53,Mojo,Darren Waller,TE,TE,CAR,False,False
+2023,6,4,54,Mississippi Swamp Ass,George Kittle,TE,TE,SF,False,False
+2023,6,5,55,Monster Cheese,Chris Olave,WR,WR,NO,False,False
+2023,6,6,56,Diver Down,DeVonta Smith,WR,WR,PHI,False,False
+2023,6,7,57,THE DEMONS,Russell Wilson,QB,QB,NYG,False,False
+2023,6,8,58,Legion of Doom,Alexander Mattison,RB,RB,MIA,False,False
+2023,6,9,59,Rocket City Trash Pandas,Anthony Richardson,QB,QB,IND,False,False
+2023,6,10,60,Salty Dogs,Jaylen Waddle,WR,WR,DEN,False,False
+2023,7,1,61,Salty Dogs,Calvin Ridley,WR,WR,TEN,False,False
+2023,7,2,62,Rocket City Trash Pandas,Tee Higgins,WR,WR,CIN,False,False
+2023,7,3,63,Legion of Doom,DK Metcalf,WR,WR,PIT,False,False
+2023,7,4,64,THE DEMONS,Isiah Pacheco,RB,RB,DET,False,False
+2023,7,5,65,Diver Down,James Cook,RB,RB,BUF,False,False
+2023,7,6,66,Monster Cheese,Kenny Pickett,QB,QB,CAR,False,False
+2023,7,7,67,Mississippi Swamp Ass,George Pickens,WR,WR,DAL,False,False
+2023,7,8,68,Mojo,Derek Carr,QB,QB,NO,False,False
+2023,7,9,69,Aces High,Deebo Samuel,WR,WR,SF,False,False
+2023,7,10,70,Buckhorns,Amari Cooper,WR,WR,LV,False,False
+2023,8,1,71,Buckhorns,James Conner,RB,RB,ARI,False,False
+2023,8,2,72,Aces High,Javonte Williams,RB,RB,DAL,False,False
+2023,8,3,73,Mojo,AJ Dillon,RB,RB,CAR,False,False
+2023,8,4,74,Mississippi Swamp Ass,Cam Akers,RB,RB,SEA,False,False
+2023,8,5,75,Monster Cheese,Breece Hall,RB,RB,NYJ,False,False
+2023,8,6,76,Diver Down,Dallas Goedert,TE,TE,PHI,False,False
+2023,8,7,77,THE DEMONS,T.J. Hockenson,TE,TE,MIN,False,False
+2023,8,8,78,Legion of Doom,Khalil Herbert,RB,RB,SF,False,False
+2023,8,9,79,Rocket City Trash Pandas,DeAndre Hopkins,WR,WR,BAL,False,False
+2023,8,10,80,Salty Dogs,Kyle Pitts,TE,TE,ATL,False,False
+2023,9,1,81,Salty Dogs,David Montgomery,RB,RB,HOU,False,False
+2023,9,2,82,Rocket City Trash Pandas,Rashaad Penny,RB,RB,,False,False
+2023,9,3,83,Legion of Doom,Alvin Kamara,RB,RB,NO,False,False
+2023,9,4,84,THE DEMONS,Ezekiel Elliott,RB,RB,,False,False
+2023,9,5,85,Diver Down,Drake London,WR,WR,ATL,False,False
+2023,9,6,86,Monster Cheese,Jordan Addison,WR,WR,MIN,False,False
+2023,9,7,87,Mississippi Swamp Ass,Jerry Jeudy,WR,WR,CLE,False,False
+2023,9,8,88,Mojo,Keenan Allen,WR,WR,IND,False,False
+2023,9,9,89,Aces High,D'Andre Swift,RB,RB,CHI,False,False
+2023,9,10,90,Buckhorns,David Njoku,TE,TE,LAC,False,False
+2023,10,1,91,Buckhorns,Greg Dulcich,TE,TE,MIA,False,False
+2023,10,2,92,Aces High,Tyler Lockett,WR,WR,LV,False,False
+2023,10,3,93,Mojo,Roschon Johnson,RB,RB,CHI,False,False
+2023,10,4,94,Mississippi Swamp Ass,Dalton Kincaid,TE,TE,BUF,False,False
+2023,10,5,95,Monster Cheese,Gabe Davis,WR,WR,BUF,False,False
+2023,10,6,96,Diver Down,Jimmy Garoppolo,QB,QB,LAR,False,False
+2023,10,7,97,THE DEMONS,Dalvin Cook,RB,RB,,False,False
+2023,10,8,98,Legion of Doom,Jamaal Williams,RB,RB,NO,False,False
+2023,10,9,99,Rocket City Trash Pandas,Rachaad White,RB,RB,WAS,False,False
+2023,10,10,100,Salty Dogs,Brandon Aiyuk,WR,WR,SF,False,False
+2023,11,1,101,Salty Dogs,Zach Charbonnet,RB,RB,SEA,False,False
+2023,11,2,102,Rocket City Trash Pandas,Pat Freiermuth,TE,TE,PIT,False,False
+2023,11,3,103,Legion of Doom,Matthew Stafford,QB,QB,LAR,False,False
+2023,11,4,104,THE DEMONS,Christian Kirk,WR,WR,SF,False,False
+2023,11,5,105,Diver Down,Damien Harris,RB,RB,,False,False
+2023,11,6,106,Monster Cheese,Skyy Moore,WR,WR,GB,False,False
+2023,11,7,107,Mississippi Swamp Ass,Raheem Mostert,RB,RB,LV,False,False
+2023,11,8,108,Mojo,Baker Mayfield,QB,QB,TB,False,False
+2023,11,9,109,Aces High,Sam Howell,QB,QB,DAL,False,False
+2023,11,10,110,Buckhorns,Bryce Young,QB,QB,CAR,False,False
+2023,12,1,111,Buckhorns,Kyler Murray,QB,QB,MIN,False,False
+2023,12,2,112,Aces High,Antonio Gibson,RB,RB,NE,False,False
+2023,12,3,113,Mojo,Michael Thomas,WR,WR,,False,False
+2023,12,4,114,Mississippi Swamp Ass,Zay Flowers,WR,WR,BAL,False,False
+2023,12,5,115,Monster Cheese,Diontae Johnson,WR,WR,CLE,False,False
+2023,12,6,116,Diver Down,Mike Williams,WR,WR,LAC,False,False
+2023,12,7,117,THE DEMONS,Mike Evans,WR,WR,SF,False,False
+2023,12,8,118,Legion of Doom,Chris Godwin,WR,WR,TB,False,False
+2023,12,9,119,Rocket City Trash Pandas,Justin Tucker,K,K,BAL,False,False
+2023,12,10,120,Salty Dogs,Jahan Dotson,WR,WR,ATL,False,False
+2023,13,1,121,Salty Dogs,C.J. Stroud,QB,QB,HOU,False,False
+2023,13,2,122,Rocket City Trash Pandas,Eagles,DST,DST,PHI,False,False
+2023,13,3,123,Legion of Doom,Terry McLaurin,WR,WR,WAS,False,False
+2023,13,4,124,THE DEMONS,Brandin Cooks,WR,WR,BUF,False,False
+2023,13,5,125,Diver Down,Elijah Mitchell,RB,RB,PHI,False,False
+2023,13,6,126,Monster Cheese,Jerick McKinnon,RB,RB,,False,False
+2023,13,7,127,Mississippi Swamp Ass,Cowboys,DST,DST,DAL,False,False
+2023,13,8,128,Mojo,Harrison Butker,K,K,KC,False,False
+2023,13,9,129,Aces High,Ryan Tannehill,QB,QB,,False,False
+2023,13,10,130,Buckhorns,De'Von Achane,RB,RB,MIA,False,False
+2023,14,1,131,Buckhorns,Deuce Vaughn,RB,RB,DEN,False,False
+2023,14,2,132,Aces High,Dalton Schultz,TE,TE,HOU,False,False
+2023,14,3,133,Mojo,Chiefs,DST,DST,KC,False,False
+2023,14,4,134,Mississippi Swamp Ass,Desmond Ridder,QB,QB,GB,False,False
+2023,14,5,135,Monster Cheese,Tyjae Spears,RB,RB,TEN,False,False
+2023,14,6,136,Diver Down,Rashod Bateman,WR,WR,BAL,False,False
+2023,14,7,137,THE DEMONS,Tyler Allgeier,RB,RB,ARI,False,False
+2023,14,8,138,Legion of Doom,Marquise Brown,WR,WR,PHI,False,False
+2023,14,9,139,Rocket City Trash Pandas,Mac Jones,QB,QB,SF,False,False
+2023,14,10,140,Salty Dogs,Evan Engram,TE,TE,DEN,False,False
+2023,15,1,141,Salty Dogs,Samaje Perine,RB,RB,CIN,False,False
+2023,15,2,142,Rocket City Trash Pandas,Jeff Wilson,RB,RB,MIA,False,False
+2023,15,3,143,Legion of Doom,Cole Kmet,TE,TE,CHI,False,False
+2023,15,4,144,THE DEMONS,Jakobi Meyers,WR,WR,JAC,False,False
+2023,15,5,145,Diver Down,Irv Smith,TE,TE,HOU,False,False
+2023,15,6,146,Monster Cheese,Chase Brown,RB,RB,CIN,False,False
+2023,15,7,147,Mississippi Swamp Ass,Jaxon Smith-Njigba,WR,WR,SEA,False,False
+2023,15,8,148,Mojo,Kendre Miller,RB,RB,NO,False,False
+2023,15,9,149,Aces High,Kenneth Gainwell,RB,RB,TB,False,False
+2023,15,10,150,Buckhorns,Jake Moody,K,K,WAS,False,False
+2023,16,1,151,Buckhorns,Jonathan Mingo,WR,WR,DAL,False,False
+2023,16,2,152,Aces High,Steelers,DST,DST,PIT,False,False
+2023,16,3,153,Mojo,Quentin Johnston,WR,WR,LAC,False,False
+2023,16,4,154,Mississippi Swamp Ass,Tank Bigsby,RB,RB,PHI,False,False
+2023,16,5,155,Monster Cheese,Chigoziem Okonkwo,TE,TE,WAS,False,False
+2023,16,6,156,Diver Down,Younghoe Koo,K,K,NYJ,False,False
+2023,16,7,157,THE DEMONS,Tyler Bass,K,K,BUF,False,False
+2023,16,8,158,Legion of Doom,Daniel Carlson,K,K,LV,False,False
+2023,16,9,159,Rocket City Trash Pandas,Jake Elliott,K,K,PHI,False,False
+2023,16,10,160,Salty Dogs,49ers,DST,DST,SF,False,False
+2023,17,1,161,Salty Dogs,Evan McPherson,K,K,CIN,False,False
+2023,17,2,162,Rocket City Trash Pandas,D'Onta Foreman,RB,RB,CLE,False,False
+2023,17,3,163,Legion of Doom,Jets,DST,DST,NYJ,False,False
+2023,17,4,164,THE DEMONS,Bills,DST,DST,BUF,False,False
+2023,17,5,165,Diver Down,Patriots,DST,DST,NE,False,False
+2023,17,6,166,Monster Cheese,Packers,DST,DST,GB,False,False
+2023,17,7,167,Mississippi Swamp Ass,Jason Sanders,K,K,NYJ,False,False
+2023,17,8,168,Mojo,Zay Jones,WR,WR,HOU,False,False
+2023,17,9,169,Aces High,Dolphins,DST,DST,MIA,False,False
+2023,17,10,170,Buckhorns,Jalin Hyatt,WR,WR,NYG,False,False
+2023,18,1,171,Buckhorns,Texans,DST,DST,HOU,False,False
+2023,18,2,172,Aces High,Cameron Dicker,K,K,LAC,False,False
+2023,18,3,173,Mojo,Joshua Kelley,RB,RB,TEN,False,False
+2023,18,4,174,Mississippi Swamp Ass,Commanders,DST,DST,WAS,False,False
+2023,18,5,175,Monster Cheese,Jason Myers,K,K,SEA,False,False
+2023,18,6,176,Diver Down,Greg Zuerlein,K,K,NYJ,False,False
+2023,18,7,177,THE DEMONS,Gus Edwards,RB,RB,LAC,False,False
+2023,18,8,178,Legion of Doom,Odell Beckham Jr.,WR,WR,NYG,False,False
+2023,18,9,179,Rocket City Trash Pandas,Saints,DST,DST,NO,False,False
+2023,18,10,180,Salty Dogs,Jaylen Warren,RB,RB,PIT,False,False
+2023,19,1,181,Salty Dogs,Ravens,DST,DST,BAL,False,False
+2023,19,2,182,Rocket City Trash Pandas,JuJu Smith-Schuster,WR,WR,NYG,False,False
+2023,19,3,183,Legion of Doom,Broncos,DST,DST,DEN,False,False
+2023,19,4,184,THE DEMONS,Brandon McManus,K,K,GB,False,False
+2023,19,5,185,Diver Down,Bengals,DST,DST,CIN,False,False
+2023,19,6,186,Monster Cheese,Graham Gano,K,K,NYG,False,False
+2023,19,7,187,Mississippi Swamp Ass,Treylon Burks,WR,WR,WAS,False,False
+2023,19,8,188,Mojo,Browns,DST,DST,CLE,False,False
+2023,19,9,189,Aces High,Romeo Doubs,WR,WR,NE,False,False
+2023,19,10,190,Buckhorns,Greg Joseph,K,K,LV,False,False
+2023,20,1,191,Buckhorns,Lions,DST,DST,DET,False,False
+2023,20,2,192,Aces High,Brett Maher,K,K,,False,False
+2023,20,3,193,Mojo,Riley Patterson,K,K,MIA,False,False
+2023,20,4,194,Mississippi Swamp Ass,Brandon Aubrey,K,K,DAL,False,False
+2023,20,5,195,Monster Cheese,Giants,DST,DST,NYG,False,False
+2023,20,6,196,Diver Down,Chuba Hubbard,RB,RB,CAR,False,False
+2023,20,7,197,THE DEMONS,Chargers,DST,DST,LAC,False,False
+2023,20,8,198,Legion of Doom,Cade York,K,K,NYJ,False,False
+2023,20,9,199,Rocket City Trash Pandas,Courtland Sutton,WR,WR,DEN,False,False
+2023,20,10,200,Salty Dogs,Matt Gay,K,K,LV,False,False
+2023,21,1,201,Buckhorns,Clyde Edwards-Helaire,RB,RB,KC,False,False
+2023,21,2,202,Aces High,Zamir White,RB,RB,SF,False,False
+2023,21,3,203,Mojo,Nico Collins,WR,WR,HOU,False,False
+2023,21,4,204,Mississippi Swamp Ass,Aidan O'Connell,QB,QB,LV,False,False
+2023,21,5,205,Monster Cheese,Elijah Moore,WR,WR,PHI,False,False
+2023,21,6,206,Diver Down,Ty Chandler,RB,RB,NO,False,False
+2023,21,7,207,THE DEMONS,Michael Pittman,WR,WR,PIT,False,False
+2023,21,8,208,Legion of Doom,Kadarius Toney,WR,WR,,False,False
+2023,21,9,209,Rocket City Trash Pandas,Sam LaPorta,TE,TE,DET,False,False
+2023,21,10,210,Salty Dogs,Allen Lazard,WR,WR,NYJ,False,False
+2023,22,1,211,Salty Dogs,Jameson Williams,WR,WR,DET,False,False
+2023,22,2,212,Rocket City Trash Pandas,Devin Singletary,RB,RB,NYG,False,False
+2023,22,3,213,Legion of Doom,Tyler Higbee,TE,TE,LAR,False,False
+2023,22,4,214,THE DEMONS,Taysom Hill,QB,"QB,TE",NO,False,False
+2023,22,5,215,Diver Down,Darnell Mooney,WR,WR,NYG,False,False
+2023,22,6,216,Monster Cheese,Parris Campbell,WR,WR,DAL,False,False
+2023,22,7,217,Mississippi Swamp Ass,Michael Mayer,TE,TE,LV,False,False
+2023,22,8,218,Mojo,Chase Claypool,WR,WR,,False,False
+2023,22,9,219,Aces High,Tyler Boyd,WR,WR,TEN,False,False
+2023,22,10,220,Buckhorns,Brian Hoyer,QB,QB,,False,False
+2024,1,1,1,Ball Busters,Patrick Mahomes,QB,QB,KC,False,False
+2024,1,2,2,Monster Cheese,Josh Allen,QB,QB,BUF,False,False
+2024,1,3,3,Pimp Daddy,Christian McCaffrey,RB,RB,SF,False,False
+2024,1,4,4,THE DEMONS,Breece Hall,RB,RB,NYJ,False,False
+2024,1,5,5,Salty Dogs,Bijan Robinson,RB,RB,ATL,False,False
+2024,1,6,6,Mojo,Lamar Jackson,QB,QB,BAL,False,False
+2024,1,7,7,Legion of Doom,Jalen Hurts,QB,QB,PHI,False,False
+2024,1,8,8,Aces High,Joe Burrow,QB,QB,CIN,False,False
+2024,1,9,9,Mississippi Swamp Ass,Jordan Love,QB,QB,GB,False,False
+2024,1,10,10,Buckhorns,Saquon Barkley,RB,RB,PHI,False,False
+2024,2,1,11,Buckhorns,Jonathan Taylor,RB,RB,IND,False,False
+2024,2,2,12,Mississippi Swamp Ass,Kyren Williams,RB,RB,LAR,False,False
+2024,2,3,13,Aces High,Ja'Marr Chase,WR,WR,CIN,False,False
+2024,2,4,14,Legion of Doom,Tyreek Hill,WR,WR,MIA,False,False
+2024,2,5,15,Mojo,Derrick Henry,RB,RB,BAL,False,False
+2024,2,6,16,Salty Dogs,CeeDee Lamb,WR,WR,DAL,False,False
+2024,2,7,17,THE DEMONS,C.J. Stroud,QB,QB,HOU,False,False
+2024,2,8,18,Pimp Daddy,Tua Tagovailoa,QB,QB,ATL,False,False
+2024,2,9,19,Monster Cheese,Jahmyr Gibbs,RB,RB,DET,False,False
+2024,2,10,20,Ball Busters,Isiah Pacheco,RB,RB,DET,False,False
+2024,3,1,21,Ball Busters,James Cook,RB,RB,BUF,False,False
+2024,3,2,22,Monster Cheese,Amon-Ra St. Brown,WR,WR,DET,False,False
+2024,3,3,23,Pimp Daddy,Justin Jefferson,WR,WR,MIN,False,False
+2024,3,4,24,THE DEMONS,Dak Prescott,QB,QB,DAL,False,False
+2024,3,5,25,Salty Dogs,Jared Goff,QB,QB,DET,False,False
+2024,3,6,26,Mojo,De'Von Achane,RB,RB,MIA,False,False
+2024,3,7,27,Legion of Doom,A.J. Brown,WR,WR,NE,False,False
+2024,3,8,28,Aces High,Kyler Murray,QB,QB,MIN,False,False
+2024,3,9,29,Mississippi Swamp Ass,Garrett Wilson,WR,WR,NYJ,False,False
+2024,3,10,30,Buckhorns,Brock Purdy,QB,QB,SF,False,False
+2024,4,1,31,Buckhorns,Joe Mixon,RB,RB,HOU,False,False
+2024,4,2,32,Mississippi Swamp Ass,Puka Nacua,WR,WR,LAR,False,False
+2024,4,3,33,Aces High,Marvin Harrison Jr.,WR,WR,ARI,False,False
+2024,4,4,34,Legion of Doom,Caleb Williams,QB,QB,CHI,False,False
+2024,4,5,35,Mojo,Trevor Lawrence,QB,QB,JAC,False,False
+2024,4,6,36,Salty Dogs,Travis Etienne,RB,RB,NO,False,False
+2024,4,7,37,THE DEMONS,Travis Kelce,TE,TE,KC,False,False
+2024,4,8,38,Pimp Daddy,Sam LaPorta,TE,TE,DET,False,False
+2024,4,9,39,Monster Cheese,Anthony Richardson,QB,QB,IND,False,False
+2024,4,10,40,Ball Busters,Mike Evans,WR,WR,SF,False,False
+2024,5,1,41,Ball Busters,Derek Carr,QB,QB,NO,False,False
+2024,5,2,42,Monster Cheese,Kenneth Walker III,RB,RB,KC,False,False
+2024,5,3,43,Pimp Daddy,Jayden Daniels,QB,QB,WAS,False,False
+2024,5,4,44,THE DEMONS,Josh Jacobs,RB,RB,GB,False,False
+2024,5,5,45,Salty Dogs,Raheem Mostert,RB,RB,LV,False,False
+2024,5,6,46,Mojo,Nico Collins,WR,WR,HOU,False,False
+2024,5,7,47,Legion of Doom,Alvin Kamara,RB,RB,NO,False,False
+2024,5,8,48,Aces High,Mark Andrews,TE,TE,BAL,False,False
+2024,5,9,49,Mississippi Swamp Ass,Kirk Cousins,QB,QB,LV,False,False
+2024,5,10,50,Buckhorns,Deshaun Watson,QB,QB,CLE,False,False
+2024,6,1,51,Buckhorns,Baker Mayfield,QB,QB,TB,False,False
+2024,6,2,52,Mississippi Swamp Ass,D'Andre Swift,RB,RB,CHI,False,False
+2024,6,3,53,Aces High,Deebo Samuel,WR,WR,SF,False,False
+2024,6,4,54,Legion of Doom,Rachaad White,RB,RB,WAS,False,False
+2024,6,5,55,Mojo,DK Metcalf,WR,WR,PIT,False,False
+2024,6,6,56,Salty Dogs,Matthew Stafford,QB,QB,LAR,False,False
+2024,6,7,57,THE DEMONS,Aaron Rodgers,QB,QB,PIT,False,False
+2024,6,8,58,Pimp Daddy,Tony Pollard,RB,RB,TEN,False,False
+2024,6,9,59,Monster Cheese,Chris Olave,WR,WR,NO,False,False
+2024,6,10,60,Ball Busters,DeVonta Smith,WR,WR,PHI,False,False
+2024,7,1,61,Ball Busters,George Kittle,TE,TE,SF,False,False
+2024,7,2,62,Monster Cheese,Rhamondre Stevenson,RB,RB,NE,False,False
+2024,7,3,63,Pimp Daddy,Brandon Aiyuk,WR,WR,SF,False,False
+2024,7,4,64,THE DEMONS,Davante Adams,WR,WR,LAR,False,False
+2024,7,5,65,Salty Dogs,Drake London,WR,WR,ATL,False,False
+2024,7,6,66,Mojo,Trey McBride,TE,TE,ARI,False,False
+2024,7,7,67,Legion of Doom,James Conner,RB,RB,ARI,False,False
+2024,7,8,68,Aces High,Gus Edwards,RB,RB,LAC,False,False
+2024,7,9,69,Mississippi Swamp Ass,Dalton Kincaid,TE,TE,BUF,False,False
+2024,7,10,70,Buckhorns,DJ Moore,WR,WR,BUF,False,False
+2024,8,1,71,Buckhorns,Tank Dell,WR,WR,HOU,False,False
+2024,8,2,72,Mississippi Swamp Ass,Malik Nabers,WR,WR,NYG,False,False
+2024,8,3,73,Aces High,Justin Herbert,QB,QB,LAC,False,False
+2024,8,4,74,Legion of Doom,Cooper Kupp,WR,WR,SEA,False,False
+2024,8,5,75,Mojo,Kyle Pitts,TE,TE,ATL,False,False
+2024,8,6,76,Salty Dogs,Jaylen Waddle,WR,WR,DEN,False,False
+2024,8,7,77,THE DEMONS,Stefon Diggs,WR,WR,WAS,False,False
+2024,8,8,78,Pimp Daddy,Will Levis,QB,QB,TEN,False,False
+2024,8,9,79,Monster Cheese,Aaron Jones,RB,RB,MIN,False,False
+2024,8,10,80,Ball Busters,Najee Harris,RB,RB,NYG,False,False
+2024,9,1,81,Ball Busters,George Pickens,WR,WR,DAL,False,False
+2024,9,2,82,Monster Cheese,Evan Engram,TE,TE,DEN,False,False
+2024,9,3,83,Pimp Daddy,Brian Robinson Jr.,RB,RB,ATL,False,False
+2024,9,4,84,THE DEMONS,David Montgomery,RB,RB,HOU,False,False
+2024,9,5,85,Salty Dogs,Jake Ferguson,TE,TE,DAL,False,False
+2024,9,6,86,Mojo,Sam Darnold,QB,QB,SEA,False,False
+2024,9,7,87,Legion of Doom,Amari Cooper,WR,WR,LV,False,False
+2024,9,8,88,Aces High,Zack Moss,RB,RB,CIN,False,False
+2024,9,9,89,Mississippi Swamp Ass,Javonte Williams,RB,RB,DAL,False,False
+2024,9,10,90,Buckhorns,Zamir White,RB,RB,SF,False,False
+2024,10,1,91,Buckhorns,Calvin Ridley,WR,WR,TEN,False,False
+2024,10,2,92,Mississippi Swamp Ass,Christian Watson,WR,WR,GB,False,False
+2024,10,3,93,Aces High,Rashee Rice,WR,WR,KC,False,False
+2024,10,4,94,Legion of Doom,Nick Chubb,RB,RB,HOU,False,False
+2024,10,5,95,Mojo,Rico Dowdle,RB,RB,PIT,False,False
+2024,10,6,96,Salty Dogs,Geno Smith,QB,QB,NYJ,False,False
+2024,10,7,97,THE DEMONS,Devin Singletary,RB,RB,NYG,False,False
+2024,10,8,98,Pimp Daddy,Brock Bowers,TE,TE,LV,False,False
+2024,10,9,99,Monster Cheese,Bo Nix,QB,QB,DEN,False,False
+2024,10,10,100,Ball Busters,Zay Flowers,WR,WR,BAL,False,False
+2024,11,1,101,Ball Busters,J.K. Dobbins,RB,RB,DEN,False,False
+2024,11,2,102,Monster Cheese,Tyjae Spears,RB,RB,TEN,False,False
+2024,11,3,103,Pimp Daddy,Courtland Sutton,WR,WR,DEN,False,False
+2024,11,4,104,THE DEMONS,Tee Higgins,WR,WR,CIN,False,False
+2024,11,5,105,Salty Dogs,Michael Pittman,WR,WR,PIT,False,False
+2024,11,6,106,Mojo,Trey Benson,RB,RB,ARI,False,False
+2024,11,7,107,Legion of Doom,Terry McLaurin,WR,WR,WAS,False,False
+2024,11,8,108,Aces High,Jerome Ford,RB,RB,WAS,False,False
+2024,11,9,109,Mississippi Swamp Ass,Jaylen Warren,RB,RB,PIT,False,False
+2024,11,10,110,Buckhorns,Bryce Young,QB,QB,CAR,False,False
+2024,12,1,111,Buckhorns,DeAndre Hopkins,WR,WR,BAL,False,False
+2024,12,2,112,Mississippi Swamp Ass,Austin Ekeler,RB,RB,WAS,False,False
+2024,12,3,113,Aces High,David Njoku,TE,TE,LAC,True,False
+2024,12,4,114,Legion of Doom,Jonathon Brooks,RB,RB,CAR,False,False
+2024,12,5,115,Mojo,Harrison Butker,K,K,KC,False,False
+2024,12,6,116,Salty Dogs,Blake Corum,RB,RB,LAR,False,False
+2024,12,7,117,THE DEMONS,Ezekiel Elliott,RB,RB,,False,False
+2024,12,8,118,Pimp Daddy,Xavier Worthy,WR,WR,KC,False,False
+2024,12,9,119,Monster Cheese,Christian Kirk,WR,WR,SF,False,False
+2024,12,10,120,Ball Busters,Daniel Jones,QB,QB,IND,False,False
+2024,13,1,121,Ball Busters,Cole Kmet,TE,TE,CHI,False,False
+2024,13,2,122,Monster Cheese,Chris Godwin,WR,WR,TB,False,False
+2024,13,3,123,Pimp Daddy,Jacoby Brissett,QB,QB,ARI,False,False
+2024,13,4,124,THE DEMONS,Keenan Allen,WR,WR,IND,False,False
+2024,13,5,125,Salty Dogs,Diontae Johnson,WR,WR,CLE,False,False
+2024,13,6,126,Mojo,Jameson Williams,WR,WR,DET,False,False
+2024,13,7,127,Legion of Doom,Dallas Goedert,TE,TE,PHI,False,False
+2024,13,8,128,Aces High,Justin Tucker,K,K,BAL,False,False
+2024,13,9,129,Mississippi Swamp Ass,Gardner Minshew,QB,QB,ARI,False,False
+2024,13,10,130,Buckhorns,Dalton Schultz,TE,TE,HOU,False,False
+2024,14,1,131,Buckhorns,Isaiah Likely,TE,TE,NYG,False,False
+2024,14,2,132,Mississippi Swamp Ass,49ers,DST,DST,SF,False,False
+2024,14,3,133,Aces High,Ravens,DST,DST,BAL,False,False
+2024,14,4,134,Legion of Doom,Russell Wilson,QB,QB,NYG,False,False
+2024,14,5,135,Mojo,Jayden Reed,WR,WR,GB,False,False
+2024,14,6,136,Salty Dogs,Chase Brown,RB,RB,CIN,False,False
+2024,14,7,137,THE DEMONS,Chuba Hubbard,RB,RB,CAR,False,False
+2024,14,8,138,Pimp Daddy,Ray Davis,RB,RB,BUF,False,False
+2024,14,9,139,Monster Cheese,Zach Charbonnet,RB,RB,SEA,False,False
+2024,14,10,140,Ball Busters,Ty Chandler,RB,RB,NO,False,False
+2024,15,1,141,Ball Busters,Ladd McConkey,WR,WR,LAC,False,False
+2024,15,2,142,Monster Cheese,Josh Palmer,WR,WR,BUF,False,False
+2024,15,3,143,Pimp Daddy,Chris Rodriguez Jr.,RB,RB,JAC,False,False
+2024,15,4,144,THE DEMONS,Marquise Brown,WR,WR,PHI,False,False
+2024,15,5,145,Salty Dogs,Pat Freiermuth,TE,TE,PIT,False,False
+2024,15,6,146,Mojo,Jaleel McLaughlin,RB,RB,DEN,False,False
+2024,15,7,147,Legion of Doom,Rome Odunze,WR,WR,CHI,False,False
+2024,15,8,148,Aces High,Kimani Vidal,RB,RB,LAC,False,False
+2024,15,9,149,Mississippi Swamp Ass,Khalil Shakir,WR,WR,BUF,False,False
+2024,15,10,150,Buckhorns,Hunter Henry,TE,TE,NE,False,False
+2024,16,1,151,Buckhorns,MarShawn Lloyd,RB,RB,GB,False,False
+2024,16,2,152,Mississippi Swamp Ass,Jason Sanders,K,K,NYJ,False,False
+2024,16,3,153,Aces High,Romeo Doubs,WR,WR,NE,False,False
+2024,16,4,154,Legion of Doom,T.J. Hockenson,TE,TE,MIN,False,False
+2024,16,5,155,Mojo,Keon Coleman,WR,WR,BUF,False,False
+2024,16,6,156,Salty Dogs,Cowboys,DST,DST,DAL,False,False
+2024,16,7,157,THE DEMONS,Brandon Aubrey,K,K,DAL,False,False
+2024,16,8,158,Pimp Daddy,Jets,DST,DST,NYJ,False,False
+2024,16,9,159,Monster Cheese,Tyler Conklin,TE,TE,DET,False,False
+2024,16,10,160,Ball Busters,Jakobi Meyers,WR,WR,JAC,False,False
+2024,17,1,161,Ball Busters,Younghoe Koo,K,K,NYJ,False,False
+2024,17,2,162,Monster Cheese,Browns,DST,DST,CLE,False,False
+2024,17,3,163,Pimp Daddy,Greg Zuerlein,K,K,NYJ,False,False
+2024,17,4,164,THE DEMONS,Luke Musgrave,TE,TE,GB,True,False
+2024,17,5,165,Salty Dogs,Jake Elliott,K,K,PHI,False,False
+2024,17,6,166,Mojo,Texans,DST,DST,HOU,False,False
+2024,17,7,167,Legion of Doom,Bears,DST,DST,CHI,False,False
+2024,17,8,168,Aces High,Khalil Herbert,RB,RB,SF,False,False
+2024,17,9,169,Mississippi Swamp Ass,Gerald Everett,TE,TE,CHI,False,False
+2024,17,10,170,Buckhorns,Jason Myers,K,K,SEA,False,False
+2024,18,1,171,Buckhorns,Ka'imi Fairbairn,K,K,HOU,False,False
+2024,18,2,172,Mississippi Swamp Ass,Audric Estime,RB,RB,NO,False,False
+2024,18,3,173,Aces High,Steelers,DST,DST,PIT,False,False
+2024,18,4,174,Legion of Doom,Cairo Santos,K,K,CHI,False,False
+2024,18,5,175,Mojo,Bills,DST,DST,BUF,False,False
+2024,18,6,176,Salty Dogs,Dolphins,DST,DST,MIA,False,False
+2024,18,7,177,THE DEMONS,Tyler Bass,K,K,BUF,False,False
+2024,18,8,178,Pimp Daddy,Eagles,DST,DST,PHI,False,False
+2024,18,9,179,Monster Cheese,Jake Moody,K,K,WAS,False,False
+2024,18,10,180,Ball Busters,Chiefs,DST,DST,KC,False,False
+2024,19,1,181,Ball Busters,Matt Gay,K,K,LV,False,False
+2024,19,2,182,Monster Cheese,Jake Bates,K,K,DET,False,False
+2024,19,3,183,Pimp Daddy,Mason Crosby,K,K,,False,False
+2024,19,4,184,THE DEMONS,Colts,DST,DST,IND,False,False
+2024,19,5,185,Salty Dogs,Brian Thomas Jr.,WR,WR,JAC,False,False
+2024,19,6,186,Mojo,Evan McPherson,K,K,CIN,False,False
+2024,19,7,187,Legion of Doom,Cameron Dicker,K,K,LAC,False,False
+2024,19,8,188,Aces High,Matt Prater,K,K,BUF,False,False
+2024,19,9,189,Mississippi Swamp Ass,Daniel Carlson,K,K,LV,False,False
+2024,19,10,190,Buckhorns,Bengals,DST,DST,CIN,False,False
+2024,20,1,191,Buckhorns,Chargers,DST,DST,LAC,False,False
+2024,20,2,192,Mississippi Swamp Ass,Seahawks,DST,DST,SEA,False,False
+2024,20,3,193,Aces High,D'Onta Foreman,RB,RB,CLE,False,False
+2024,20,4,194,Legion of Doom,Buccaneers,DST,DST,TB,False,False
+2024,20,5,195,Mojo,Drake Maye,QB,QB,NE,False,False
+2024,20,6,196,Salty Dogs,Blake Grupe,K,K,IND,False,False
+2024,20,7,197,THE DEMONS,Saints,DST,DST,NO,False,False
+2024,20,8,198,Pimp Daddy,Matt Breida,RB,RB,,False,False
+2024,20,9,199,Monster Cheese,Lions,DST,DST,DET,False,False
+2024,20,10,200,Ball Busters,Packers,DST,DST,GB,False,False
+2024,21,1,201,Buckhorns,Justin Fields,QB,QB,KC,False,False
+2024,21,2,202,Mississippi Swamp Ass,Tyler Allgeier,RB,RB,ARI,False,False
+2024,21,3,203,Aces High,Tank Bigsby,RB,RB,PHI,False,False
+2024,21,4,204,Legion of Doom,Jordan Addison,WR,WR,MIN,False,False
+2024,21,5,205,Mojo,Adonai Mitchell,WR,WR,NYJ,False,False
+2024,21,6,206,Salty Dogs,Jaylen Wright,RB,RB,MIA,False,False
+2024,21,7,207,THE DEMONS,Antonio Gibson,RB,RB,NE,False,False
+2024,21,8,208,Pimp Daddy,Tyler Lockett,WR,WR,LV,False,False
+2024,21,9,209,Monster Cheese,Brandin Cooks,WR,WR,BUF,False,False
+2024,21,10,210,Ball Busters,Tim Patrick,WR,WR,NYJ,False,False
+2024,22,1,211,Ball Busters,Taysom Hill,QB,"QB,TE",NO,False,False
+2024,22,2,212,Monster Cheese,Darnell Mooney,WR,WR,NYG,False,False
+2024,22,3,213,Pimp Daddy,Mike Williams,WR,WR,LAC,False,False
+2024,22,4,214,THE DEMONS,Jaxon Smith-Njigba,WR,WR,SEA,False,False
+2024,22,5,215,Salty Dogs,Rashid Shaheed,WR,WR,SEA,False,False
+2024,22,6,216,Mojo,Quentin Johnston,WR,WR,LAC,False,False
+2024,22,7,217,Legion of Doom,Alexander Mattison,RB,RB,MIA,False,False
+2024,22,8,218,Aces High,Roschon Johnson,RB,RB,CHI,False,False
+2024,22,9,219,Mississippi Swamp Ass,Curtis Samuel,WR,WR,BUF,False,False
+2024,22,10,220,Buckhorns,Aidan O'Connell,QB,QB,LV,False,False
+2025,1,1,1,Salty Dogs,Joe Burrow,QB,QB,CIN,False,False
+2025,1,2,2,Ball Busters,Josh Allen,QB,QB,BUF,False,False
+2025,1,3,3,Pimp Daddy,Lamar Jackson,QB,QB,BAL,False,False
+2025,1,4,4,Legion of Doom,Saquon Barkley,RB,RB,PHI,False,False
+2025,1,5,5,Buckhorns,Josh Jacobs,RB,RB,GB,False,False
+2025,1,6,6,Monster Cheese,Jayden Daniels,QB,QB,WAS,False,False
+2025,1,7,7,THE DEMONS,Jahmyr Gibbs,RB,RB,DET,False,False
+2025,1,8,8,Mississippi Swamp Ass,Ja'Marr Chase,WR,WR,CIN,False,False
+2025,1,9,9,Mojo,Derrick Henry,RB,RB,BAL,False,False
+2025,1,10,10,Aces High,Bijan Robinson,RB,RB,ATL,True,False
+2025,2,1,11,Aces High,Jalen Hurts,QB,QB,PHI,False,False
+2025,2,2,12,Mojo,Baker Mayfield,QB,QB,TB,False,False
+2025,2,3,13,Mississippi Swamp Ass,Kyren Williams,RB,RB,LAR,False,False
+2025,2,4,14,THE DEMONS,Patrick Mahomes,QB,QB,KC,False,False
+2025,2,5,15,Monster Cheese,Ashton Jeanty,RB,RB,LV,False,False
+2025,2,6,16,Buckhorns,Jared Goff,QB,QB,DET,False,False
+2025,2,7,17,Legion of Doom,Christian McCaffrey,RB,RB,SF,False,False
+2025,2,8,18,Pimp Daddy,Justin Jefferson,WR,WR,MIN,False,False
+2025,2,9,19,Ball Busters,James Cook,RB,RB,BUF,False,False
+2025,2,10,20,Salty Dogs,Jonathan Taylor,RB,RB,IND,False,False
+2025,3,1,21,Salty Dogs,CeeDee Lamb,WR,WR,DAL,False,False
+2025,3,2,22,Ball Busters,Bucky Irving,RB,RB,TB,False,False
+2025,3,3,23,Pimp Daddy,David Montgomery,RB,RB,HOU,False,False
+2025,3,4,24,Legion of Doom,Malik Nabers,WR,WR,NYG,True,False
+2025,3,5,25,Buckhorns,Chase Brown,RB,RB,CIN,False,False
+2025,3,6,26,Monster Cheese,Brian Thomas Jr.,WR,WR,JAC,False,False
+2025,3,7,27,THE DEMONS,Brock Purdy,QB,QB,SF,False,False
+2025,3,8,28,Mississippi Swamp Ass,Brock Bowers,TE,TE,LV,False,False
+2025,3,9,29,Mojo,Chuba Hubbard,RB,RB,CAR,False,False
+2025,3,10,30,Aces High,A.J. Brown,WR,WR,NE,True,False
+2025,4,1,31,Aces High,Dak Prescott,QB,QB,DAL,False,False
+2025,4,2,32,Mojo,George Kittle,TE,TE,SF,False,False
+2025,4,3,33,Mississippi Swamp Ass,TreVeyon Henderson,RB,RB,NE,False,False
+2025,4,4,34,THE DEMONS,Nico Collins,WR,WR,HOU,False,False
+2025,4,5,35,Monster Cheese,Jordan Love,QB,QB,GB,False,False
+2025,4,6,36,Buckhorns,Kenneth Walker III,RB,RB,KC,False,False
+2025,4,7,37,Legion of Doom,De'Von Achane,RB,RB,MIA,False,False
+2025,4,8,38,Pimp Daddy,Aaron Jones,RB,RB,MIN,False,False
+2025,4,9,39,Ball Busters,Davante Adams,WR,WR,LAR,False,False
+2025,4,10,40,Salty Dogs,Bo Nix,QB,QB,DEN,False,False
+2025,5,1,41,Salty Dogs,Amon-Ra St. Brown,WR,WR,DET,False,False
+2025,5,2,42,Ball Busters,Tua Tagovailoa,QB,QB,ATL,False,False
+2025,5,3,43,Pimp Daddy,Puka Nacua,WR,WR,LAR,False,False
+2025,5,4,44,Legion of Doom,Caleb Williams,QB,QB,CHI,False,False
+2025,5,5,45,Buckhorns,Tee Higgins,WR,WR,CIN,False,False
+2025,5,6,46,Monster Cheese,Drake London,WR,WR,ATL,False,False
+2025,5,7,47,THE DEMONS,Breece Hall,RB,RB,NYJ,False,False
+2025,5,8,48,Mississippi Swamp Ass,Alvin Kamara,RB,RB,NO,False,False
+2025,5,9,49,Mojo,Mike Evans,WR,WR,SF,False,False
+2025,5,10,50,Aces High,D'Andre Swift,RB,RB,CHI,True,False
+2025,6,1,51,Aces High,Trey McBride,TE,TE,ARI,True,False
+2025,6,2,52,Mojo,Justin Herbert,QB,QB,LAC,False,False
+2025,6,3,53,Mississippi Swamp Ass,Kyler Murray,QB,QB,MIN,False,False
+2025,6,4,54,THE DEMONS,Travis Kelce,TE,TE,KC,False,False
+2025,6,5,55,Monster Cheese,Drake Maye,QB,QB,NE,False,False
+2025,6,6,56,Buckhorns,Xavier Worthy,WR,WR,KC,False,False
+2025,6,7,57,Legion of Doom,Justin Fields,QB,QB,KC,False,False
+2025,6,8,58,Pimp Daddy,C.J. Stroud,QB,QB,HOU,False,False
+2025,6,9,59,Ball Busters,Ladd McConkey,WR,WR,LAC,False,False
+2025,6,10,60,Salty Dogs,RJ Harvey,RB,RB,DEN,False,False
+2025,7,1,61,Salty Dogs,Omarion Hampton,RB,RB,LAC,False,False
+2025,7,2,62,Ball Busters,Mark Andrews,TE,TE,BAL,False,False
+2025,7,3,63,Pimp Daddy,Marvin Harrison Jr.,WR,WR,ARI,False,False
+2025,7,4,64,Legion of Doom,James Conner,RB,RB,ARI,False,False
+2025,7,5,65,Buckhorns,Tony Pollard,RB,RB,TEN,False,False
+2025,7,6,66,Monster Cheese,T.J. Hockenson,TE,TE,MIN,False,False
+2025,7,7,67,THE DEMONS,Matthew Stafford,QB,QB,LAR,False,False
+2025,7,8,68,Mississippi Swamp Ass,Michael Penix Jr.,QB,QB,ATL,False,False
+2025,7,9,69,Mojo,Sam LaPorta,TE,TE,DET,False,False
+2025,7,10,70,Aces High,DJ Moore,WR,WR,BUF,False,False
+2025,8,1,71,Aces High,Jordan Mason,RB,RB,MIN,True,False
+2025,8,2,72,Mojo,Joe Mixon,RB,RB,HOU,False,False
+2025,8,3,73,Mississippi Swamp Ass,Quinshon Judkins,RB,RB,CLE,False,False
+2025,8,4,74,THE DEMONS,DK Metcalf,WR,WR,PIT,False,False
+2025,8,5,75,Monster Cheese,Isiah Pacheco,RB,RB,DET,False,False
+2025,8,6,76,Buckhorns,Geno Smith,QB,QB,NYJ,False,False
+2025,8,7,77,Legion of Doom,Terry McLaurin,WR,WR,WAS,False,False
+2025,8,8,78,Pimp Daddy,Tyrone Tracy Jr.,RB,RB,NYG,False,False
+2025,8,9,79,Ball Busters,DeVonta Smith,WR,WR,PHI,False,False
+2025,8,10,80,Salty Dogs,Jaxon Smith-Njigba,WR,WR,SEA,False,False
+2025,9,1,81,Salty Dogs,Tyler Warren,TE,TE,IND,False,False
+2025,9,2,82,Ball Busters,Courtland Sutton,WR,WR,DEN,False,False
+2025,9,3,83,Pimp Daddy,Evan Engram,TE,TE,DEN,False,False
+2025,9,4,84,Legion of Doom,Tyreek Hill,WR,WR,MIA,False,False
+2025,9,5,85,Buckhorns,Daniel Jones,QB,QB,IND,False,False
+2025,9,6,86,Monster Cheese,Garrett Wilson,WR,WR,NYJ,False,False
+2025,9,7,87,THE DEMONS,J.K. Dobbins,RB,RB,DEN,False,False
+2025,9,8,88,Mississippi Swamp Ass,Jameson Williams,WR,WR,DET,False,False
+2025,9,9,89,Mojo,Zay Flowers,WR,WR,BAL,False,False
+2025,9,10,90,Aces High,Kaleb Johnson,RB,RB,PIT,True,False
+2025,10,1,91,Aces High,Ricky Pearsall,WR,WR,SF,False,False
+2025,10,2,92,Mojo,Rome Odunze,WR,WR,CHI,False,False
+2025,10,3,93,Mississippi Swamp Ass,J.J. McCarthy,QB,QB,MIN,False,False
+2025,10,4,94,THE DEMONS,Najee Harris,RB,RB,NYG,False,False
+2025,10,5,95,Monster Cheese,Calvin Ridley,WR,WR,TEN,False,False
+2025,10,6,96,Buckhorns,Jakobi Meyers,WR,WR,JAC,False,False
+2025,10,7,97,Legion of Doom,Trevor Lawrence,QB,QB,JAC,False,False
+2025,10,8,98,Pimp Daddy,Tank Bigsby,RB,RB,PHI,False,False
+2025,10,9,99,Ball Busters,Austin Ekeler,RB,RB,WAS,False,False
+2025,10,10,100,Salty Dogs,Sam Darnold,QB,QB,SEA,False,False
+2025,11,1,101,Salty Dogs,Jacory Croskey-Merritt,RB,RB,WAS,False,False
+2025,11,2,102,Ball Busters,Nick Chubb,RB,RB,HOU,False,False
+2025,11,3,103,Pimp Daddy,Travis Hunter,WR,WR,JAC,False,False
+2025,11,4,104,Legion of Doom,David Njoku,TE,TE,LAC,False,False
+2025,11,5,105,Buckhorns,Emeka Egbuka,WR,WR,TB,False,False
+2025,11,6,106,Monster Cheese,Cam Skattebo,RB,RB,NYG,False,False
+2025,11,7,107,THE DEMONS,Aaron Rodgers,QB,QB,PIT,False,False
+2025,11,8,108,Mississippi Swamp Ass,Cooper Kupp,WR,WR,SEA,False,False
+2025,11,9,109,Mojo,Bryce Young,QB,QB,CAR,False,False
+2025,11,10,110,Aces High,George Pickens,WR,WR,DAL,False,False
+2025,12,1,111,Aces High,Keon Coleman,WR,WR,BUF,False,False
+2025,12,2,112,Mojo,Rashee Rice,WR,WR,KC,False,False
+2025,12,3,113,Mississippi Swamp Ass,Jauan Jennings,WR,WR,MIN,False,False
+2025,12,4,114,THE DEMONS,Jordan Addison,WR,WR,MIN,False,False
+2025,12,5,115,Monster Cheese,Zach Charbonnet,RB,RB,SEA,False,False
+2025,12,6,116,Buckhorns,Ollie Gordon II,RB,RB,MIA,False,False
+2025,12,7,117,Legion of Doom,Tetairoa McMillan,WR,WR,CAR,False,False
+2025,12,8,118,Pimp Daddy,Jaylen Waddle,WR,WR,DEN,False,False
+2025,12,9,119,Ball Busters,Michael Pittman,WR,WR,PIT,False,False
+2025,12,10,120,Salty Dogs,Stefon Diggs,WR,WR,WAS,False,False
+2025,13,1,121,Salty Dogs,Jaylen Warren,RB,RB,PIT,False,False
+2025,13,2,122,Ball Busters,Rashod Bateman,WR,WR,BAL,False,False
+2025,13,3,123,Pimp Daddy,Rhamondre Stevenson,RB,RB,NE,False,False
+2025,13,4,124,Legion of Doom,Matthew Golden,WR,WR,GB,False,False
+2025,13,5,125,Buckhorns,Jerry Jeudy,WR,WR,CLE,False,False
+2025,13,6,126,Monster Cheese,Rachaad White,RB,RB,WAS,False,False
+2025,13,7,127,THE DEMONS,Zach Ertz,TE,TE,WAS,False,False
+2025,13,8,128,Mississippi Swamp Ass,Khalil Shakir,WR,WR,BUF,False,False
+2025,13,9,129,Mojo,Eagles,DST,DST,PHI,False,False
+2025,13,10,130,Aces High,Chris Rodriguez Jr.,RB,RB,JAC,False,False
+2025,14,1,131,Aces High,Cam Ward,QB,QB,TEN,False,False
+2025,14,2,132,Mojo,Matt Gay,K,K,LV,False,False
+2025,14,3,133,Mississippi Swamp Ass,Colston Loveland,TE,TE,CHI,False,False
+2025,14,4,134,THE DEMONS,Travis Etienne,RB,RB,NO,False,False
+2025,14,5,135,Monster Cheese,Bhayshul Tuten,RB,RB,JAC,False,False
+2025,14,6,136,Buckhorns,Tucker Kraft,TE,TE,GB,False,False
+2025,14,7,137,Legion of Doom,Javonte Williams,RB,RB,DAL,False,False
+2025,14,8,138,Pimp Daddy,Pat Freiermuth,TE,TE,PIT,False,False
+2025,14,9,139,Ball Busters,Kendre Miller,RB,RB,NO,False,False
+2025,14,10,140,Salty Dogs,Deebo Samuel,WR,WR,SF,False,False
+2025,15,1,141,Salty Dogs,Jonnu Smith,TE,TE,PIT,False,False
+2025,15,2,142,Ball Busters,Russell Wilson,QB,QB,NYG,False,False
+2025,15,3,143,Pimp Daddy,Jaxson Dart,QB,QB,NYG,False,False
+2025,15,4,144,Legion of Doom,Chris Godwin,WR,WR,TB,False,False
+2025,15,5,145,Buckhorns,Darnell Mooney,WR,WR,NYG,False,False
+2025,15,6,146,Monster Cheese,Josh Downs,WR,WR,IND,False,False
+2025,15,7,147,THE DEMONS,Keenan Allen,WR,WR,IND,False,False
+2025,15,8,148,Mississippi Swamp Ass,Vikings,DST,DST,MIN,False,False
+2025,15,9,149,Mojo,Roschon Johnson,RB,RB,CHI,False,False
+2025,15,10,150,Aces High,Jake Ferguson,TE,TE,DAL,False,False
+2025,16,1,151,Aces High,Ray Davis,RB,RB,BUF,True,False
+2025,16,2,152,Mojo,Jaydon Blue,RB,RB,DAL,False,False
+2025,16,3,153,Mississippi Swamp Ass,Jake Elliott,K,K,PHI,False,False
+2025,16,4,154,THE DEMONS,Brandon Aubrey,K,K,DAL,False,False
+2025,16,5,155,Monster Cheese,Packers,DST,DST,GB,False,False
+2025,16,6,156,Buckhorns,MarShawn Lloyd,RB,RB,GB,False,False
+2025,16,7,157,Legion of Doom,Chris Olave,WR,WR,NO,False,False
+2025,16,8,158,Pimp Daddy,Texans,DST,DST,HOU,False,False
+2025,16,9,159,Ball Busters,Hunter Henry,TE,TE,NE,False,False
+2025,16,10,160,Salty Dogs,Bills,DST,DST,BUF,False,False
+2025,17,1,161,Salty Dogs,Chase McLaughlin,K,K,TB,False,False
+2025,17,2,162,Ball Busters,Cowboys,DST,DST,DAL,False,False
+2025,17,3,163,Pimp Daddy,Tyler Bass,K,K,BUF,False,False
+2025,17,4,164,Legion of Doom,Bears,DST,DST,CHI,False,False
+2025,17,5,165,Buckhorns,Harrison Butker,K,K,KC,False,False
+2025,17,6,166,Monster Cheese,Isaac Guerendo,RB,RB,SF,False,False
+2025,17,7,167,THE DEMONS,Brian Robinson Jr.,RB,RB,ATL,False,False
+2025,17,8,168,Mississippi Swamp Ass,Tyler Shough,QB,QB,NO,False,False
+2025,17,9,169,Mojo,Luther Burden III,WR,WR,CHI,False,False
+2025,17,10,170,Aces High,Ravens,DST,DST,BAL,False,False
+2025,18,1,171,Aces High,Younghoe Koo,K,K,NYJ,False,False
+2025,18,2,172,Mojo,Wil Lutz,K,K,DEN,False,False
+2025,18,3,173,Mississippi Swamp Ass,Jerome Ford,RB,RB,WAS,False,False
+2025,18,4,174,THE DEMONS,Broncos,DST,DST,DEN,False,False
+2025,18,5,175,Monster Cheese,Jake Bates,K,K,DET,False,False
+2025,18,6,176,Buckhorns,Steelers,DST,DST,PIT,False,False
+2025,18,7,177,Legion of Doom,Cameron Dicker,K,K,LAC,False,False
+2025,18,8,178,Pimp Daddy,Lions,DST,DST,DET,False,False
+2025,18,9,179,Ball Busters,Brandon McManus,K,K,GB,False,False
+2025,18,10,180,Salty Dogs,Chargers,DST,DST,LAC,False,False
+2025,19,1,181,Salty Dogs,Will Reichard,K,K,MIN,False,False
+2025,19,2,182,Ball Busters,Evan McPherson,K,K,CIN,False,False
+2025,19,3,183,Pimp Daddy,Chris Boswell,K,K,PIT,False,False
+2025,19,4,184,Legion of Doom,Ka'imi Fairbairn,K,K,HOU,False,False
+2025,19,5,185,Buckhorns,49ers,DST,DST,SF,False,False
+2025,19,6,186,Monster Cheese,Jake Moody,K,K,WAS,False,False
+2025,19,7,187,THE DEMONS,Tyler Loop,K,K,BAL,False,False
+2025,19,8,188,Mississippi Swamp Ass,Jason Sanders,K,K,NYJ,False,False
+2025,19,9,189,Mojo,Quentin Johnston,WR,WR,LAC,False,False
+2025,19,10,190,Aces High,Cam Little,K,K,JAC,False,False
+2025,20,1,191,Aces High,Giants,DST,DST,NYG,False,False
+2025,20,2,192,Mojo,Commanders,DST,DST,WAS,False,False
+2025,20,3,193,Mississippi Swamp Ass,Dalton Kincaid,TE,TE,BUF,False,False
+2025,20,4,194,THE DEMONS,Chiefs,DST,DST,KC,False,False
+2025,20,5,195,Monster Cheese,Seahawks,DST,DST,SEA,False,False
+2025,20,6,196,Buckhorns,Spencer Shrader,K,K,IND,False,False
+2025,20,7,197,Legion of Doom,Browns,DST,DST,CLE,False,False
+2025,20,8,198,Pimp Daddy,Brandon Aiyuk,WR,WR,SF,False,False
+2025,20,9,199,Ball Busters,Rams,DST,DST,LAR,False,False
+2025,20,10,200,Salty Dogs,Jayden Reed,WR,WR,GB,False,False
+2025,21,1,201,Aces High,Joe Flacco,QB,QB,CIN,False,False
+2025,21,2,202,Mojo,Cade Otton,TE,TE,TB,False,False
+2025,21,3,203,Mississippi Swamp Ass,Cardinals,DST,DST,ARI,False,False
+2025,21,4,204,THE DEMONS,Romeo Doubs,WR,WR,NE,False,False
+2025,21,5,205,Monster Cheese,Will Shipley,RB,RB,PHI,False,False
+2025,21,6,206,Buckhorns,Braelon Allen,RB,RB,NYJ,False,False
+2025,21,7,207,Legion of Doom,Kyle Pitts,TE,TE,ATL,False,False
+2025,21,8,208,Pimp Daddy,Marvin Mims,WR,WR,DEN,False,False
+2025,21,9,209,Ball Busters,Trey Benson,RB,RB,ARI,False,False
+2025,21,10,210,Salty Dogs,Tyjae Spears,RB,RB,TEN,False,False
+2025,22,1,211,Salty Dogs,Rashid Shaheed,WR,WR,SEA,False,False
+2025,22,2,212,Ball Busters,Tyler Higbee,TE,TE,LAR,False,False
+2025,22,3,213,Pimp Daddy,DeAndre Hopkins,WR,WR,BAL,False,False
+2025,22,4,214,Legion of Doom,Darren Waller,TE,TE,CAR,False,False
+2025,22,5,215,Buckhorns,Dylan Sampson,RB,RB,CLE,True,False
+2025,22,6,216,Monster Cheese,Christian Kirk,WR,WR,SF,False,False
+2025,22,7,217,THE DEMONS,Kareem Hunt,RB,RB,KC,False,False
+2025,22,8,218,Mississippi Swamp Ass,Adam Thielen,WR,WR,PIT,False,False
+2025,22,9,219,Mojo,Isaiah Likely,TE,TE,NYG,False,False
+2025,22,10,220,Aces High,Tyler Allgeier,RB,RB,ARI,False,False

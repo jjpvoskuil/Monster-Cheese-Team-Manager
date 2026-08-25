@@ -1,0 +1,220 @@
+1|1|Salty Dogs|Patrick Mahomes QB • KC
+1|2|Rocket City Trash Pandas|Christian McCaffrey RB • SF
+1|3|Legion of Doom|Josh Allen QB • BUF
+1|4|THE DEMONS|Joe Burrow QB • CIN
+1|5|Diver Down|Jalen Hurts QB • PHI
+1|6|Monster Cheese|Bijan Robinson RB • ATL
+1|7|Mississippi Swamp Ass|Austin Ekeler RB • WAS
+1|8|Mojo|Justin Herbert QB • LAC
+1|9|Aces High|Ja'Marr Chase WR • CIN
+1|10|Buckhorns|Nick Chubb RB • HOU
+2|1|Buckhorns|Derrick Henry RB • BAL
+2|2|Aces High|Justin Jefferson WR • MIN
+2|3|Mojo|Travis Kelce TE • KC
+2|4|Mississippi Swamp Ass|Saquon Barkley RB • PHI
+2|5|Monster Cheese|Trevor Lawrence QB • JAC
+2|6|Diver Down|Lamar Jackson QB • BAL
+2|7|THE DEMONS|Justin Fields QB • KC
+2|8|Legion of Doom|Tony Pollard RB • TEN
+2|9|Rocket City Trash Pandas|Tyreek Hill WR • MIA
+2|10|Salty Dogs|Stefon Diggs WR • WAS
+3|1|Salty Dogs|Tua Tagovailoa QB • ATL
+3|2|Rocket City Trash Pandas|Kirk Cousins QB • LV
+3|3|Legion of Doom|Josh Jacobs RB • GB
+3|4|THE DEMONS|Davante Adams WR • LAR
+3|5|Diver Down|Cooper Kupp WR • SEA
+3|6|Monster Cheese|Najee Harris RB • NYG
+3|7|Mississippi Swamp Ass|DJ Moore WR • BUF
+3|8|Mojo|Jonathan Taylor RB • IND
+3|9|Aces High|Deshaun Watson QB • CLE
+3|10|Buckhorns|Jared Goff QB • DET
+4|1|Buckhorns|Aaron Rodgers QB • PIT
+4|2|Aces High|Joe Mixon RB • HOU
+4|3|Mojo|A.J. Brown WR • NE
+4|4|Mississippi Swamp Ass|Dak Prescott QB • DAL
+4|5|Monster Cheese|Daniel Jones QB • IND
+4|6|Diver Down|Aaron Jones RB • MIN
+4|7|THE DEMONS|Travis Etienne RB • NO
+4|8|Legion of Doom|CeeDee Lamb WR • DAL
+4|9|Rocket City Trash Pandas|Dameon Pierce RB • PHI
+4|10|Salty Dogs|Jahmyr Gibbs RB • DET
+5|1|Salty Dogs|Rhamondre Stevenson RB • NE
+5|2|Rocket City Trash Pandas|Garrett Wilson WR • NYJ
+5|3|Legion of Doom|Geno Smith QB • NYJ
+5|4|THE DEMONS|Brian Robinson Jr. RB • ATL
+5|5|Diver Down|J.K. Dobbins RB • DEN
+5|6|Monster Cheese|Amon-Ra St. Brown WR • DET
+5|7|Mississippi Swamp Ass|Jordan Love QB • GB
+5|8|Mojo|Kenneth Walker III RB • KC
+5|9|Aces High|Brock Purdy QB • SF
+5|10|Buckhorns|Christian Watson WR • GB
+6|1|Buckhorns|Miles Sanders RB • DAL
+6|2|Aces High|Mark Andrews TE • BAL
+6|3|Mojo|Darren Waller TE • CAR
+6|4|Mississippi Swamp Ass|George Kittle TE • SF
+6|5|Monster Cheese|Chris Olave WR • NO
+6|6|Diver Down|DeVonta Smith WR • PHI
+6|7|THE DEMONS|Russell Wilson QB • NYG
+6|8|Legion of Doom|Alexander Mattison RB • MIA
+6|9|Rocket City Trash Pandas|Anthony Richardson QB • IND
+6|10|Salty Dogs|Jaylen Waddle WR • DEN
+7|1|Salty Dogs|Calvin Ridley WR • TEN
+7|2|Rocket City Trash Pandas|Tee Higgins WR • CIN
+7|3|Legion of Doom|DK Metcalf WR • PIT
+7|4|THE DEMONS|Isiah Pacheco RB • DET
+7|5|Diver Down|James Cook RB • BUF
+7|6|Monster Cheese|Kenny Pickett QB • CAR
+7|7|Mississippi Swamp Ass|George Pickens WR • DAL
+7|8|Mojo|Derek Carr QB • NO
+7|9|Aces High|Deebo Samuel WR • SF
+7|10|Buckhorns|Amari Cooper WR • LV
+8|1|Buckhorns|James Conner RB • ARI
+8|2|Aces High|Javonte Williams RB • DAL
+8|3|Mojo|AJ Dillon RB • CAR
+8|4|Mississippi Swamp Ass|Cam Akers RB • SEA
+8|5|Monster Cheese|Breece Hall RB • NYJ
+8|6|Diver Down|Dallas Goedert TE • PHI
+8|7|THE DEMONS|T.J. Hockenson TE • MIN
+8|8|Legion of Doom|Khalil Herbert RB • SF
+8|9|Rocket City Trash Pandas|DeAndre Hopkins WR • BAL
+8|10|Salty Dogs|Kyle Pitts TE • ATL
+9|1|Salty Dogs|David Montgomery RB • HOU
+9|2|Rocket City Trash Pandas|Rashaad Penny RB •
+9|3|Legion of Doom|Alvin Kamara RB • NO
+9|4|THE DEMONS|Ezekiel Elliott RB •
+9|5|Diver Down|Drake London WR • ATL
+9|6|Monster Cheese|Jordan Addison WR • MIN
+9|7|Mississippi Swamp Ass|Jerry Jeudy WR • CLE
+9|8|Mojo|Keenan Allen WR • IND
+9|9|Aces High|D'Andre Swift RB • CHI
+9|10|Buckhorns|David Njoku TE • LAC
+10|1|Buckhorns|Greg Dulcich TE • MIA
+10|2|Aces High|Tyler Lockett WR • LV
+10|3|Mojo|Roschon Johnson RB • CHI
+10|4|Mississippi Swamp Ass|Dalton Kincaid TE • BUF
+10|5|Monster Cheese|Gabe Davis WR • BUF
+10|6|Diver Down|Jimmy Garoppolo QB • LAR
+10|7|THE DEMONS|Dalvin Cook RB •
+10|8|Legion of Doom|Jamaal Williams RB • NO
+10|9|Rocket City Trash Pandas|Rachaad White RB • WAS
+10|10|Salty Dogs|Brandon Aiyuk WR • SF
+11|1|Salty Dogs|Zach Charbonnet RB • SEA
+11|2|Rocket City Trash Pandas|Pat Freiermuth TE • PIT
+11|3|Legion of Doom|Matthew Stafford QB • LAR
+11|4|THE DEMONS|Christian Kirk WR • SF
+11|5|Diver Down|Damien Harris RB •
+11|6|Monster Cheese|Skyy Moore WR • GB
+11|7|Mississippi Swamp Ass|Raheem Mostert RB • LV
+11|8|Mojo|Baker Mayfield QB • TB
+11|9|Aces High|Sam Howell QB • DAL
+11|10|Buckhorns|Bryce Young QB • CAR
+12|1|Buckhorns|Kyler Murray QB • MIN
+12|2|Aces High|Antonio Gibson RB • NE
+12|3|Mojo|Michael Thomas WR •
+12|4|Mississippi Swamp Ass|Zay Flowers WR • BAL
+12|5|Monster Cheese|Diontae Johnson WR • CLE
+12|6|Diver Down|Mike Williams WR • LAC
+12|7|THE DEMONS|Mike Evans WR • SF
+12|8|Legion of Doom|Chris Godwin WR • TB
+12|9|Rocket City Trash Pandas|Justin Tucker K • BAL
+12|10|Salty Dogs|Jahan Dotson WR • ATL
+13|1|Salty Dogs|C.J. Stroud QB • HOU
+13|2|Rocket City Trash Pandas|Eagles DST • PHI
+13|3|Legion of Doom|Terry McLaurin WR • WAS
+13|4|THE DEMONS|Brandin Cooks WR • BUF
+13|5|Diver Down|Elijah Mitchell RB • PHI
+13|6|Monster Cheese|Jerick McKinnon RB •
+13|7|Mississippi Swamp Ass|Cowboys DST • DAL
+13|8|Mojo|Harrison Butker K • KC
+13|9|Aces High|Ryan Tannehill QB •
+13|10|Buckhorns|De'Von Achane RB • MIA
+14|1|Buckhorns|Deuce Vaughn RB • DEN
+14|2|Aces High|Dalton Schultz TE • HOU
+14|3|Mojo|Chiefs DST • KC
+14|4|Mississippi Swamp Ass|Desmond Ridder QB • GB
+14|5|Monster Cheese|Tyjae Spears RB • TEN
+14|6|Diver Down|Rashod Bateman WR • BAL
+14|7|THE DEMONS|Tyler Allgeier RB • ARI
+14|8|Legion of Doom|Marquise Brown WR • PHI
+14|9|Rocket City Trash Pandas|Mac Jones QB • SF
+14|10|Salty Dogs|Evan Engram TE • DEN
+15|1|Salty Dogs|Samaje Perine RB • CIN
+15|2|Rocket City Trash Pandas|Jeff Wilson RB • MIA
+15|3|Legion of Doom|Cole Kmet TE • CHI
+15|4|THE DEMONS|Jakobi Meyers WR • JAC
+15|5|Diver Down|Irv Smith TE • HOU
+15|6|Monster Cheese|Chase Brown RB • CIN
+15|7|Mississippi Swamp Ass|Jaxon Smith-Njigba WR • SEA
+15|8|Mojo|Kendre Miller RB • NO
+15|9|Aces High|Kenneth Gainwell RB • TB
+15|10|Buckhorns|Jake Moody K • WAS
+16|1|Buckhorns|Jonathan Mingo WR • DAL
+16|2|Aces High|Steelers DST • PIT
+16|3|Mojo|Quentin Johnston WR • LAC
+16|4|Mississippi Swamp Ass|Tank Bigsby RB • PHI
+16|5|Monster Cheese|Chigoziem Okonkwo TE • WAS
+16|6|Diver Down|Younghoe Koo K • NYJ
+16|7|THE DEMONS|Tyler Bass K • BUF
+16|8|Legion of Doom|Daniel Carlson K • LV
+16|9|Rocket City Trash Pandas|Jake Elliott K • PHI
+16|10|Salty Dogs|49ers DST • SF
+17|1|Salty Dogs|Evan McPherson K • CIN
+17|2|Rocket City Trash Pandas|D'Onta Foreman RB • CLE
+17|3|Legion of Doom|Jets DST • NYJ
+17|4|THE DEMONS|Bills DST • BUF
+17|5|Diver Down|Patriots DST • NE
+17|6|Monster Cheese|Packers DST • GB
+17|7|Mississippi Swamp Ass|Jason Sanders K • NYJ
+17|8|Mojo|Zay Jones WR • HOU
+17|9|Aces High|Dolphins DST • MIA
+17|10|Buckhorns|Jalin Hyatt WR • NYG
+18|1|Buckhorns|Texans DST • HOU
+18|2|Aces High|Cameron Dicker K • LAC
+18|3|Mojo|Joshua Kelley RB • TEN
+18|4|Mississippi Swamp Ass|Commanders DST • WAS
+18|5|Monster Cheese|Jason Myers K • SEA
+18|6|Diver Down|Greg Zuerlein K • NYJ
+18|7|THE DEMONS|Gus Edwards RB • LAC
+18|8|Legion of Doom|Odell Beckham Jr. WR • NYG
+18|9|Rocket City Trash Pandas|Saints DST • NO
+18|10|Salty Dogs|Jaylen Warren RB • PIT
+19|1|Salty Dogs|Ravens DST • BAL
+19|2|Rocket City Trash Pandas|JuJu Smith-Schuster WR • NYG
+19|3|Legion of Doom|Broncos DST • DEN
+19|4|THE DEMONS|Brandon McManus K • GB
+19|5|Diver Down|Bengals DST • CIN
+19|6|Monster Cheese|Graham Gano K • NYG
+19|7|Mississippi Swamp Ass|Treylon Burks WR • WAS
+19|8|Mojo|Browns DST • CLE
+19|9|Aces High|Romeo Doubs WR • NE
+19|10|Buckhorns|Greg Joseph K • LV
+20|1|Buckhorns|Lions DST • DET
+20|2|Aces High|Brett Maher K •
+20|3|Mojo|Riley Patterson K • MIA
+20|4|Mississippi Swamp Ass|Brandon Aubrey K • DAL
+20|5|Monster Cheese|Giants DST • NYG
+20|6|Diver Down|Chuba Hubbard RB • CAR
+20|7|THE DEMONS|Chargers DST • LAC
+20|8|Legion of Doom|Cade York K • NYJ
+20|9|Rocket City Trash Pandas|Courtland Sutton WR • DEN
+20|10|Salty Dogs|Matt Gay K • LV
+21|1|Buckhorns|Clyde Edwards-Helaire RB • KC
+21|2|Aces High|Zamir White RB • SF
+21|3|Mojo|Nico Collins WR • HOU
+21|4|Mississippi Swamp Ass|Aidan O'Connell QB • LV
+21|5|Monster Cheese|Elijah Moore WR • PHI
+21|6|Diver Down|Ty Chandler RB • NO
+21|7|THE DEMONS|Michael Pittman WR • PIT
+21|8|Legion of Doom|Kadarius Toney WR •
+21|9|Rocket City Trash Pandas|Sam LaPorta TE • DET
+21|10|Salty Dogs|Allen Lazard WR • NYJ
+22|1|Salty Dogs|Jameson Williams WR • DET
+22|2|Rocket City Trash Pandas|Devin Singletary RB • NYG
+22|3|Legion of Doom|Tyler Higbee TE • LAR
+22|4|THE DEMONS|Taysom Hill QB,TE • NO
+22|5|Diver Down|Darnell Mooney WR • NYG
+22|6|Monster Cheese|Parris Campbell WR • DAL
+22|7|Mississippi Swamp Ass|Michael Mayer TE • LV
+22|8|Mojo|Chase Claypool WR •
+22|9|Aces High|Tyler Boyd WR • TEN
+22|10|Buckhorns|Brian Hoyer QB •

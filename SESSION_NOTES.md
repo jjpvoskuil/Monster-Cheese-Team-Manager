@@ -58,7 +58,27 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   looked reasonable but still produced a 30-player/218-point top QB tier.
   Tier divider rows render in the player grid when filtered to a single
   position.
-- `pytest` — 66/66 passing.
+- New `pages/3_Draft_Tendencies.py` page (2026-08-25): historical
+  positional draft tendencies from 4 completed seasons of real CBS draft
+  results (2022-2025, 220 picks each, 880 total), pulled and parsed per
+  the league manager's request to automate what "Alt Targets" in
+  `TARGETS 2025.xlsx` used to track by hand. Raw captures live in
+  `data/draft_history/raw/<year>_raw.txt`; `scripts/fetch_draft_history.py`
+  parses them (via `src/data_sources/draft_history.py`) into the
+  canonical `data/draft_history/draft_history.csv`. `src/draft_tendencies.py`
+  computes per-round position counts and cumulative-by-pick curves,
+  averaged across any user-selected subset of years, and predicts how
+  many of each position are likely to go in the next N rounds from the
+  live draft state. `src/roster_needs.py` cross-references each upcoming
+  opponent's already-drafted roster against `roster.starters` to flag
+  which starter slots they still need filled (dedicated slots like
+  QB/RB/TE/K/DST filled first, then WR_TE_FLEX/SUPERFLEX/FLEX), and the
+  page combines that with the historical prediction into one "watch this
+  position" signal. 2022's draft-results page has 3 dropdown entries and
+  only one ("2022 - MFL Draft", URL segment `2022:3:MFL Draft`) has real
+  pick data — the other two ("2022 - 2" and "2022" plain) are empty
+  placeholder tables; confirmed by visiting all three before capturing.
+- `pytest` — 89/89 passing.
 - Deployed to Streamlit Cloud; user confirmed the Draft Board loads
   correctly as of 2026-08-25.
 - Known gaps (not blocking): ESPN blending not done (would be a 4th
@@ -66,12 +86,17 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   still a stub, manual pick entry is the reliable path; defensive
   PA/yards-allowed tables (only 3 tiers each on CBS's page) not yet
   re-confirmed with the commissioner; no full UI click-through of the
-  Draft Board or Projections page has been done beyond direct pipeline
-  checks and Streamlit's `AppTest` harness (see lesson below); parsing an
-  in-progress/completed draft (PLAYER column populated) is not built —
-  only the pre-draft order; FantasyPros' live-refresh-via-`requests` path
-  is UNVERIFIED (this dev sandbox has no general internet egress to test
-  against fantasypros.com — see entry below).
+  Draft Board, Projections, or Draft Tendencies page has been done beyond
+  direct pipeline checks and Streamlit's `AppTest` harness (see lesson
+  below); parsing an in-progress/completed draft (PLAYER column
+  populated) is not built for `draft_order.py` (the pre-draft order
+  parser) — but IS now built separately for historical completed drafts
+  via `draft_history.py`, above; FantasyPros' live-refresh-via-`requests`
+  path is UNVERIFIED (this dev sandbox has no general internet egress to
+  test against fantasypros.com — see entry below); draft-history only
+  covers 2022-2025 — re-run `scripts/fetch_draft_history.py` after
+  capturing a new raw file once the 2026 draft actually happens, to fold
+  it into future-year tendency averages.
 
 ## Git push access — read this if `git push` 403s
 
@@ -93,6 +118,73 @@ carry their own Authorization header. Ask the user for a fresh PAT each
 time; don't assume an old one from the log below is still valid.
 
 ## Log
+
+### 2026-08-25 — Draft Tendencies: 4 years of real CBS draft history + live position-run prediction + opponent roster-need view
+League manager's request: "the number of players per position per draft
+round is somewhat consistent... predict what will happen in the next
+round or 2 by position... also look at the roster for each team to see
+what positions are filled." This was previously done by hand in
+`TARGETS 2025.xlsx`'s "Alt Targets" sheet.
+
+Captured 2022-2025 actual completed drafts (not just draft order) from
+`https://maniacfl.football.cbssports.com/draft/results/` via Claude in
+Chrome (this page requires a logged-in session and blocks robots.txt, so
+`WebFetch`/`requests` can't touch it). Used a new large-extraction
+technique to work around `javascript_tool`'s ~1100-1200 char direct-return
+truncation: write the extracted data into the page's own DOM as a `<pre>`
+block, then retrieve it with the separate `get_page_text` tool (no
+truncation there) — reliably pulled all 220 picks/year in one shot.
+2022 needed extra care: 3 entries in the "DRAFTS" dropdown for that year,
+found via `document.querySelectorAll('li')` (`value` attribute holds the
+URL path even though it's a custom widget, not a native `<select>`) —
+visited all 3 (`2022:3:MFL Draft`, `2022:2:2`, `2022:Pre-season`) and
+confirmed only the first has a populated table (264 rows incl. headers =
+220 real picks); the other two are empty placeholder drafts. 2022's raw
+page also has 2 extra columns (Elig, Elapsed Time, Total/Active Fpts)
+that other years don't show, and 2 "(Skipped Pick)" rows (round
+21 pick 4, round 22 pick 7, both Buckhorns) not seen in any other year —
+new edge case, handled explicitly (excluded from position counts).
+
+Raw captures saved to `data/draft_history/raw/<year>_raw.txt` (pipe
+-delimited round|pick|team|player_cell, one line per pick). New
+`src/data_sources/draft_history.py` parses these into a canonical schema,
+handling: auto-pick prefix (`*`), blank/free-agent NFL team (trailing
+bullet with nothing after), DST picks (mascot as "player name"), and
+dual-position eligibility (e.g. "Taysom Hill QB,TE" — tallied under the
+FIRST listed position only, since double-counting one pick across two
+positions would inflate round totals; full list kept in a `positions`
+field for anyone who wants a different rule later). `scripts/
+fetch_draft_history.py` runs the parser over every `*_raw.txt` file found
+and writes the combined `data/draft_history/draft_history.csv` (880 picks
+across the 4 years; 2 skipped, 13 auto-picks).
+
+`src/draft_tendencies.py`: `counts_by_round()` (avg positions drafted per
+round, any year subset), `cumulative_counts_by_pick()` (avg cumulative
+count by exact overall pick number — the direct automation of the old
+Alt Targets table), `predict_position_counts()` / `next_run_positions()`
+(expected position counts in the next N picks from any current pick,
+i.e. "is a run coming"). `src/roster_needs.py`: given a team's drafted
+players and `config/league_settings.yaml`'s `roster.starters`, greedily
+fills the most position-restrictive slots first (QB/RB/TE/K/DST) then the
+flex slots (WR_TE_FLEX/SUPERFLEX/FLEX) to find which slots are still
+open, and spreads that unfilled-slot "demand" across each slot's eligible
+positions. New `pages/3_Draft_Tendencies.py` ties it together against the
+LIVE `DraftState` (same `data/draft_state.json` the Draft Board writes):
+year-subset picker, per-round historical table + chart, live next-N
+-round position prediction, and a per-upcoming-opponent "likely needs"
+table plus a combined-demand view that flags when historical prediction
+and opponent roster gaps agree on the same position.
+
+Verified via `AppTest` against `pages/3_Draft_Tendencies.py` in three
+draft-state scenarios (empty/no draft started, mid-draft with opponents
+ahead, mid-draft where it's my_team's own turn) — all render without
+exception; spot-checked the opponent-needs and combined-demand tables'
+actual values by hand against a synthetic roster. Real-data sanity check:
+round 1 averages 4.75 QB + 4.75 RB (superflex-heavy league, matches the
+2026-08-25 VOR work above), K/DST cluster in rounds 16-20 as expected.
+33 new tests (`test_draft_history.py`, `test_draft_tendencies.py`,
+`test_roster_needs.py`), 89/89 total passing. Not yet pushed — see next
+step in this same session if this entry is still here.
 
 ### 2026-08-25 — Fixed two real tiering bugs the league manager caught by using it: manual override drifting wide, automatic method too coarse
 Follow-up to the tiering feature shipped earlier the same day (next log

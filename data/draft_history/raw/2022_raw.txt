@@ -1,0 +1,220 @@
+1|1|Mississippi Swamp Ass|Josh Allen QB • BUF
+1|2|THE DEMONS|Jonathan Taylor RB • IND
+1|3|Salty Dogs|Christian McCaffrey RB • SF
+1|4|Monster Cheese|Dalvin Cook RB •
+1|5|Aces High|Patrick Mahomes QB • KC
+1|6|Ball Busters|Tom Brady QB •
+1|7|Buckhorns|Austin Ekeler RB • WAS
+1|8|WARPIGS|Justin Herbert QB • LAC
+1|9|Mojo|Derrick Henry RB • BAL
+1|10|Shakedown Posse L.O.D.|Najee Harris RB • NYG
+2|1|Shakedown Posse L.O.D.|Joe Mixon RB • HOU
+2|2|Mojo|Lamar Jackson QB • BAL
+2|3|WARPIGS|Cooper Kupp WR • SEA
+2|4|Buckhorns|Aaron Rodgers QB • PIT
+2|5|Ball Busters|Alvin Kamara RB • NO
+2|6|Aces High|Justin Jefferson WR • MIN
+2|7|Monster Cheese|Javonte Williams RB • DAL
+2|8|Salty Dogs|Ja'Marr Chase WR • CIN
+2|9|THE DEMONS|Matthew Stafford QB • LAR
+2|10|Mississippi Swamp Ass|Nick Chubb RB • HOU
+3|1|Mississippi Swamp Ass|Travis Kelce TE • KC
+3|2|THE DEMONS|Dak Prescott QB • DAL
+3|3|Salty Dogs|Davante Adams WR • LAR
+3|4|Monster Cheese|Joe Burrow QB • CIN
+3|5|Aces High|Aaron Jones RB • MIN
+3|6|Ball Busters|Mike Evans WR • SF
+3|7|Buckhorns|James Conner RB • ARI
+3|8|WARPIGS|Ezekiel Elliott RB •
+3|9|Mojo|Kirk Cousins QB • LV
+3|10|Shakedown Posse L.O.D.|Kyler Murray QB • MIN
+4|1|Shakedown Posse L.O.D.|Russell Wilson QB • NYG
+4|2|Mojo|Mark Andrews TE • BAL
+4|3|WARPIGS|Leonard Fournette RB •
+4|4|Buckhorns|Jalen Hurts QB • PHI
+4|5|Ball Busters|Derek Carr QB • NO
+4|6|Aces High|Matt Ryan QB •
+4|7|Monster Cheese|CeeDee Lamb WR • DAL
+4|8|Salty Dogs|D'Andre Swift RB • CHI
+4|9|THE DEMONS|Stefon Diggs WR • WAS
+4|10|Mississippi Swamp Ass|Deebo Samuel WR • SF
+5|1|Mississippi Swamp Ass|Saquon Barkley RB • PHI
+5|2|THE DEMONS|Tyreek Hill WR • MIA
+5|3|Salty Dogs|Trey Lance QB • LAC
+5|4|Monster Cheese|Breece Hall RB • NYJ
+5|5|Aces High|Michael Pittman WR • PIT
+5|6|Ball Busters|A.J. Brown WR • NE
+5|7|Buckhorns|Josh Jacobs RB • GB
+5|8|WARPIGS|Mike Williams WR • LAC
+5|9|Mojo|J.K. Dobbins RB • DEN
+5|10|Shakedown Posse L.O.D.|David Montgomery RB • HOU
+6|1|Shakedown Posse L.O.D.|Keenan Allen WR • IND
+6|2|Mojo|Tee Higgins WR • CIN
+6|3|WARPIGS|Courtland Sutton WR • DEN
+6|4|Buckhorns|Trevor Lawrence QB • JAC
+6|5|Ball Busters|Damien Harris RB •
+6|6|Aces High|Dameon Pierce RB • PHI
+6|7|Monster Cheese|Tua Tagovailoa QB • ATL
+6|8|Salty Dogs|Jameis Winston QB • NYG
+6|9|THE DEMONS|Cam Akers RB • SEA
+6|10|Mississippi Swamp Ass|Clyde Edwards-Helaire RB • KC
+7|1|Mississippi Swamp Ass|Justin Fields QB • KC
+7|2|THE DEMONS|Antonio Gibson RB • NE
+7|3|Salty Dogs|AJ Dillon RB • CAR
+7|4|Monster Cheese|DJ Moore WR • BUF
+7|5|Aces High|Kyle Pitts TE • ATL
+7|6|Ball Busters|Dallas Goedert TE • PHI
+7|7|Buckhorns|Elijah Mitchell RB • PHI
+7|8|WARPIGS|Tony Pollard RB • TEN
+7|9|Mojo|Rashaad Penny RB •
+7|10|Shakedown Posse L.O.D.|Jaylen Waddle WR • DEN
+8|1|Shakedown Posse L.O.D.|Marquise Brown WR • PHI
+8|2|Mojo|Chris Godwin WR • TB
+8|3|WARPIGS|Devin Singletary RB • NYG
+8|4|Buckhorns|DK Metcalf WR • PIT
+8|5|Ball Busters|Miles Sanders RB • DAL
+8|6|Aces High|Chase Edmonds RB • WAS
+8|7|Monster Cheese|Gabe Davis WR • BUF
+8|8|Salty Dogs|Adam Thielen WR • PIT
+8|9|THE DEMONS|Travis Etienne RB • NO
+8|10|Mississippi Swamp Ass|Elijah Moore WR • PHI
+9|1|Mississippi Swamp Ass|Darren Waller TE • CAR
+9|2|THE DEMONS|Kareem Hunt RB • KC
+9|3|Salty Dogs|George Kittle TE • SF
+9|4|Monster Cheese|Rhamondre Stevenson RB • NE
+9|5|Aces High|Allen Robinson WR • DET
+9|6|Ball Busters|Darnell Mooney WR • NYG
+9|7|Buckhorns|DeVonta Smith WR • PHI
+9|8|WARPIGS|Baker Mayfield QB • TB
+9|9|Mojo|James Robinson RB •
+9|10|Shakedown Posse L.O.D.|Jerry Jeudy WR • CLE
+10|1|Shakedown Posse L.O.D.|Diontae Johnson WR • CLE
+10|2|Mojo|Terry McLaurin WR • WAS
+10|3|WARPIGS|Brian Robinson Jr. RB • ATL
+10|4|Buckhorns|Brandin Cooks WR • BUF
+10|5|Ball Busters|Marcus Mariota QB • WAS
+10|6|Aces High|Daniel Jones QB • IND
+10|7|Monster Cheese|Mac Jones QB • SF
+10|8|Salty Dogs|Cordarrelle Patterson RB • PIT
+10|9|THE DEMONS|Ryan Tannehill QB •
+10|10|Mississippi Swamp Ass|Rashod Bateman WR • BAL
+11|1|Mississippi Swamp Ass|Allen Lazard WR • NYJ
+11|2|THE DEMONS|Hunter Renfrow WR • CAR
+11|3|Salty Dogs|Carson Wentz QB • MIN
+11|4|Monster Cheese|Dawson Knox TE • BUF
+11|5|Aces High|JuJu Smith-Schuster WR • NYG
+11|6|Ball Busters|Mike Gesicki TE • CIN
+11|7|Buckhorns|Jared Goff QB • DET
+11|8|WARPIGS|Davis Mills QB • HOU
+11|9|Mojo|Dalton Schultz TE • HOU
+11|10|Shakedown Posse L.O.D.|James Cook RB • BUF
+12|1|Shakedown Posse L.O.D.|Deshaun Watson QB • CLE
+12|2|Mojo|Kenneth Walker III RB • KC
+12|3|WARPIGS|Pat Freiermuth TE • PIT
+12|4|Buckhorns|Amari Cooper WR • LV
+12|5|Ball Busters|Melvin Gordon RB •
+12|6|Aces High|DeAndre Hopkins WR • BAL
+12|7|Monster Cheese|Tyler Allgeier RB • ARI
+12|8|Salty Dogs|Kenneth Gainwell RB • TB
+12|9|THE DEMONS|T.J. Hockenson TE • MIN
+12|10|Mississippi Swamp Ass|Amon-Ra St. Brown WR • DET
+13|1|Mississippi Swamp Ass|Darrell Henderson Jr. RB •
+13|2|THE DEMONS|Zach Ertz TE • WAS
+13|3|Salty Dogs|Christian Kirk WR • SF
+13|4|Monster Cheese|Rachaad White RB • WAS
+13|5|Aces High|Isiah Pacheco RB • DET
+13|6|Ball Busters|Michael Thomas WR •
+13|7|Buckhorns|Tyler Lockett WR • LV
+13|8|WARPIGS|Chris Olave WR • NO
+13|9|Mojo|Tyler Bass K • BUF
+13|10|Shakedown Posse L.O.D.|Raheem Mostert RB • LV
+14|1|Shakedown Posse L.O.D.|Cole Kmet TE • CHI
+14|2|Mojo|Mitch Trubisky QB • TEN
+14|3|WARPIGS|Zamir White RB • SF
+14|4|Buckhorns|Damien Williams RB •
+14|5|Ball Busters|Jamaal Williams RB • NO
+14|6|Aces High|Marlon Mack RB •
+14|7|Monster Cheese|Alexander Mattison RB • MIA
+14|8|Salty Dogs|Robert Woods WR • PIT
+14|9|THE DEMONS|DeVante Parker WR •
+14|10|Mississippi Swamp Ass|Zach Wilson QB • NO
+15|1|Mississippi Swamp Ass|Darrel Williams RB •
+15|2|THE DEMONS|Julio Jones WR •
+15|3|Salty Dogs|Hunter Henry TE • NE
+15|4|Monster Cheese|Skyy Moore WR • GB
+15|5|Aces High|Evan Engram TE • DEN
+15|6|Ball Busters|Geno Smith QB • NYJ
+15|7|Buckhorns|David Njoku TE • LAC
+15|8|WARPIGS|Justin Tucker K • BAL
+15|9|Mojo|Drake London WR • ATL
+15|10|Shakedown Posse L.O.D.|Jacoby Brissett QB • ARI
+16|1|Shakedown Posse L.O.D.|Hassan Haskins RB • NE
+16|2|Mojo|Bills DST • BUF
+16|3|WARPIGS|Gerald Everett TE • CHI
+16|4|Buckhorns|Evan McPherson K • CIN
+16|5|Ball Busters|Treylon Burks WR • WAS
+16|6|Aces High|Khalil Herbert RB • SF
+16|7|Monster Cheese|Jahan Dotson WR • ATL
+16|8|Salty Dogs|Saints DST • NO
+16|9|THE DEMONS|Michael Carter RB • TEN
+16|10|Mississippi Swamp Ass|Cowboys DST • DAL
+17|1|Mississippi Swamp Ass|Rodrigo Blankenship K •
+17|2|THE DEMONS|Buccaneers DST • TB
+17|3|Salty Dogs|Packers DST • GB
+17|4|Monster Cheese|Steelers DST • PIT
+17|5|Aces High|Colts DST • IND
+17|6|Ball Busters|Harrison Butker K • KC
+17|7|Buckhorns|Matt Gay K • LV
+17|8|WARPIGS|Rams DST • LAR
+17|9|Mojo|Nyheim Miller-Hines RB • NO
+17|10|Shakedown Posse L.O.D.|49ers DST • SF
+18|1|Shakedown Posse L.O.D.|Daniel Carlson K • LV
+18|2|Mojo|Isaiah Spiller RB • LV
+18|3|WARPIGS|Robbie Gould K •
+18|4|Buckhorns|Vikings DST • MIN
+18|5|Ball Busters|Bears DST • CHI
+18|6|Aces High|Ryan Succop K •
+18|7|Monster Cheese|Greg Joseph K • LV
+18|8|Salty Dogs|Dustin Hopkins K • CLE
+18|9|THE DEMONS|Matt Prater K • BUF
+18|10|Mississippi Swamp Ass|Ronald Jones RB •
+19|1|Mississippi Swamp Ass|Giants DST • NYG
+19|2|THE DEMONS|Jason Sanders K • NYJ
+19|3|Salty Dogs|Nick Folk K • ATL
+19|4|Monster Cheese|Patriots DST • NE
+19|5|Aces High|Chargers DST • LAC
+19|6|Ball Busters|Younghoe Koo K • NYJ
+19|7|Buckhorns|*Austin Hooper TE • ATL
+19|8|WARPIGS|George Pickens WR • DAL
+19|9|Mojo|Brett Maher K •
+19|10|Shakedown Posse L.O.D.|Brandon McManus K • GB
+20|1|Shakedown Posse L.O.D.|Ravens DST • BAL
+20|2|Mojo|Chiefs DST • KC
+20|3|WARPIGS|Browns DST • CLE
+20|4|Buckhorns|*Irv Smith TE • HOU
+20|5|Ball Busters|Broncos DST • DEN
+20|6|Aces High|Chris Boswell K • PIT
+20|7|Monster Cheese|Jake Elliott K • PHI
+20|8|Salty Dogs|Kadarius Toney WR •
+20|9|THE DEMONS|Dolphins DST • MIA
+20|10|Mississippi Swamp Ass|Austin Seibert K • WAS
+21|1|Shakedown Posse L.O.D.|Michael Gallup WR • WAS
+21|2|Mojo|Chase Claypool WR •
+21|3|WARPIGS|K.J. Osborn WR • TEN
+21|4|Buckhorns|(Skipped Pick)
+21|5|Ball Busters|Donovan Peoples-Jones WR • NO
+21|6|Aces High|Kenny Pickett QB • CAR
+21|7|Monster Cheese|Brandon Aiyuk WR • SF
+21|8|Salty Dogs|Rondale Moore WR •
+21|9|THE DEMONS|Mark Ingram RB •
+21|10|Mississippi Swamp Ass|Marquez Valdes-Scantling WR • DAL
+22|1|Mississippi Swamp Ass|Sony Michel RB •
+22|2|THE DEMONS|J.D. McKissic RB •
+22|3|Salty Dogs|Tyler Boyd WR • TEN
+22|4|Monster Cheese|Romeo Doubs WR • NE
+22|5|Aces High|Mecole Hardman WR • BUF
+22|6|Ball Busters|Noah Fant TE • NO
+22|7|Buckhorns|(Skipped Pick)
+22|8|WARPIGS|Jalen Tolbert WR • MIA
+22|9|Mojo|Tyrion Davis-Price RB • GB
+22|10|Shakedown Posse L.O.D.|Garrett Wilson WR • NYJ
