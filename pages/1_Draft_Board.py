@@ -7,7 +7,6 @@ live-sync (src/data_sources/cbs.py) ever gets built.
 
 from __future__ import annotations
 
-import glob
 import os
 
 import pandas as pd
@@ -20,9 +19,24 @@ from src.scoring import load_config
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
-REAL_DATA_GLOB = os.path.join(ROOT, "data", "projections", "*.*")
-SAMPLE_DATA_GLOB = os.path.join(ROOT, "data", "sample", "*.csv")
+# Only match actual data files here — a bare "*.*" glob also picks up
+# data/projections/README.md and hands it to pd.read_csv(), which throws
+# a ParserError (README.md isn't a CSV). Restrict to the extensions
+# load_table() actually knows how to read.
+DATA_EXTENSIONS = (".csv", ".tsv", ".xlsx", ".xlsm", ".xltx", ".xls")
+REAL_DATA_DIR = os.path.join(ROOT, "data", "projections")
+SAMPLE_DATA_DIR = os.path.join(ROOT, "data", "sample")
 DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
+
+
+def _data_files(data_dir: str) -> list[str]:
+    if not os.path.isdir(data_dir):
+        return []
+    return sorted(
+        os.path.join(data_dir, name)
+        for name in os.listdir(data_dir)
+        if os.path.splitext(name)[1].lower() in DATA_EXTENSIONS
+    )
 
 st.set_page_config(page_title="Draft Board — Monster Cheese", page_icon="🏈", layout="wide")
 
@@ -33,10 +47,10 @@ def get_config():
 
 
 @st.cache_data
-def get_ranked_players(data_glob: str, _mtimes: tuple) -> tuple[pd.DataFrame, bool]:
+def get_ranked_players(data_dir: str, _mtimes: tuple) -> tuple[pd.DataFrame, bool]:
     """Returns (ranked_df, is_sample_data). _mtimes busts the cache when
     source files change on disk."""
-    paths = sorted(glob.glob(data_glob))
+    paths = _data_files(data_dir)
     if not paths:
         return pd.DataFrame(), False
     sources = [(p, os.path.splitext(os.path.basename(p))[0]) for p in paths]
@@ -46,15 +60,15 @@ def get_ranked_players(data_glob: str, _mtimes: tuple) -> tuple[pd.DataFrame, bo
 
 
 def load_players() -> tuple[pd.DataFrame, bool]:
-    real_paths = sorted(glob.glob(REAL_DATA_GLOB))
+    real_paths = _data_files(REAL_DATA_DIR)
     if real_paths:
         mtimes = tuple(os.path.getmtime(p) for p in real_paths)
-        df, _ = get_ranked_players(REAL_DATA_GLOB, mtimes)
+        df, _ = get_ranked_players(REAL_DATA_DIR, mtimes)
         return df, False
-    sample_paths = sorted(glob.glob(SAMPLE_DATA_GLOB))
+    sample_paths = _data_files(SAMPLE_DATA_DIR)
     if sample_paths:
         mtimes = tuple(os.path.getmtime(p) for p in sample_paths)
-        df, _ = get_ranked_players(SAMPLE_DATA_GLOB, mtimes)
+        df, _ = get_ranked_players(SAMPLE_DATA_DIR, mtimes)
         return df, True
     return pd.DataFrame(), False
 
