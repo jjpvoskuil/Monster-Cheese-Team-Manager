@@ -14,8 +14,9 @@ import streamlit as st
 
 from src.data_sources.manual_import import load_many
 from src.draft_state import DraftState
-from src.projections import build_draft_board
+from src.projections import build_draft_board, compute_tiers
 from src.scoring import load_config
+from src.tier_display import add_tier_divider_rows
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
@@ -189,7 +190,25 @@ with filt_col2:
 with filt_col3:
     sort_by = st.selectbox("Sort by", ["vor_rank", "overall_rank", "position_rank"], index=0)
 
-view = available
+tier_col1, tier_col2 = st.columns([1, 3])
+with tier_col1:
+    tier_gap_input = st.number_input(
+        "Tier gap override (pts)", min_value=0.0, value=0.0, step=1.0,
+        help="0 = auto-detect tier breaks (a statistically significant point "
+             "drop-off per position). Set a number to force a new tier whenever "
+             "the gap to the next player exceeds it, e.g. 10 = every player "
+             "within 10 pts of each other is the same tier.",
+    )
+with tier_col2:
+    st.caption(
+        "Tier breaks are shown as divider rows when filtered to a single "
+        "position (tiers are relative to that position's own point scale)."
+    )
+
+gap_threshold = tier_gap_input if tier_gap_input > 0 else None
+available_tiered = compute_tiers(available, gap_threshold=gap_threshold)
+
+view = available_tiered
 if search:
     view = view[view["name"].str.contains(search, case=False, na=False)]
 if pos_filter:
@@ -198,14 +217,18 @@ view = view.sort_values(sort_by)
 
 display_cols = [
     "vor_rank", "overall_rank", "position_rank", "name", "position", "nfl_team",
-    "score_total", "vor", "num_sources",
+    "score_total", "vor", "tier", "num_sources",
 ]
+display_view = view[display_cols].rename(columns={
+    "vor_rank": "VOR Rk", "overall_rank": "Ovr Rk", "position_rank": "Pos Rk",
+    "name": "Player", "position": "Pos", "nfl_team": "Team",
+    "score_total": "Proj Pts", "vor": "VOR", "tier": "Tier", "num_sources": "# Sources",
+})
+if len(pos_filter) == 1:
+    display_view = add_tier_divider_rows(display_view, tier_col="Tier", label_col="Player")
+
 st.dataframe(
-    view[display_cols].rename(columns={
-        "vor_rank": "VOR Rk", "overall_rank": "Ovr Rk", "position_rank": "Pos Rk",
-        "name": "Player", "position": "Pos", "nfl_team": "Team",
-        "score_total": "Proj Pts", "vor": "VOR", "num_sources": "# Sources",
-    }),
+    display_view,
     hide_index=True,
     use_container_width=True,
     height=500,

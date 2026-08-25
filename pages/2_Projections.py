@@ -34,8 +34,9 @@ import streamlit as st
 from src.data_sources.fantasypros import fetch_all as fetch_fantasypros_all
 from src.data_sources.fftoday import fetch_all as fetch_fftoday_all
 from src.data_sources.manual_import import load_many
-from src.projections import blend_projections, score_and_rank
+from src.projections import blend_projections, compute_tiers, score_and_rank
 from src.scoring import load_config
+from src.tier_display import add_tier_divider_rows
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
@@ -174,6 +175,32 @@ board = blend_and_score(mtimes, weight_items, raw_df)
 st.divider()
 
 # ---------------------------------------------------------------------
+# Tiering — group same-position players into tiers by point drop-off
+# ---------------------------------------------------------------------
+
+st.subheader("Tiers")
+tier_col1, tier_col2 = st.columns([1, 3])
+with tier_col1:
+    tier_gap_input = st.number_input(
+        "Tier gap override (pts)", min_value=0.0, value=0.0, step=1.0, key="tier_gap_override",
+        help="0 = auto-detect tier breaks (a statistically significant point "
+             "drop-off per position, relative to that position's own scale). "
+             "Set a number to force a new tier whenever the gap to the next "
+             "player exceeds it, e.g. 10 = every player within 10 pts of each "
+             "other counts as the same tier.",
+    )
+with tier_col2:
+    st.caption(
+        "Tiers are computed per position on projected points (equivalent to VOR "
+        "within a position, since VOR is just points minus a constant). Divider "
+        "rows below only appear when the board is filtered to one position."
+    )
+tier_gap_threshold = tier_gap_input if tier_gap_input > 0 else None
+board = compute_tiers(board, gap_threshold=tier_gap_threshold)
+
+st.divider()
+
+# ---------------------------------------------------------------------
 # Player lookup: per-source raw lines + blended result
 # ---------------------------------------------------------------------
 
@@ -202,7 +229,7 @@ if player:
         st.markdown("**Blended result (with current weights)**")
         b_shown = ["sources", "num_sources", "games"] + [
             c for c in display_stat_cols if blended_row[c].notna().any()
-        ] + ["score_total", "vor", "overall_rank", "position_rank", "vor_rank"]
+        ] + ["score_total", "vor", "tier", "overall_rank", "position_rank", "vor_rank"]
         st.dataframe(
             blended_row[b_shown].rename(columns={"score_total": "Proj Pts", "vor": "VOR"}),
             hide_index=True,
@@ -233,13 +260,19 @@ if pos_filter:
     view = view[view["position"].isin(pos_filter)]
 view = view.sort_values("vor_rank")
 
+board_display = view[
+    ["vor_rank", "name", "position", "nfl_team", "sources", "num_sources", "score_total", "vor", "tier"]
+].rename(
+    columns={
+        "vor_rank": "VOR Rk", "name": "Player", "position": "Pos", "nfl_team": "Team",
+        "sources": "Sources", "num_sources": "# Sources", "score_total": "Proj Pts", "vor": "VOR", "tier": "Tier",
+    }
+)
+if len(pos_filter) == 1:
+    board_display = add_tier_divider_rows(board_display, tier_col="Tier", label_col="Player")
+
 st.dataframe(
-    view[["vor_rank", "name", "position", "nfl_team", "sources", "num_sources", "score_total", "vor"]].rename(
-        columns={
-            "vor_rank": "VOR Rk", "name": "Player", "position": "Pos", "nfl_team": "Team",
-            "sources": "Sources", "num_sources": "# Sources", "score_total": "Proj Pts", "vor": "VOR",
-        }
-    ),
+    board_display,
     hide_index=True,
     use_container_width=True,
     height=500,

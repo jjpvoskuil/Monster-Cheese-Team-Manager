@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from typing import Optional
 
+import numpy as np
 import pandas as pd
 
 from .data_sources.manual_import import CANONICAL_COLUMNS
@@ -121,3 +122,84 @@ def build_draft_board(df: pd.DataFrame, config: dict, source_weights: Optional[d
     """End-to-end: raw multi-source projections -> blended -> scored -> ranked."""
     blended = blend_projections(df, source_weights)
     return score_and_rank(blended, config)
+
+
+def compute_tiers(
+    board: pd.DataFrame,
+    metric: str = "score_total",
+    gap_threshold: Optional[float] = None,
+    k: float = 1.0,
+) -> pd.DataFrame:
+    """Group players within each position into tiers -- clusters of
+    roughly-equivalent value separated by a meaningful point drop-off, the
+    way draft analysts talk about "tier 1 RBs" vs "tier 2 RBs."
+
+    Adds two columns:
+      - tier: 1-indexed rank of the tier within that position (1 = best).
+      - tier_gap: the point drop from the previous-ranked player at the
+        same position that triggered a new tier (0.0 for a player who
+        isn't a tier boundary, including every position's #1 player).
+
+    Two ways to pick where a tier boundary falls:
+      - gap_threshold (points, e.g. 10.0): manual override -- start a new
+        tier whenever the drop to the next player exceeds this many
+        points. This is the "all players in a tier are within N points"
+        mode a user can dial in directly.
+      - gap_threshold=None (default): automatic "natural break" detection.
+        For each position, computes the point-drop between every pair of
+        consecutive players (sorted by metric, descending) and flags a
+        drop as a tier boundary when it's a statistical outlier relative
+        to that position's other drops: drop > mean(drops) + k*std(drops).
+        This adapts to each position's own scoring scale automatically
+        (kickers cluster far tighter than QBs in this league) rather than
+        using one fixed point value across every position.
+
+    metric defaults to "score_total" (raw projected points) rather than
+    "vor". Within a single position these produce identical tier
+    boundaries -- vor is just score_total minus that position's constant
+    replacement_score -- but score_total is the more intuitive "points"
+    number to reason about tier gaps in.
+
+    Positions with 0-1 players are left as a single tier (nothing to
+    compare). Requires board to already have a "position" column and the
+    chosen metric column, e.g. the output of build_draft_board()/
+    score_and_rank().
+    """
+    out = board.copy()
+    out["tier"] = 1
+    out["tier_gap"] = 0.0
+    if out.empty:
+        return out
+
+    for _pos, group in out.groupby("position"):
+        idx = group.sort_values(metric, ascending=False).index
+        scores = out.loc[idx, metric].to_numpy(dtype=float)
+        n = len(scores)
+        if n <= 1:
+            continue
+
+        drops = -np.diff(scores)  # drops[i] = scores[i] - scores[i+1], i.e. the gap AFTER player i
+        if gap_threshold is not None:
+            threshold = gap_threshold
+        else:
+            mean_drop = drops.mean()
+            std_drop = drops.std(ddof=0)
+            # A tiny epsilon keeps a perfectly uniform ladder of drops (std=0)
+            # from flagging every single gap as "significant" -- with no
+            # variance at all there's no natural break to find, so treat the
+            # whole position as one tier rather than n singleton tiers.
+            threshold = mean_drop + k * std_drop + 1e-9
+
+        tiers = np.ones(n, dtype=int)
+        gaps = np.zeros(n, dtype=float)
+        tier_num = 1
+        for i in range(1, n):
+            gap = scores[i - 1] - scores[i]
+            if gap > threshold:
+                tier_num += 1
+                gaps[i] = gap
+            tiers[i] = tier_num
+        out.loc[idx, "tier"] = tiers
+        out.loc[idx, "tier_gap"] = gaps
+
+    return out

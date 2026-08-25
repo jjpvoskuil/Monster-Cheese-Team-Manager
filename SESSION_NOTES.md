@@ -37,7 +37,23 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   just exposed directly. FFToday and FantasyPros each have a "Refresh from
   web" button (live re-fetch); CBS does not (requires a logged-in
   session — re-pull manually, see below).
-- `pytest` — 46/46 passing.
+- SUPERFLEX demand assumption (`config/league_settings.yaml` →
+  `estimation_assumptions.flex_position_splits.SUPERFLEX`) is now 90% QB
+  (was 55%), per league-manager feedback that this scoring system makes a
+  good QB nearly always the right superflex fill — every team should
+  expect to start ~2 QBs almost every week. QB league-wide demand is now
+  ~19 (10 dedicated + ~9 of the superflex slot), up from ~15.5, which
+  raises QB's replacement level and lowers early-QB VOR accordingly.
+- Both the Draft Board and Projections pages now compute position tiers
+  (`src/projections.py`'s `compute_tiers()`) — same-position players
+  clustered by point drop-off, either auto-detected per position (a
+  statistically significant gap relative to that position's own score
+  gaps) or a manual points-gap override the user can dial in (e.g. "10" =
+  every player within 10 pts of each other is one tier). Tier divider rows
+  render in the player grid when the view is filtered to a single
+  position. See the dated log entry below for the Arrow-serialization bug
+  this caught and fixed along the way.
+- `pytest` — 58/58 passing.
 - Deployed to Streamlit Cloud; user confirmed the Draft Board loads
   correctly as of 2026-08-25.
 - Known gaps (not blocking): ESPN blending not done (would be a 4th
@@ -72,6 +88,78 @@ carry their own Authorization header. Ask the user for a fresh PAT each
 time; don't assume an old one from the log below is still valid.
 
 ## Log
+
+### 2026-08-25 — Superflex-heavy QB demand assumption + position tiering (auto + manual override)
+Two related requests from the league manager after reviewing Josh Allen's
+VOR rank (#23 despite #1 overall raw points): (1) this league's scoring
+system makes QB the near-automatic superflex fill, so demand modeling
+should reflect ~2 QBs/team almost every week, not a soft 55% lean; (2)
+add visible "tiers" to the player grid — clusters of same-position players
+who are roughly interchangeable, split by real point drop-offs, with both
+an automatic default and a manual override (e.g. "all players within 10
+points are one tier").
+
+**Superflex demand:** `config/league_settings.yaml` →
+`estimation_assumptions.flex_position_splits.SUPERFLEX` changed from
+QB 0.55/RB 0.20/WR 0.20/TE 0.05 to **QB 0.90/RB 0.04/WR 0.04/TE 0.02**. The
+small non-QB residual is deliberate (not a claim ~10% of teams will
+genuinely bench a good QB for the flex) — it keeps replacement level from
+being brittle to a single 100%-certain assumption. New test
+(`test_superflex_demand_is_now_overwhelmingly_qb` in
+`tests/test_projections.py`) locks in QB demand ≈ 19 (10 dedicated + 9 from
+superflex) vs. the old ≈ 15.5.
+
+**Tiering:** `src/projections.py`'s new `compute_tiers(board, metric=
+"score_total", gap_threshold=None, k=1.0)` groups each position's players
+into 1-indexed tiers:
+- `gap_threshold=None` (default): automatic — flags a tier boundary when
+  the point-drop to the next player is a statistical outlier for that
+  position (`drop > mean(drops) + k*std(drops)`), so it adapts to each
+  position's own scoring scale (kickers cluster tight, QBs/RBs spread
+  wider) without a single fixed point value across positions.
+- `gap_threshold=<number>`: manual override — new tier whenever the drop
+  exceeds that many points, exactly the "within N points" control asked
+  for.
+- Tiering by `score_total` and by `vor` produce identical boundaries
+  within a position (vor is just score_total minus a per-position
+  constant) — verified by test, so the page only needs to expose one.
+
+Real result on the actual 2026 blended data: QB auto-tiers into just 3
+tiers (30 QBs in tier 1 — this year's pool really is that bunched at the
+top, consistent with the VOR writeup in `docs/draft_insights.md`), while
+RB auto-tiers into 9 much tighter tiers, matching the known shallow/fast-
+drop-off RB pool. This is a good sanity check that the auto method is
+doing something real, not just noise.
+
+`pages/1_Draft_Board.py` and `pages/2_Projections.py` both got: a "Tier
+gap override (pts)" number input (0 = automatic), a "Tier" column in the
+player grid, and — only when the grid is filtered to exactly one position
+(tier numbers are position-relative, so mixing positions would be
+confusing) — visible "— Tier N —" divider rows via the new
+`src/tier_display.py`'s `add_tier_divider_rows()`.
+
+**Bug caught and fixed via `AppTest` before shipping:** the first version
+of `add_tier_divider_rows()` wrote the divider's label text into whichever
+column happened to be first in the display frame. On the Draft Board
+that's "VOR Rk" — a numeric rank column — so mixing in a string label
+corrupted it to a mixed int/string object column, which threw a real
+`pyarrow.lib.ArrowTypeError` inside `st.dataframe` (silently auto-"fixed"
+by Streamlit's own fallback, so it wouldn't have crashed the page, but
+it's exactly the kind of fragile-in-a-way-status-codes-won't-catch bug
+this project has hit before — see the ParserError entry below). Fixed by
+adding an explicit `label_col` parameter (both pages pass `"Player"`) and
+using `None` instead of `""` for every other column in a divider row, so
+pandas upcasts a numeric column to float+NaN — which Arrow serializes
+fine — instead of degrading it to a generic object column. Caught by
+running both pages through `streamlit.testing.v1.AppTest`, filtering to a
+single position, and inspecting the actual rendered dataframe's dtypes —
+not just checking for an exception. Regression test in
+`tests/test_tier_display.py`.
+
+Verified: 58/58 tests passing (12 new); both pages run clean under
+`AppTest` with a position filter applied and a manual tier-gap override
+set, with the rendered dataframe inspected directly (not just "no
+exception raised").
 
 ### 2026-08-25 — Three-source projection ingestion (CBS + FFToday + FantasyPros), new Projections page, live refresh
 The app's rankings are only as good as the stat projections feeding the

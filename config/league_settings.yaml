@@ -286,11 +286,19 @@ estimation_assumptions:
       TE: 0.15
       K: 0.05
     SUPERFLEX:
-      # Weighted toward QB: this league's passing yardage/TD bonuses are
-      # rich (up to 38 pts for 600+ pass yards, TD bonus for 26+ yd
-      # scores), which typically makes QB the highest-value superflex fill
-      # even before accounting for QB scarcity relative to demand.
-      QB: 0.55
-      RB: 0.20
-      WR: 0.20
-      TE: 0.05
+      # Overwhelmingly QB, per league manager feedback (2026-08-25): this
+      # league's passing yardage/TD bonuses are rich enough (up to 38 pts
+      # for 600+ pass yards, bonus for 26+ yd scores) that a good QB nearly
+      # always beats a good RB/WR/TE in this slot -- every team should be
+      # expected to start 2 QBs (1 dedicated + 1 superflex) almost every
+      # week, not just "usually." Previously 0.55/0.20/0.20/0.05 (a much
+      # softer QB lean); revised up. The small residual on RB/WR/TE isn't a
+      # claim that ~10% of teams will genuinely start a non-QB here -- it's
+      # a deliberate buffer so a single flex position isn't modeled as
+      # 100% certain, which would make replacement level (and therefore
+      # VOR) brittle to one bad assumption. Tune further if draft-day
+      # behavior looks different.
+      QB: 0.90
+      RB: 0.04
+      WR: 0.04
+      TE: 0.02
