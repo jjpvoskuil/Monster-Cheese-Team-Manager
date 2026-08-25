@@ -89,9 +89,10 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   TEAM)" format, punctuated last names, the live room's Pick column
   already being the OVERALL pick number unlike the historical results
   page). `src/data_sources/cbs.py`'s old stub for this is superseded —
-  see its docstring. Still needs: confirmation of the DST/K live-room
-  cell format (not observed yet in a mock draft), and an actual
-  draft-day dry run.
+  see its docstring. DST/K live-room cell format confirmed and a second
+  independent mock draft run end-to-end (see the 2026-08-25 "test-drive"
+  log entry below) — only an actual draft-day dry run is still
+  outstanding.
 - **Suggested pick (2026-08-25)**: `src/pick_suggestion.py` powers a new
   "🎯 Suggested pick" panel on the Draft Board, right above the player
   grid. Recommends a POSITION (not a single player) by combining three
@@ -153,6 +154,77 @@ carry their own Authorization header. Ask the user for a fresh PAT each
 time; don't assume an old one from the log below is still valid.
 
 ## Log
+
+### 2026-08-25 — Test-drove the full live-sync + suggested-pick pipeline against a SECOND real CBS mock draft
+League manager's request, after the Suggested Pick feature shipped:
+"Lets test drive this with a mock draft to see how it goes." Chose the
+"quick smoke test" depth (~5 rounds) over a deeper or full run.
+
+Joined a fresh CBS practice mock draft (10 teams, 14 rounds, standard
+roster — 1 QB/2 RB/3 WR/1 TE/1 K/1 DST/5 RES, a real mix of human
+participants and bots — draft id 2832563, separate from both the real
+league and the earlier Phase 1 test draft) via Claude in Chrome, took
+draft slot 6, and played 5+ full rounds (55 picks) live: 2 picks made
+manually by clicking through the room after computing the suggestion
+(picks 6 and 15 — De'Von Achane and Kyren Williams, both RB per the
+suggestion engine's recommendation), the rest handled by CBS's own
+autopilot for my team once real findings below made manual clicking
+impractical for every single pick.
+
+**What worked, confirmed against REAL data from a draft this session had
+no part in scripting:**
+- `parse_live_room_dump()` correctly parsed all 52 picks from this
+  draft's live results panel in one extraction (via the documented
+  "switch to All Results, dump to a `<pre>` element, retrieve via
+  `get_page_text`" technique) with zero parse failures, including edge
+  cases the FIRST mock draft's test didn't happen to produce: apostrophes
+  ("De'Von Achane"), periods in a first name ("A.J. Brown"), and
+  multi-word autopilot team names ("Auto-Pilot Team 1").
+- `sync_new_picks()` logged all 52 picks correctly with zero mismatches,
+  AND — for the first time verified against real data rather than only
+  synthetic fixtures — a SECOND identical poll against the same 52-pick
+  dump was confirmed fully idempotent (0 newly logged, 52 already known,
+  no duplicate/corrupted state). This is exactly the steady-state
+  behavior a ~90-120s polling loop depends on.
+- `suggest_position()` produced sensible, explainable recommendations
+  throughout: recommended RB early (an RB run was genuinely happening —
+  5 of the first 5 picks leaguewide were RBs) and correctly favored value
+  +need later once the roster's RB/WR starter slots filled up. One
+  recommended player (Jeremiyah Love) got drafted by another team one
+  pick after the suggestion named him as the top RB available —
+  independent confirmation the engine's value judgment lines up with
+  what a real drafting field also wants, not just an internal metric.
+- **Resolved both items flagged as unverified in the live-sync work
+  above**: DST ("Browns (DST CLE)") and K ("Mevis, Harrison (K LAR)")
+  live-room cell formats are now confirmed correct against real data —
+  observed in the FIRST mock draft (left running with autopilot since
+  the original Phase 1 session, discovered already complete at the start
+  of this session) rather than needing a new draft to run 14 full
+  rounds. `parse_live_room_player_cell()`'s existing fallback regex
+  handled the DST case correctly with no changes needed.
+
+**Real, non-code finding worth planning around for draft day:** this
+particular mock draft moved very fast — as little as ~10-20 seconds
+between picks once bots were involved, and this session's own pick clock
+ran out once (pick 26, CBS's autopilot filled in A.J. Brown for a
+missed manual pick) while a suggestion was being computed. The lesson
+isn't a pipeline bug — `sync_new_picks`/`suggest_position` themselves
+ran in well under a second — it's that extracting the room, running the
+suggestion, and clicking a pick are three separate round-trips that
+don't fit inside a fast pick clock if done from scratch reactively. On
+the real draft, this isn't a problem the way it was in this test:
+the league manager will have the Draft Board already open with an
+already-computed, continuously-refreshing suggestion (from the ongoing
+sync loop), so deciding is a glance-and-click, not a compute-from
+-scratch-under-the-clock. The lesson that DOES carry over: for the real
+draft, precompute/refresh the suggestion as soon as a session is only
+1-2 picks away from its own turn, don't wait until it's actually on the
+clock to start pulling data.
+
+No code changes this session — this was a pipeline/UX validation pass,
+not a bug-fix pass, since nothing broke. 128/128 tests still passing
+(unchanged). Draft left running in CBS's system on autopilot (harmless,
+same as the earlier Phase 1 test draft).
 
 ### 2026-08-25 — Suggested pick panel: recommend a position + top 3 players, live during the draft
 League manager's ask, right after the live-sync work above landed: "add a
