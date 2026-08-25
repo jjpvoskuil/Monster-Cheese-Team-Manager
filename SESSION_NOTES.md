@@ -109,7 +109,11 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   turn's recommendation even while others are picking). The tier-gap
   override control moved up the page (now sits right before this panel,
   since both it and the player grid below now share one `available_tiered`
-  computation). 14 new tests in `tests/test_pick_suggestion.py`.
+  computation). A "↩️ Back to &lt;position&gt;" button appears next to the
+  override dropdown whenever it's been changed away from the
+  recommendation, so it's a one-click return rather than having to
+  remember/re-pick the original suggestion. 14 new tests in
+  `tests/test_pick_suggestion.py`.
 - `pytest` — 128/128 passing.
 - Deployed to Streamlit Cloud; user confirmed the Draft Board loads
   correctly as of 2026-08-25.
@@ -225,6 +229,26 @@ position-override dropdown (switching to TE correctly relabeled the
 shown players and captioned that it was overriding the RB recommendation).
 14 new tests in `tests/test_pick_suggestion.py`; 128/128 total passing.
 All 4 Streamlit pages re-verified clean.
+
+**Follow-up same day:** added a "↩️ Back to &lt;recommended position&gt;"
+button next to the override dropdown, so overriding to check another
+position doesn't mean having to remember/re-select what the app
+originally suggested. Non-obvious Streamlit gotcha hit and fixed here:
+`st.session_state[key] = value` cannot be called for a widget's key
+inline after that widget has already run earlier in the same script pass
+(`StreamlitAPIException`, caught immediately via `AppTest` rather than
+shipped) — the reset has to happen in an `on_click` callback instead
+(`_set_position_override()`), which Streamlit runs before the next
+rerun's widgets are recreated. Also guarded against a position dropping
+out of the option list entirely between reruns (e.g. K/DST fully
+drafted) by clearing an now-invalid `session_state` selection before the
+selectbox renders, rather than letting it raise. Re-verified via
+`AppTest`: override to a different position, confirm the reset button
+appears and correctly jumps back, confirm it disappears again once back
+on the recommendation. 128/128 tests still passing (no new test file --
+this is UI-callback behavior that `AppTest`'s widget interaction API
+covers directly; the underlying `suggest_position()`/`top_available_players()`
+logic already covered in `tests/test_pick_suggestion.py` is unchanged).
 
 ### 2026-08-25 — Live CBS draft sync built and verified against a real mock draft (Phase 1 of live-draft-day support)
 User's ask, after the tiering/tendencies work above: "when we are running

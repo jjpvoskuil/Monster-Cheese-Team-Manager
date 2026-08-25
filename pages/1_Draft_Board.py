@@ -39,6 +39,15 @@ LIVE_SYNC_STATUS_FILE = os.path.join(ROOT, "data", "live_sync_status.json")
 DRAFT_HISTORY_CSV = os.path.join(ROOT, "data", "draft_history", "draft_history.csv")
 
 
+def _set_position_override(key: str, position: str) -> None:
+    """Callback for the "Back to <recommended>" button below -- must run
+    as an on_click callback rather than inline after the button check, or
+    Streamlit raises (you can't assign to a widget's session_state key
+    after that widget has already been instantiated in the same script
+    pass; on_click callbacks run before the next rerun's widgets exist)."""
+    st.session_state[key] = position
+
+
 def _data_files(data_dir: str) -> list[str]:
     if not os.path.isdir(data_dir):
         return []
@@ -302,15 +311,43 @@ else:
 
         position_options = [s.position for s in suggestion.all_scores]
         default_idx = position_options.index(suggestion.recommended_position)
-        chosen_position = st.selectbox(
-            "Top players for position",
-            options=position_options,
-            index=default_idx,
-            help="Defaults to the recommended position — change this to see "
-                 "the best available players/value at any other position.",
-            key="suggestion_position_override",
-        )
+        override_key = "suggestion_position_override"
+        # A position can drop out of the list entirely (e.g. K/DST fully
+        # drafted) between reruns -- if whatever was previously selected
+        # (including a value the reset button below just set) is no
+        # longer a valid option, drop it so the selectbox falls back to
+        # its default `index` instead of raising.
+        if st.session_state.get(override_key) not in position_options:
+            st.session_state.pop(override_key, None)
+
+        pos_select_col, pos_reset_col = st.columns([3, 1])
+        with pos_select_col:
+            chosen_position = st.selectbox(
+                "Top players for position",
+                options=position_options,
+                index=default_idx,
+                help="Defaults to the recommended position — change this to see "
+                     "the best available players/value at any other position.",
+                key=override_key,
+            )
         if chosen_position != suggestion.recommended_position:
+            with pos_reset_col:
+                st.write("")
+                st.write("")
+                # Setting st.session_state[override_key] has to happen in
+                # an on_click callback, not inline after the button check
+                # -- the selectbox above already instantiated that key
+                # THIS run, and Streamlit raises if you assign to a
+                # widget's session_state key after its widget has run in
+                # the same script pass. on_click callbacks run before the
+                # next rerun's widgets are (re)created, so it's safe there.
+                st.button(
+                    f"↩️ Back to {suggestion.recommended_position}",
+                    use_container_width=True,
+                    help="Jump back to the app's recommended position.",
+                    on_click=_set_position_override,
+                    args=(override_key, suggestion.recommended_position),
+                )
             st.caption(
                 f"Showing **{chosen_position}** (overriding the recommended "
                 f"**{suggestion.recommended_position}**)."
