@@ -1,27 +1,23 @@
 """
-CBS Sports integration — STUBBED, NOT IMPLEMENTED.
+CBS Sports integration.
 
-Nice-to-have, not the critical path. Two possible uses if this ever gets
-built out:
+league settings auto-pull — still STUBBED, NOT IMPLEMENTED. Blocked on
+CBS having no public API and requiring an authenticated session; edit
+config/league_settings.yaml manually instead (see its header for how the
+current values were captured).
 
-1. Auto-pulling league scoring/roster settings from the CBS rules page
-   (currently done manually — see config/league_settings.yaml header for
-   how/when it was captured).
-2. Live draft pick sync from the CBS draft room, so the Draft Board doesn't
-   need manual pick entry.
-
-Both are blocked on the same practical issue: this app needs an
-authenticated CBS session to read league-specific pages, and CBS has no
-public API for either of these. The manual pick-entry flow in
-pages/1_Draft_Board.py is the reliable fallback and is NOT dependent on
-this module — draft day works fine without it.
-
-If picked up later: the CBS draft room's actual live-update mechanism is
-unverified (the room hasn't been observed live yet — the boilerplate seen
-on related CBS pages mentioning Adobe Flash is almost certainly stale
-documentation, not a real dependency). Inspect network requests in the
-draft room with browser dev tools once the draft opens, before assuming
-any particular approach (websocket vs. polling vs. page scrape).
+Live draft pick sync — IMPLEMENTED, but not in this module and not as a
+function this app calls. See src/live_sync.py for the full explanation
+of why: it can't be a plain function here because reaching CBS requires
+an active Claude session driving a real logged-in browser (Claude in
+Chrome) -- there's no public API or unauthenticated endpoint to hit with
+a normal HTTP client, which is exactly the blocker described above for
+league settings too. src/live_sync.py is the merge/parsing half of that
+pipeline (pure functions, fully unit-tested, including against real data
+captured from a live CBS mock draft on 2026-08-25); the browser-driving
+half is a procedure a Claude session runs during the actual draft, not
+code that lives in this repo. The manual "log a pick" flow in
+pages/1_Draft_Board.py remains the reliable fallback either way.
 """
 
 from __future__ import annotations
@@ -32,11 +28,4 @@ def fetch_league_settings(league_url: str) -> dict:
         "CBS auto-pull of league settings is not implemented. "
         "Edit config/league_settings.yaml manually — see its header for "
         "how the current values were captured."
-    )
-
-
-def fetch_live_draft_picks(league_url: str):
-    raise NotImplementedError(
-        "CBS live draft sync is not implemented. Use the manual 'log a "
-        "pick' flow in the Draft Board page instead."
     )

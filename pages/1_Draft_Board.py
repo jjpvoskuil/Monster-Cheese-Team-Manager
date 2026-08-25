@@ -1,19 +1,24 @@
 """
 Draft Board — ranked available players, manual pick logging, live draft
 status and roster tracking. This is the tool actually used live on draft
-day; manual pick entry is the reliable path regardless of whether CBS
-live-sync (src/data_sources/cbs.py) ever gets built.
+day. Manual pick entry (this page's "Log a pick" form) always works and
+needs nothing else running; picks can ALSO arrive here automatically via
+a live CBS sync (see src/live_sync.py) run by an active Claude session
+during the draft — both write to the same data/draft_state.json, so this
+page doesn't need to know or care which one produced a given pick.
 """
 
 from __future__ import annotations
 
 import os
+from datetime import datetime, timezone
 
 import pandas as pd
 import streamlit as st
 
 from src.data_sources.manual_import import load_many
 from src.draft_state import DraftState
+from src.live_sync import read_sync_status
 from src.projections import build_draft_board, compute_tiers
 from src.scoring import load_config
 from src.tier_display import add_tier_divider_rows
@@ -28,6 +33,7 @@ DATA_EXTENSIONS = (".csv", ".tsv", ".xlsx", ".xlsm", ".xltx", ".xls")
 REAL_DATA_DIR = os.path.join(ROOT, "data", "projections")
 SAMPLE_DATA_DIR = os.path.join(ROOT, "data", "sample")
 DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
+LIVE_SYNC_STATUS_FILE = os.path.join(ROOT, "data", "live_sync_status.json")
 
 
 def _data_files(data_dir: str) -> list[str]:
@@ -115,6 +121,34 @@ with st.sidebar:
         else:
             until = draft_state.picks_until_my_turn()
             st.caption(f"{until} picks until your turn")
+
+    sync_status = read_sync_status(LIVE_SYNC_STATUS_FILE)
+    if sync_status:
+        st.divider()
+        st.subheader("🔴 Live sync from CBS")
+        synced_at = datetime.fromisoformat(sync_status["last_sync_at"])
+        age_seconds = (datetime.now(timezone.utc) - synced_at).total_seconds()
+        st.caption(f"Last synced pick: #{sync_status['last_synced_overall_pick']}")
+        if age_seconds < 150:
+            st.caption(f"✅ Updated {int(age_seconds)}s ago")
+        elif age_seconds < 600:
+            st.caption(f"⚠️ Updated {int(age_seconds // 60)} min ago — may be behind")
+        else:
+            st.caption(
+                f"🛑 Last update was {int(age_seconds // 60)} min ago — live sync "
+                f"looks stopped. Log picks manually below until it resumes."
+            )
+        if sync_status["mismatches"]:
+            st.error(
+                "Live sync found a mismatch with what's already logged — "
+                "check with whoever is running the sync before trusting "
+                "the board:\n" + "\n".join(f"- {m}" for m in sync_status["mismatches"])
+            )
+        if sync_status["pending_ahead"]:
+            st.caption(
+                f"{len(sync_status['pending_ahead'])} live pick(s) seen out of "
+                f"order, waiting on a gap to close"
+            )
 
     if st.button("↩️ Undo last pick", use_container_width=True, disabled=not draft_state.picks):
         undone = draft_state.undo_last_pick()

@@ -78,12 +78,25 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   only one ("2022 - MFL Draft", URL segment `2022:3:MFL Draft`) has real
   pick data — the other two ("2022 - 2" and "2022" plain) are empty
   placeholder tables; confirmed by visiting all three before capturing.
-- `pytest` — 89/89 passing.
+- **Live CBS draft sync (2026-08-25)**: `src/live_sync.py` parses the
+  live CBS draft room's results panel and merges new picks into
+  `data/draft_state.json` (the SAME file manual "Log a pick" writes to
+  — the Draft Board doesn't know or care which one produced a pick).
+  Built and verified against a REAL CBS mock draft, not synthetic data
+  — see the dedicated log entry below for the full runbook (exact JS
+  extraction snippet, polling cadence, how to run it live) and the real
+  -data edge cases it handles (autopilot `*` prefix, "Last, First (POS
+  TEAM)" format, punctuated last names, the live room's Pick column
+  already being the OVERALL pick number unlike the historical results
+  page). `src/data_sources/cbs.py`'s old stub for this is superseded —
+  see its docstring. Still needs: confirmation of the DST/K live-room
+  cell format (not observed yet in a mock draft), and an actual
+  draft-day dry run.
+- `pytest` — 114/114 passing.
 - Deployed to Streamlit Cloud; user confirmed the Draft Board loads
   correctly as of 2026-08-25.
 - Known gaps (not blocking): ESPN blending not done (would be a 4th
-  source — see notes below); `src/data_sources/cbs.py` live draft sync is
-  still a stub, manual pick entry is the reliable path; defensive
+  source — see notes below); defensive
   PA/yards-allowed tables (only 3 tiers each on CBS's page) not yet
   re-confirmed with the commissioner; no full UI click-through of the
   Draft Board, Projections, or Draft Tendencies page has been done beyond
@@ -118,6 +131,136 @@ carry their own Authorization header. Ask the user for a fresh PAT each
 time; don't assume an old one from the log below is still valid.
 
 ## Log
+
+### 2026-08-25 — Live CBS draft sync built and verified against a real mock draft (Phase 1 of live-draft-day support)
+User's ask, after the tiering/tendencies work above: "when we are running
+the draft I want the actual draft results to drive my app so that as
+players are picked on cbs it updates my app immediately." Also floated
+having the app auto-pick on CBS too (Phase 2). Agreed scope with the user:
+**Phase 1 only** — one-way sync (CBS → app), read-only, no automated
+clicking on CBS. Phase 2 (app picks on CBS on the user's behalf) is
+explicitly a "nice to have if it works really well," not built now, and
+would need per-pick user confirmation before ever clicking "Draft" on CBS
+regardless (an irreversible action on a live third-party site).
+
+**Why this can't be a plain scheduled job:** CBS requires a logged-in
+session and has no public API, and the deployed Streamlit app has no
+browser of its own — it cannot reach out to CBS by itself under any
+design. The only way to get live pick data out of CBS is an active Claude
+session driving a real logged-in browser (Claude in Chrome). So the
+architecture is split in two: `src/live_sync.py` (this repo, pure
+functions, fully unit-tested) does the parsing/merging once pick data has
+been extracted; the actual "go get the data from CBS" step is a procedure
+a Claude session runs live during the draft, described below, not code
+that lives in the repo.
+
+**Tested against a REAL CBS mock draft, not synthetic data.** CBS has a
+free, unlimited "Mock Draft" lobby (from the league site: Draft → Mock
+Drafts → `mockdraft-1.football.cbssports.com/mockdraft/standard`) —
+separate from the real league draft, real people + bot-filled, so there
+was zero risk of touching the actual league draft while testing. Joined
+one, took a team slot, and let it run to round 4 while inspecting the
+live draft room's results panel DOM directly. This mattered: the live
+room turned out to differ from the historical completed-draft results
+page (`src/data_sources/draft_history.py`, used for the Draft Tendencies
+page above) in two independent, non-obvious ways that a naive port of
+that page's parser would have gotten silently wrong:
+- **Player-cell text format** differs: historical page shows
+  `"Josh Allen QB • BUF"`; live room shows `"Allen, Josh (QB BUF)"`.
+- **Pick numbering** differs: historical page's "Pick" column resets to
+  1 every round (combined with round number to get an overall pick);
+  the live room's "Pick" column is already the overall pick number and
+  just keeps counting up across round boundaries (round 2 shows picks
+  11, 12, 13...).
+- Both pages share the same auto-pick convention: a `*` prefix on the
+  player cell (e.g. `"*Henry, Derrick (RB BAL)"`) when a pick was made by
+  autopilot rather than a human clicking.
+
+**Real bug found and fixed via the real-data test, not caught by
+synthetic fixtures:** the first version of `parse_live_room_dump()`
+assumed the live room's "Pick" column needed the same `(round-1)*
+teams_per_round+pick` arithmetic as the historical page. Tested against a
+real captured 14-pick/2-round dump, this produced a wrong overall_pick
+for every round-2+ pick (offset into the 21-24 range instead of 11-14),
+which `sync_new_picks()`'s gap-safety logic correctly refused to bridge —
+so only 10 of 14 real picks got logged, caught by a failing assertion
+(`10 == 14`) rather than a silent wrong answer. Fixed by dropping that
+arithmetic entirely and using the live room's "Pick" column value
+directly as `overall_pick` — see the extensive warning comment in
+`parse_live_room_dump()`'s docstring so a future session doesn't
+reintroduce this. `sync_new_picks()` itself worked correctly throughout
+(it's what caught the bug in the first place, by refusing to skip a
+gap) — the bug was purely in how the raw text got parsed into pick
+numbers upstream of it.
+
+**Extraction technique (the exact steps to run live on draft day):**
+1. In the live draft room, switch the results panel from "Latest Results"
+   to "All Results" so every pick made so far is visible, not just the
+   current round. The panel's dropdown is a custom widget backed by a
+   hidden `<select id="selectRoundResults">`; toggle it via
+   `javascript_tool`:
+   ```js
+   var sel = document.getElementById('selectRoundResults');
+   sel.value = 'all';
+   mainapp.resultsView.selectOption();
+   ```
+2. Dump the results table to plain pipe-delimited text
+   (`round|pick|team|player_cell` per line) by walking
+   `#DraftRoom.views.results .SLTables1 table.data`'s rows (`tr.bg1` =
+   round-label rows to read the round number from, `tr.bg2` = actual pick
+   rows with 3 `<td>`s: pick number, team, player link text). Returning
+   this directly from `javascript_tool` gets `[BLOCKED: Cookie/query
+   string data]` (the player links' hrefs contain `?playerid=...`, which
+   trips the tool's own content filter) — work around this the same way
+   the Draft Tendencies historical-page capture did: write the dump into
+   a `<pre>` element appended to `document.body`, then retrieve it with
+   the separate `get_page_text` tool, which has no such filter and no
+   `javascript_tool`'s ~1100-1200 char truncation either.
+3. Feed that text to `parse_live_room_dump()`, then `sync_new_picks(draft_state,
+   live_picks)`, then `write_sync_status(LIVE_SYNC_STATUS_FILE, draft_state,
+   result)` so the Draft Board's sidebar shows how fresh the feed is.
+4. Repeat on a poll loop. Recommended cadence: **90-120 seconds.** In the
+   test mock draft, real picks landed roughly every 40-60 seconds
+   (faster than a real league draft will likely run, since bots don't
+   deliberate) — 90-120s keeps the app comfortably current without
+   polling so often it's wasted effort, and the Draft Board's sidebar
+   flags staleness (⚠️ past 150s, 🛑 past 600s) so a slower cadence, or a
+   dropped poll, is visible rather than silent.
+
+**`pages/1_Draft_Board.py`** now shows a "🔴 Live sync from CBS" sidebar
+block whenever `data/live_sync_status.json` exists: last synced pick
+number, freshness (✅ under 150s / ⚠️ 150-600s / 🛑 over 600s — "log
+picks manually below until it resumes"), and any mismatches or
+out-of-order picks the last sync pass found. The manual "Log a pick" form
+is unchanged and still the reliable fallback — both write to the same
+`data/draft_state.json`, so the page doesn't know or care which produced
+a given pick. `src/data_sources/cbs.py`'s old `fetch_live_draft_picks`
+stub is removed; its docstring now points here.
+
+**Verified:** `src/live_sync.py` covered by 18 new tests in
+`tests/test_live_sync.py`, including two end-to-end tests built from the
+actual captured mock-draft dumps (`REAL_LIVE_ROOM_DUMP`,
+`REAL_LIVE_ROOM_DUMP_ROUND_2`) — not just synthetic fixtures — plus
+tests for contiguous logging, gap handling, idempotent re-polling,
+mismatch detection, and stopping cleanly at draft-complete. 114/114 tests
+passing repo-wide. All 4 Streamlit pages re-verified via `AppTest` with
+the new sidebar block present, including a stale/mismatch scenario, no
+exceptions.
+
+**Still open, not blocking Phase 1 use:**
+- DST and K live-room cell format is unconfirmed — the test mock draft
+  only reached round 4 of 14 before wrapping up, and those positions
+  typically go much later. `parse_live_room_player_cell()` has a
+  defensive fallback regex for a no-comma cell shape that won't crash on
+  an unexpected format, but its exact correctness for DST/K is unverified
+  until observed for real.
+- No continuous real-time poll loop has been run yet end-to-end (parsing
+  and merging have each been verified against real snapshots taken at
+  different points in the mock draft, but not yet exercised as a
+  repeated poll-extract-sync cycle sustained over a full draft).
+- No dry run against the actual league's draft day (2026-08-30) yet.
+- Phase 2 (app → CBS pick submission) not started, per the user's own
+  "nice to have" prioritization — Phase 1 (this) is the whole ask for now.
 
 ### 2026-08-25 — Draft Tendencies: 4 years of real CBS draft history + live position-run prediction + opponent roster-need view
 League manager's request: "the number of players per position per draft
