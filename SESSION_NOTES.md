@@ -185,7 +185,62 @@ session — the proxy's allowlist doesn't intercept requests that already
 carry their own Authorization header. Ask the user for a fresh PAT each
 time; don't assume an old one from the log below is still valid.
 
+## Local clone access via the device bridge (correction to 2026-08-26's dry-run entry)
+
+The dry-run session below said "any git operation involving lock files
+does NOT work through the `device_bash` remote-devices bridge" based on
+`git clone` failing. That's too broad — **`git pull`/`git status`/`git
+log` DO work through `device_bash`**, once two things are true:
+
+1. The folder is actually connected to the session. If
+   `get_device_info`'s `connectedFolders` is empty, call
+   `device_request_folder_access` with the folder (e.g. `~/MFL` covers
+   the whole MFL workspace including `monster-cheese-team-manager`) —
+   this pops a one-time approval dialog on the user's device.
+2. **`device_bash` can't delete/unlink files by default** — a plain `git
+   pull` fails partway through with a wall of
+   `warning: unable to unlink '.git/objects/.../tmp_obj_...': Operation
+   not permitted` (git's internals use temp-file-then-rename, which needs
+   unlink) and then errors on any tracked file it needs to replace. Fix:
+   call `device_request_delete_permission` on the connected folder root
+   BEFORE pulling — this is its own one-time approval dialog, separate
+   from folder access. After that, `git pull` (and presumably `push`,
+   though push wasn't exercised via the bridge this session — the PAT
+   workaround above handles push from the cloud-workspace clone instead)
+   works normally. A pull attempted before requesting delete permission
+   can leave `.git/index.lock` / `.git/objects/maintenance.lock` behind
+   and new files partially written (untracked) that then block the retry
+   with "would be overwritten by merge" — clean those up (`rm` the lock
+   files, `rm` the conflicting untracked files if their content matches
+   what's incoming) once delete permission is granted, then pull again.
+
+Still true from the original entry: don't run `git clone` or venv/pip
+setup through `device_bash` — that's still untested/likely fragile for a
+fresh clone (lock-file lifecycle during a full clone is heavier than a
+fast-forward pull), and the local venv's `python` symlink points to a
+system path (`/Library/Developer/CommandLineTools/...`) that's outside
+the mounted folder and so unreachable from `device_bash` — the app itself
+can only actually be run by the user in their own Terminal.app, not
+verified from here. Use `device_bash` for git pull/status and for
+editing/reading files in the clone directly; keep clone-from-scratch,
+venv creation, and `streamlit run` in the user's own Terminal.
+
 ## Log
+
+### 2026-08-26 — Connected the local clone folder to the session; local clone synced to latest
+Right after the UI overhaul below, user asked to connect the local
+`~/MFL` folder so this session could push updates to the local clone
+directly instead of only the cloud-workspace GitHub clone. Connected via
+`device_request_folder_access(["~/MFL"])`, then
+`device_request_delete_permission` once a `git pull` through
+`device_bash` hit the unlink-permission wall described in the new
+section above. Local clone (`~/MFL/monster-cheese-team-manager`) is now
+fast-forwarded to `e4d7532` (the UI overhaul commit) — verified via
+matching SHA-256 hashes of the changed files between the cloud-workspace
+clone and the local one, not just "git pull reported success." See the
+new "Local clone access via the device bridge" section above for the
+full mechanics/gotchas — this corrects the prior session's blanket "git
+doesn't work over the bridge" claim.
 
 ### 2026-08-26 — Draft Board UI overhaul: clickable grid, sidebar round/upcoming panels, separate My Roster page
 League manager's ask, picking back up after the paused dry-run session
