@@ -77,6 +77,39 @@ def test_positions_that_would_fill_spreads_demand_across_eligible_positions():
     assert demand["TE"] == pytest.approx(1.0)
 
 
+def test_positions_that_would_fill_uses_flex_splits_when_given():
+    config, starters = _real_starters()
+    flex_splits = config["estimation_assumptions"]["flex_position_splits"]
+    # Bug this fixes (SESSION_NOTES 2026-08-26): an unfilled SUPERFLEX
+    # used to contribute an even 0.25 to QB, same as RB/WR/TE -- despite
+    # this league's own modeling assumption (used elsewhere for VOR) that
+    # SUPERFLEX is ~90% likely to actually be started as a 2nd QB. That
+    # made "need" nearly blind to a real, still-open 2nd-QB requirement.
+    demand = positions_that_would_fill({"SUPERFLEX": 1}, starters, flex_splits)
+    assert demand["QB"] == pytest.approx(0.90)
+    assert demand["RB"] == pytest.approx(0.04)
+    assert demand["WR"] == pytest.approx(0.04)
+    assert demand["TE"] == pytest.approx(0.02)
+
+
+def test_positions_that_would_fill_flex_splits_still_sum_to_the_slots_need():
+    config, starters = _real_starters()
+    flex_splits = config["estimation_assumptions"]["flex_position_splits"]
+    demand = positions_that_would_fill({"WR_TE_FLEX": 3, "FLEX": 2}, starters, flex_splits)
+    # WR_TE_FLEX's 3 needed + FLEX's 2 needed = 5 total demand units,
+    # regardless of how the weights carve it up across positions.
+    assert sum(demand.values()) == pytest.approx(5.0)
+
+
+def test_positions_that_would_fill_falls_back_to_even_split_for_uncovered_slot():
+    _, starters = _real_starters()
+    # flex_splits provided but doesn't mention this slot at all -- same
+    # even-split behavior as passing no flex_splits.
+    demand = positions_that_would_fill({"WR_TE_FLEX": 2}, starters, flex_splits={"SUPERFLEX": {"QB": 1.0}})
+    assert demand["WR"] == pytest.approx(1.0)
+    assert demand["TE"] == pytest.approx(1.0)
+
+
 def test_opponent_needs_before_next_pick_covers_only_teams_ahead_of_me():
     config, starters = _real_starters()
     ds = _fresh_state()

@@ -168,7 +168,98 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   cover the roster-slot/scoring/transaction settings already in
   `config/league_settings.yaml`. Not yet implemented — waiting on the
   league manager to supply the actual requirement.
-- `pytest` — 145/145 passing.
+- **Suggested Pick "need" math fix (2026-08-26)**: found and fixed a real
+  bug behind the league manager's report that drafting a QB early and
+  still needing a 2nd one (for SUPERFLEX) never made the panel recommend
+  QB again. `src/roster_needs.positions_that_would_fill()` was spreading
+  an unfilled flex slot's need EVENLY across its eligible positions —
+  fine for a slot with no real skew, but SUPERFLEX (QB/RB/WR/TE eligible)
+  already has a documented league assumption
+  (`estimation_assumptions.flex_position_splits.SUPERFLEX`, 90% QB) that
+  this function just wasn't using. Even split made a real, still-open
+  2nd-QB need contribute only 0.25 "need" to QB — the same as to RB/WR/TE
+  — vs. RB/WR's much larger dedicated-slot needs (3 RB starters, 3
+  WR_TE_FLEX starters), so QB's need signal could never compete no matter
+  how many rounds passed. Fix: `positions_that_would_fill()` takes an
+  optional `flex_splits` dict and weights by it when a slot has one
+  (falls back to even split otherwise, so every existing caller/test that
+  doesn't pass it is unaffected); threaded config's real
+  `flex_position_splits` through both `my_position_need()` (Suggested
+  Pick) and `opponent_needs_before_next_pick()` (Draft Tendencies) so
+  both benefit consistently, not just the panel that was reported broken.
+  Verified against real 2026 data: same "drafted QB1 at pick 8" scenario
+  now gives QB a need_raw of 0.90 instead of 0.25 (hand-verified the
+  arithmetic for every position, not just QB, before trusting it) — QB
+  doesn't necessarily become the top recommendation immediately (RB/WR
+  still have both more raw value AND legitimately more roster slots to
+  fill), but it's no longer mathematically incapable of ever winning.
+  5 new tests (`test_roster_needs.py`, `test_pick_suggestion.py`).
+- **Suggested Pick redundancy/overdraft fix + Monte Carlo simulation
+  (2026-08-26)**: per the league manager's request to "look at the league
+  tendencies and rerun some statistical simulations to see if the pick
+  suggestions make sense consistently," built a simulation harness (not
+  yet committed to the repo — currently `/tmp/sim/simulate.py` in the
+  cloud workspace scratch space; decide whether to formalize it as
+  `scripts/simulate_draft.py` or a slow `tests/` integration test) that
+  runs full 220-pick simulated drafts: Monster Cheese always follows
+  `suggest_position()`'s own recommendation, opponents draft using
+  `src.draft_tendencies.counts_by_round`'s real historical per-round
+  position frequencies. This caught two real problems the single
+  hand-checked scenario above couldn't:
+  1. Config's `roster.position_active_limits` (QB max 2, RB max 5, TE max
+     1, WR_TE max 5 combined, K max 3, DST max 1 — captured from CBS's
+     rules page in an earlier session) was never wired into any code
+     (confirmed via `grep`). Shallow-pool positions (K/DST/TE) kept
+     getting recommended well past any roster benefit, because their best
+     -available VOR stays mildly positive far longer than a skill
+     position's does once it craters past replacement level — one early
+     run ended with 6 TEs and 5 DSTs drafted, and Monster Cheese took
+     almost exclusively K/DST from round 9 to round 18. Fixed in
+     `src/pick_suggestion.py`: once my own drafted count at a position
+     meets its configured cap, that position's NEED is zeroed and it's
+     excluded from recommendation as long as any legal alternative
+     exists — a flat squash on the composite alone (first attempt) wasn't
+     enough, since a small positive number still beat a skill position
+     whose value had gone negative; rerunning the simulation against that
+     first attempt is what caught it.
+  2. Fixing #1 surfaced something worse: some 22-round simulated drafts
+     ended having NEVER drafted a single QB — a deep league-wide QB
+     replacement pool (see the VOR analysis below) means QB's raw VOR
+     rarely craters enough to win the composite against RB/WR, even with
+     the flex-splits need fix above. An empty mandatory starter slot
+     scores zero every week of the season. Fixed with a new
+     "mandatory-deadline fill" override: once I'm down to my LAST
+     remaining pick(s) that could still fill an unfilled dedicated
+     single-position slot (QB/RB/TE/K/DST), that position is forced to
+     the top, overriding value/need/scarcity entirely.
+  3. Per league-manager feedback mid-session ("kickers and defenses are
+     pretty much a dime a dozen, rarely worth taking before round 17"),
+     added a separate, softer, config-driven discount
+     (`estimation_assumptions.position_early_round_discount`: K/DST,
+     before round 17, 0.2x multiplier) — NOT a hard block, since you can
+     always draft one by hand. Expected to need reconciling once the
+     league's stated round-based fill requirement ("2 kickers and 2
+     defenses must be picked prior to round 21") is confirmed — not yet
+     supplied by the league manager as of this entry.
+  After all three fixes: a fresh 15-trial batch had every trial fill
+  DST/TE exactly at their cap of 1 and K exactly at its cap of 3, and
+  every trial ended with zero empty starter slots (vs. 4/15 trials with
+  an unfilled QB slot before fix #2). **Open question, not yet acted
+  on**: WR now absorbs most of the "leftover" picks once other positions
+  are capped/discounted (~10-11 WR/trial), and a 2nd QB remains rare
+  (6/15 trials) — this may be genuine value-optimal behavior given this
+  league's deep QB replacement pool (consistent with the VOR analysis
+  below), or it may warrant further tuning (e.g. raising SUPERFLEX's
+  demand weight further, or increasing NEED_WEIGHT). Flagging for the
+  league manager rather than guessing further. **Also unresolved**:
+  whether CBS's `roster.position_active_limits` TE max of 1 is really
+  meant to cap TOTAL rostered TEs (including bench/flex depth) or just
+  something narrower — it's in real tension with `WR_TE_FLEX` wanting up
+  to 3 more TE-eligible players; treating it as a hard total-TE cap is
+  what the fix above does, but this hasn't been confirmed with the league
+  manager.
+  24 new tests (`test_pick_suggestion.py`).
+- `pytest` — 173/173 passing.
 - Deployed to Streamlit Cloud; user confirmed the Draft Board loads
   correctly as of 2026-08-25 (2026-08-26 UI overhaul + follow-up fixes
   above not yet re-confirmed live on Streamlit Cloud — only locally/via
@@ -249,6 +340,44 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-26 — Suggested Pick: redundancy/overdraft fix + Monte Carlo simulation across many mock drafts
+Follow-up to the "need" math fix above. League manager also asked to
+"look at the league tendencies and rerun some statistical simulations to
+see if the pick suggestions make sense consistently" — not just the one
+hand-checked scenario. Full findings and fixes are in the "Current state"
+bullet above (search "Monte Carlo simulation"); short version:
+
+- Built a simulation harness (`/tmp/sim/simulate.py`, cloud-workspace
+  scratch, NOT yet committed to the repo) that runs full 220-pick
+  simulated drafts, with Monster Cheese always following
+  `suggest_position()`'s own call and opponents sampling from real
+  historical per-round position frequencies.
+- Caught config's `roster.position_active_limits` being completely
+  unused (grep confirmed zero references) — shallow-pool positions
+  (K/DST/TE) got recommended long past any real benefit since their VOR
+  never craters the way a skill position's does. Fixed with a
+  need-zeroing + hard-exclusion redundancy cap in `src/pick_suggestion.py`
+  (a flat composite squash alone wasn't enough — verified by rerunning
+  the sim against that weaker first attempt, which still lost most of the
+  time).
+- Fixing that surfaced something worse: some simulated drafts never
+  drafted a single QB across all 22 rounds (empty starter slot at the
+  end — scores zero every week). Fixed with a "mandatory-deadline fill"
+  override that forces a still-open dedicated slot once I'm on my last
+  chance to fill it, no exceptions.
+- Added a separate, softer early-round discount for K/DST (before round
+  17), per the league manager's mid-session comment that these positions
+  are "pretty much a dime a dozen" early — not a hard block.
+- Reran the 15-trial simulation after all three fixes: zero empty starter
+  slots across every trial, K/TE/DST all land exactly at their configured
+  caps. Two things flagged back to the league manager rather than guessed
+  at further: (1) WR now absorbs most "leftover" picks and a 2nd QB stays
+  rare — may just be correct given this league's deep QB pool (matches
+  the existing VOR-analysis doc), or may need more tuning; (2) whether
+  the TE=1 active-roster cap really means "never roster more than 1 TE
+  total" is unconfirmed and in tension with `WR_TE_FLEX` wanting more.
+- 24 new tests, 173/173 passing.
 
 ### 2026-08-26 — Draft Board follow-up: harden Reset, relabel SUPERFLEX, real final-round snake rule, checked CBS for round-fill rules
 League manager tried the new clickable-grid Draft Board locally ("I tried

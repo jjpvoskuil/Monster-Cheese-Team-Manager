@@ -54,22 +54,53 @@ def unfilled_starter_slots(position_counts: dict[str, int], starters: list[dict]
     return unfilled
 
 
-def positions_that_would_fill(unfilled_slots: dict[str, int], starters: list[dict]) -> Counter:
+def positions_that_would_fill(
+    unfilled_slots: dict[str, int],
+    starters: list[dict],
+    flex_splits: Optional[dict[str, dict[str, float]]] = None,
+) -> Counter:
     """Turn {slot_name: needed_count} back into a per-POSITION demand
-    weight, by spreading each unfilled slot's need evenly across its
-    eligible positions (e.g. a still-empty WR_TE_FLEX spot contributes
-    0.5 demand to WR and 0.5 to TE). Positions eligible for more unfilled
-    slots accumulate more weight."""
+    weight.
+
+    When `flex_splits` supplies weights for a slot (pass
+    config["estimation_assumptions"]["flex_position_splits"] --
+    config/league_settings.yaml's per-slot QB/RB/WR/TE/K split, the SAME
+    assumption src/projections.py's replacement-level/VOR model already
+    uses), an unfilled slot's need is distributed by those weights
+    instead of split evenly. This matters a lot for a slot like this
+    league's SUPERFLEX: eligible for QB/RB/WR/TE, but per league-manager
+    feedback this scoring system makes a good QB start there ~90% of the
+    time -- an even 25%/25%/25%/25% split was drastically understating
+    QB "need" for that slot (e.g. after your one dedicated QB slot is
+    filled, an unfilled SUPERFLEX used to contribute only 0.25 demand to
+    QB, the same as to RB/WR/TE, even though it's overwhelmingly likely
+    to actually be started as a 2nd QB -- see the 2026-08-26 SESSION_NOTES
+    entry that tracked this down via the Suggested Pick panel never
+    recommending QB again after round 1 despite a real 2nd-QB need).
+
+    Falls back to an even split across `eligible` when `flex_splits` is
+    omitted, or doesn't cover a given slot, or that slot's covered
+    weights sum to 0 -- e.g. a still-empty WR_TE_FLEX spot with no
+    configured split contributes 0.5 demand to WR and 0.5 to TE.
+    Positions eligible for more unfilled slots (or weighted more heavily
+    within one) accumulate more weight."""
     by_slot_name = {s["slot"]: s for s in starters}
+    flex_splits = flex_splits or {}
     demand: Counter[str] = Counter()
     for slot_name, need in unfilled_slots.items():
         slot = by_slot_name[slot_name]
         eligible = slot["eligible"]
         if not eligible:
             continue
-        share = need / len(eligible)
-        for pos in eligible:
-            demand[pos] += share
+        weights = {pos: flex_splits.get(slot_name, {}).get(pos, 0.0) for pos in eligible}
+        total_weight = sum(weights.values())
+        if total_weight > 0:
+            for pos in eligible:
+                demand[pos] += need * weights[pos] / total_weight
+        else:
+            share = need / len(eligible)
+            for pos in eligible:
+                demand[pos] += share
     return demand
 
 
@@ -127,6 +158,7 @@ def opponent_needs_before_next_pick(draft_state: DraftState, config: dict) -> di
         return {}
 
     starters = config["roster"]["starters"]
+    flex_splits = config.get("estimation_assumptions", {}).get("flex_position_splits", {})
     rosters = draft_state.roster_by_team()
 
     upcoming_teams = []
@@ -138,7 +170,7 @@ def opponent_needs_before_next_pick(draft_state: DraftState, config: dict) -> di
     for team in upcoming_teams:
         counts = team_position_counts(rosters.get(team, []))
         unfilled = unfilled_starter_slots(counts, starters)
-        result[team] = positions_that_would_fill(unfilled, starters)
+        result[team] = positions_that_would_fill(unfilled, starters, flex_splits)
     return result
 
 

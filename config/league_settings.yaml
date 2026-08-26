@@ -313,3 +313,20 @@ estimation_assumptions:
       RB: 0.04
       WR: 0.04
       TE: 0.02
+  position_early_round_discount:
+    # Per league-manager feedback (2026-08-26): "kickers and defenses are
+    # pretty much a dime a dozen, rarely worth taking before round 17."
+    # Used by src/pick_suggestion.py to softly discount (NOT block) K/DST
+    # in the Suggested Pick panel before `before_round` -- see
+    # _early_round_discount()'s docstring. You can still draft either by
+    # hand any time; this only affects the algorithm's own recommendation.
+    #
+    # NOTE: the league also has a round-based fill requirement -- "2
+    # kickers and 2 defenses have to be picked prior to round 21" -- that
+    # is NOT yet confirmed/wired in (league manager is still tracking down
+    # the exact source/wording as of 2026-08-26). Once that's added, it
+    # should be able to override this discount as the deadline approaches
+    # (e.g. force K/DST back up if round 20 arrives and the requirement
+    # isn't met yet). Revisit this block then.
+    K: {before_round: 17, multiplier: 0.2}
+    DST: {before_round: 17, multiplier: 0.2}
