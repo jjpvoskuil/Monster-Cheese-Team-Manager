@@ -259,7 +259,69 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   what the fix above does, but this hasn't been confirmed with the league
   manager.
   24 new tests (`test_pick_suggestion.py`).
-- `pytest` — 173/173 passing.
+- **Round-based QB quota + team-vs-league points comparison in the
+  simulation (2026-08-26)**: league manager flagged the "some simulated
+  drafts never got a 2nd QB" finding above as a major red flag ("not
+  having 2 in the first 7 rounds or so would be a disaster" in this
+  superflex league) and asked to try other model variants, rerunning the
+  simulation, this time also comparing each team's PROJECTED STARTING
+  -LINEUP POINTS against the whole league — not just checking that slots
+  get filled legally — to see whether Monster Cheese actually comes out
+  near the top.
+  - New general mechanism in `src/pick_suggestion.py`:
+    `_round_based_quota_positions()` / config's
+    `estimation_assumptions.round_based_fill_targets` — a "must have N of
+    this position by round R" target, force-prioritized (same override
+    tier as the existing mandatory-deadline-fill check) once running out
+    of realistic chances to hit it. Deliberately generalized so the SAME
+    config shape can also hold the league's real "2 kickers and 2
+    defenses by round 21" rule once confirmed — see the config comments
+    for which entries are self-imposed strategy vs. real CBS rules.
+    Shipped with one entry: `QB: {by_round: 7, count: 2}`, straight from
+    the league manager's own stated strategy target.
+  - Also hardened the K/DST early-round discount (2026-08-26, earlier
+    same day) from a squash-only adjustment into the same hard-exclusion
+    tier as the redundancy cap: a second simulation run caught it losing
+    the identical "positive-but-discounted beats negative" comparison
+    problem the redundancy squash had, letting K/DST get recommended in
+    rounds 11-15 (still before the round-17 cutoff) once every other
+    position's need was satisfied and value had gone negative. Confirmed
+    fixed: 0 such events across every subsequent simulation run (was a
+    steady 4/trial before).
+  - `suggest_position()` now also accepts optional `value_weight`/
+    `need_weight`/`scarcity_weight` overrides (default to the module's
+    constants when omitted) purely so the simulation harness can A/B
+    different composite blends without a code change per variant — the
+    Draft Board itself always calls it with defaults.
+  - New simulation harness `/tmp/sim/simulate_v2.py` (still cloud
+    -workspace scratch, not committed) + `/tmp/sim/lineup_value.py`
+    (optimal starting-lineup point value via `scipy.optimize.
+    linear_sum_assignment` — a proper weighted-bipartite-matching
+    solution, NOT the same as `assign_roster_slots()`'s greedy
+    draft-order fill, since maximizing lineup points needs the actual
+    best eligible player per slot, not "whoever was drafted first").
+    After each simulated draft, computes every one of the 10 teams'
+    optimal-lineup projected points (using real `score_total` values) and
+    ranks Monster Cheese among them.
+  - Compared 5 model variants over 20 (main two) / 12 (others) trials
+    each, same opponent-behavior seeds across variants: **current**
+    (shipped weights 0.45/0.30/0.25 + the QB quota), **no_quota**
+    (identical minus the QB round-7 target — an ablation to isolate its
+    effect), **need_heavy** (0.30/0.45/0.25), **scarcity_heavy**
+    (0.30/0.25/0.45), **value_heavy** (0.70/0.15/0.15, a pure
+    best-player-available sanity baseline). Result: the QB quota is by
+    far the dominant factor, not the value/need/scarcity weighting.
+    `current` averaged rank **2.05 of 10** (85% top-3, ranks ranged only
+    1st-4th across 20 trials, 100% got 2 QBs by round 7) vs. `no_quota`
+    averaging rank **4.65 of 10** (35% top-3, ranks ranged 1st-8th, only
+    45% ever got a 2nd QB at all, averaging round 17 when they did). The
+    3 reweighted variants all landed within noise of `current` (avg rank
+    2.42-2.75 over 12 trials each) — **no strong case to change the
+    default 0.45/0.30/0.25 weights**; getting the QB timing right
+    mattered far more than how value/need/scarcity are blended.
+  - Full detail saved at `/tmp/sim/results_v2.json` (cloud workspace,
+    not committed).
+- `pytest` — 184/184 passing.
 - Deployed to Streamlit Cloud; user confirmed the Draft Board loads
   correctly as of 2026-08-25 (2026-08-26 UI overhaul + follow-up fixes
   above not yet re-confirmed live on Streamlit Cloud — only locally/via
@@ -340,6 +402,46 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-26 — Round-based QB quota + comparing simulated teams' projected points against the whole league
+Follow-up to the redundancy/overdraft entry below. League manager flagged
+the "some simulated drafts never got a 2nd QB" finding as a real red flag
+("not having 2 in the first 7 rounds or so would be a disaster" in this
+superflex league), and asked to try other model variants and rerun the
+simulation — this time also computing each of the 10 teams' PROJECTED
+STARTING-LINEUP POINTS and comparing Monster Cheese to the league, not
+just checking legality. Full detail is in the "Current state" bullet
+above (search "team-vs-league points comparison"); short version:
+
+- Added a general "must have N of this position by round R" mechanism
+  (`_round_based_quota_positions()`, config's `estimation_assumptions.
+  round_based_fill_targets`) — force-prioritized once running out of
+  realistic chances to hit it, same override tier as the existing
+  mandatory-deadline-fill check. Shipped with `QB: {by_round: 7, count:
+  2}`. Deliberately generalized so the league's real "2 kickers/2
+  defenses by round 21" rule can go in the same config block once
+  confirmed.
+- That exposed the K/DST early-round discount had the SAME weak-squash
+  problem the redundancy cap had before it was hardened — K/DST still
+  got recommended in rounds 11-15 once other positions ran out of real
+  value. Hardened it into a hard exclusion too (0 such events in every
+  subsequent simulation run, was 4/trial before).
+- `suggest_position()` now takes optional weight overrides so the sim can
+  A/B different value/need/scarcity blends without code changes.
+- New `/tmp/sim/simulate_v2.py` + `/tmp/sim/lineup_value.py` (scipy
+  weighted-bipartite-matching optimal lineup solver, not the same as
+  `assign_roster_slots()`'s draft-order greedy fill) compute every team's
+  best-possible starting-lineup points per trial and rank Monster Cheese.
+- Compared 5 variants (20 trials for the two most important, 12 for the
+  rest, same opponent seeds across variants): the shipped config WITH the
+  QB quota averaged rank **2.05 of 10** (85% top-3, never worse than
+  4th across 20 trials); the same config WITHOUT the quota averaged rank
+  **4.65 of 10** (35% top-3, ranks as bad as 8th, only 45% of trials ever
+  got a 2nd QB at all). Reweighting value/need/scarcity on top of the
+  quota made little difference (all within noise of each other) —
+  **the QB-timing fix is what actually matters here, not the composite
+  weights**; left the default weights unchanged.
+- 11 new tests, 184/184 passing.
 
 ### 2026-08-26 — Suggested Pick: redundancy/overdraft fix + Monte Carlo simulation across many mock drafts
 Follow-up to the "need" math fix above. League manager also asked to

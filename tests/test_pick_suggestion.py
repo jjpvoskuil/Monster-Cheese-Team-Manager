@@ -13,6 +13,8 @@ from src.pick_suggestion import (
     _position_cap,
     _redundancy_penalty,
     _remaining_my_picks,
+    _remaining_my_picks_before_round,
+    _round_based_quota_positions,
     my_position_need,
     picks_before_my_next_turn,
     suggest_position,
@@ -199,6 +201,64 @@ def test_mandatory_deadline_positions_ignores_multi_eligible_only_slots():
     assert ds.is_my_pick
     assert _remaining_my_picks(ds) == 1
     assert _mandatory_deadline_positions(ds, config) == set()
+
+
+# ---------------------------------------------------------------------
+# _remaining_my_picks_before_round / _round_based_quota_positions
+# ---------------------------------------------------------------------
+
+def test_remaining_my_picks_before_round_counts_only_picks_at_or_before_the_limit():
+    ds = _fresh_state(rounds=3)  # Monster Cheese picks at overall 4, 17, 24
+    assert _remaining_my_picks_before_round(ds, round_limit=1) == 1
+    assert _remaining_my_picks_before_round(ds, round_limit=2) == 2
+    assert _remaining_my_picks_before_round(ds, round_limit=3) == 3
+
+
+def test_remaining_my_picks_before_round_is_zero_once_past_the_deadline_round():
+    ds = _fresh_state(rounds=3)
+    for _ in range(20):  # picks 1-20 logged; next pick (21) is round 3
+        ds.log_pick_on_the_clock("Filler", position="RB")
+    assert _remaining_my_picks_before_round(ds, round_limit=2) == 0
+
+
+QUOTA_CONFIG = {
+    **CONFIG,
+    "estimation_assumptions": {
+        "round_based_fill_targets": {"QB": {"by_round": 7, "count": 2}}
+    },
+}
+
+
+def test_round_based_quota_positions_empty_when_target_already_met():
+    ds = _fresh_state()
+    ds.log_pick("Monster Cheese", "QB1", position="QB")
+    ds.log_pick("Monster Cheese", "QB2", position="QB")
+    assert _round_based_quota_positions(ds, QUOTA_CONFIG) == set()
+
+
+def test_round_based_quota_positions_empty_when_deadline_round_already_passed():
+    ds = _fresh_state(rounds=15)
+    for _ in range(80):  # well past round 7
+        ds.log_pick_on_the_clock("Filler", position="RB")
+    assert _round_based_quota_positions(ds, QUOTA_CONFIG) == set()
+
+
+def test_round_based_quota_positions_not_yet_urgent_with_plenty_of_chances_left():
+    ds = _fresh_state(rounds=15)  # 7 rounds of chances ahead, 0 QBs drafted -- fine for now
+    assert _round_based_quota_positions(ds, QUOTA_CONFIG) == set()
+
+
+def test_round_based_quota_positions_flags_qb_on_the_last_realistic_chance():
+    ds = _fresh_state(rounds=15)
+    for _ in range(3):
+        ds.log_pick_on_the_clock("Filler", position="RB")  # picks 1-3, other teams
+    ds.log_pick_on_the_clock("QB1", position="QB")  # pick 4 -- Monster Cheese's round-1 pick
+    for _ in range(53):
+        ds.log_pick_on_the_clock("Filler", position="RB")  # picks 5-57
+    assert ds.next_overall_pick == 58
+    # Monster Cheese has 1 QB; only 1 more Monster Cheese pick (64, round 7)
+    # remains before the round-7 deadline -- last realistic chance for QB2.
+    assert "QB" in _round_based_quota_positions(ds, QUOTA_CONFIG)
 
 
 # ---------------------------------------------------------------------
@@ -419,6 +479,36 @@ def test_suggest_position_early_round_discount_only_squashes_k_before_configured
     assert rb_discounted.composite == pytest.approx(rb_no_discount.composite)
 
 
+def test_suggest_position_never_recommends_an_early_round_discounted_position_when_a_clean_alternative_exists():
+    # Regression test for a second Monte Carlo finding (2026-08-26): the
+    # early-round discount used to be squash-only, and K/DST kept getting
+    # recommended in rounds 11-15 anyway once every other position's need
+    # was satisfied and its value had gone negative -- the same failure
+    # mode the redundancy cap had before it was hardened. This asserts
+    # the fix: a discounted position loses to a legal, non-negative
+    # alternative even when its own squashed composite is still positive.
+    ds = _fresh_state()
+    board = _board([
+        _player("K1", "K", vor=100.0, vor_rank=1, tier=1),
+        _player("RB1", "RB", vor=1.0, vor_rank=50, tier=3),
+    ])
+    discount_config = {**CONFIG, "estimation_assumptions": EARLY_DISCOUNT_CONFIG["estimation_assumptions"]}
+    suggestion = suggest_position(board, ds, discount_config, history=None)
+    k_score = next(s for s in suggestion.all_scores if s.position == "K")
+    assert k_score.early_round_discounted is True
+    assert k_score.composite > 0  # the squash alone would still make K look attractive
+    assert suggestion.recommended_position == "RB"  # hard exclusion wins anyway
+
+
+def test_suggest_position_falls_back_to_a_discounted_position_when_nothing_else_is_available():
+    ds = _fresh_state()
+    board = _board([_player("K1", "K", vor=5.0, vor_rank=1, tier=1)])
+    discount_config = {**CONFIG, "estimation_assumptions": EARLY_DISCOUNT_CONFIG["estimation_assumptions"]}
+    suggestion = suggest_position(board, ds, discount_config, history=None)
+    assert suggestion.recommended_position == "K"
+    assert suggestion.all_scores[0].early_round_discounted is True
+
+
 def test_suggest_position_forces_mandatory_fill_over_everything_else():
     # Regression test for the 2026-08-26 Monte Carlo finding: with the
     # redundancy fix above in place, some simulated 22-round drafts went
@@ -444,6 +534,61 @@ def test_suggest_position_forces_mandatory_fill_over_everything_else():
 
 def test_suggest_position_does_not_force_anything_when_picks_still_remain():
     ds = _fresh_state()  # 15 rounds -- nowhere near a deadline
+    board = _board([
+        _player("Elite WR", "WR", vor=500.0, vor_rank=1, tier=1),
+        _player("Mediocre QB", "QB", vor=1.0, vor_rank=80, tier=3),
+    ])
+    suggestion = suggest_position(board, ds, CONFIG, history=None)
+    assert suggestion.recommended_position == "WR"
+
+
+def test_suggest_position_weight_overrides_change_the_composite_blend():
+    ds = _fresh_state()
+    board = _board([
+        _player("RB1", "RB", vor=10.0, vor_rank=1, tier=1),
+        _player("WR1", "WR", vor=1.0, vor_rank=2, tier=1),
+    ])
+    default = suggest_position(board, ds, CONFIG, history=None)
+    value_only = suggest_position(
+        board, ds, CONFIG, history=None, value_weight=1.0, need_weight=0.0, scarcity_weight=0.0,
+    )
+    rb_default = next(s for s in default.all_scores if s.position == "RB")
+    rb_value_only = next(s for s in value_only.all_scores if s.position == "RB")
+    # RB is the peak VOR (10.0) among the two, so a pure value_weight=1.0
+    # blend should give it exactly value_norm==1.0 as its composite.
+    assert rb_value_only.composite == pytest.approx(1.0)
+    assert rb_value_only.composite != rb_default.composite
+
+
+def test_suggest_position_forces_quota_deadline_position_over_everything_else():
+    ds = _fresh_state(rounds=15)
+    for _ in range(3):
+        ds.log_pick_on_the_clock("Filler", position="RB")
+    ds.log_pick_on_the_clock("QB1", position="QB")  # pick 4
+    for _ in range(53):
+        ds.log_pick_on_the_clock("Filler", position="RB")
+    assert ds.next_overall_pick == 58
+    board = _board([
+        _player("Elite WR", "WR", vor=500.0, vor_rank=1, tier=1),  # overwhelming value elsewhere
+        _player("Mediocre QB", "QB", vor=1.0, vor_rank=80, tier=3),
+    ])
+    suggestion = suggest_position(board, ds, QUOTA_CONFIG, history=None)
+    assert suggestion.recommended_position == "QB"
+    qb_score = next(s for s in suggestion.all_scores if s.position == "QB")
+    assert qb_score.quota_deadline is True
+    assert "round-based target" in suggestion.reasoning
+
+
+def test_suggest_position_does_not_force_qb_without_a_configured_quota():
+    # Same scenario as above, but with plain CONFIG (no
+    # round_based_fill_targets) -- proves the override above is actually
+    # coming from the quota mechanism, not something else.
+    ds = _fresh_state(rounds=15)
+    for _ in range(3):
+        ds.log_pick_on_the_clock("Filler", position="RB")
+    ds.log_pick_on_the_clock("QB1", position="QB")
+    for _ in range(53):
+        ds.log_pick_on_the_clock("Filler", position="RB")
     board = _board([
         _player("Elite WR", "WR", vor=500.0, vor_rank=1, tier=1),
         _player("Mediocre QB", "QB", vor=1.0, vor_rank=80, tier=3),

@@ -44,7 +44,7 @@ does once past replacement level. A first attempt that only squashed the
 composite by a flat REDUNDANCY_PENALTY still lost that comparison most of
 the time (0.05 x a small positive number can easily beat a skill
 position whose composite has gone negative) -- rerunning the simulation
-against that first attempt is what caught it. Three adjustments now
+against that first attempt is what caught it. Four adjustments now
 apply, checked in this order (most drastic first):
 
   - MANDATORY-DEADLINE FILL (checked first, overrides everything):
@@ -60,7 +60,20 @@ apply, checked in this order (most drastic first):
     empty mandatory dedicated slot scores zero for that slot every week
     of the season, so this overrides value/need/scarcity entirely, no
     exceptions -- see _mandatory_deadline_positions()'s docstring.
-  - REDUNDANCY (checked second): once my own drafted count at a position
+  - ROUND-BASED QUOTA DEADLINE (checked alongside MANDATORY-DEADLINE,
+    same override tier): a generalization of the above for a configured
+    "must have N of this position by round R" target (config's
+    estimation_assumptions.round_based_fill_targets), for when N doesn't
+    match a dedicated slot's count. Added after the league manager
+    pointed out that even getting a QB by round 22 isn't good enough --
+    in a superflex league like this one, not having 2 QBs within roughly
+    the first 7 rounds is a real strategic problem (the startable-QB pool
+    dries up), which is a self-imposed target, not something derivable
+    from roster.starters alone. The same config shape is meant to also
+    hold the league's real "2 kickers and 2 defenses must be picked prior
+    to round 21" rule once confirmed -- see
+    _round_based_quota_positions()'s docstring.
+  - REDUNDANCY (checked next): once my own drafted count at a position
     meets or exceeds config's roster.position_active_limits max (QB/RB/
     TE/K/DST -- see _position_cap()), that position's NEED is zeroed (a
     still-open flex slot that's technically eligible for it, e.g.
@@ -73,16 +86,23 @@ apply, checked in this order (most drastic first):
     gone negative. Only falls back to an at-cap position when every
     position is at cap, so a fully maxed-out board can still recommend
     something.
-  - EARLY-ROUND DISCOUNT (a softer, independent squash): K and DST
-    specifically get a multiplier-only squash before a configured round
+  - EARLY-ROUND DISCOUNT (checked alongside REDUNDANCY, same exclusion
+    tier): K and DST specifically get a squash before a configured round
     (config's estimation_assumptions.position_early_round_discount), per
     league-manager feedback (2026-08-26) that these are "pretty much a
-    dime a dozen, rarely worth taking before round 17." Deliberately NOT
-    a hard exclusion like the redundancy cap above -- you can still draft
-    one manually any time, and it's expected to need reconciling once the
-    league's round-based fill requirement ("2 kickers and 2 defenses must
-    be picked prior to round 21") is confirmed and wired in; see
-    _early_round_discount()'s docstring.
+    dime a dozen, rarely worth taking before round 17." Originally a
+    softer, squash-only adjustment that did NOT exclude from
+    recommendation -- upgraded to a hard exclusion (like REDUNDANCY
+    above) after a second Monte Carlo run caught the identical failure
+    mode: K/DST still got recommended in rounds 11-15 once every other
+    position's need was satisfied and its value had gone negative, for
+    the same reason a flat squash wasn't enough for REDUNDANCY. You can
+    still draft one manually any time, and the MANDATORY-DEADLINE-FILL
+    check above guarantees the dedicated slot still gets force-filled
+    before it's too late even with this exclusion in place. Expected to
+    need reconciling once the league's real "2 kickers and 2 defenses
+    must be picked prior to round 21" rule is confirmed and added to
+    round_based_fill_targets; see _early_round_discount()'s docstring.
 
 This module deliberately does NOT pick a player -- src/pick_suggestion.py
 recommends a position and hands back that position's top-N available
@@ -150,8 +170,9 @@ class PositionScore:
     scarcity_ratio: float      # predicted_picks / max(1, remaining_top_tier)
     top_vor_rank: Optional[int] = None
     at_position_cap: bool = False  # my drafted count already meets/exceeds the configured active-roster max
-    early_round_discounted: bool = False  # K/DST early-round soft discount was applied
+    early_round_discounted: bool = False  # K/DST early-round discount applied (squashed + excluded unless nothing else is available)
     mandatory_fill: bool = False  # I'm about to run out of picks to ever fill this dedicated slot
+    quota_deadline: bool = False  # I'm about to run out of picks to hit a configured round_based_fill_target
 
 
 @dataclass
@@ -229,6 +250,65 @@ def _mandatory_deadline_positions(draft_state: DraftState, config: dict) -> set[
     return urgent
 
 
+def _remaining_my_picks_before_round(draft_state: DraftState, round_limit: int) -> int:
+    """How many more times my_team will be on the clock at or before the
+    end of `round_limit` (inclusive), counting right now if it's currently
+    my pick. Like _remaining_my_picks() but bounded to a deadline round
+    instead of the whole draft -- see _round_based_quota_positions()."""
+    if draft_state.is_draft_complete:
+        return 0
+    count = 0
+    for p in range(draft_state.next_overall_pick, draft_state.total_picks + 1):
+        rnd, _ = draft_state.round_and_slot_for_pick(p)
+        if rnd > round_limit:
+            break  # picks are in increasing round order -- nothing further qualifies
+        if draft_state.team_for_pick(p) == draft_state.my_team:
+            count += 1
+    return count
+
+
+def _round_based_quota_positions(draft_state: DraftState, config: dict) -> set[str]:
+    """Positions with a configured "must have N by round R" target (config's
+    estimation_assumptions.round_based_fill_targets) where I'm down to my
+    last chance(s) to hit it.
+
+    Added 2026-08-26 per league-manager feedback: _mandatory_deadline_
+    positions() above only forces a fill once I'm on my literal LAST pick
+    of the entire draft -- correct for "never miss a legally required
+    slot," but too permissive for a strategic target like "get 2 QBs in
+    the first ~7 rounds or it's a disaster" (this league's superflex
+    scoring makes a good 2nd QB nearly as valuable as a 1st, and waiting
+    risks the startable-QB pool drying up well before round 22). This
+    mechanism is deliberately generic so the same config shape can also
+    hold the league's real "2 kickers and 2 defenses must be picked prior
+    to round 21" rule once the league manager confirms its exact wording
+    -- see the config comment for which entries are true CBS rules vs.
+    self-imposed strategy targets.
+
+    A target's `count` need not match roster.starters' dedicated slot
+    count for that position (e.g. QB's dedicated slot is 1, but a
+    round_based_fill_targets QB target of 2 reflects wanting a 2nd for
+    SUPERFLEX too) -- this deliberately does NOT reuse
+    _mandatory_deadline_positions()'s starters-derived logic."""
+    targets = config.get("estimation_assumptions", {}).get("round_based_fill_targets", {})
+    if not targets:
+        return set()
+    my_counts = team_position_counts(draft_state.my_roster())
+    current_round, _ = draft_state.round_and_slot_for_pick(draft_state.next_overall_pick)
+    urgent: set[str] = set()
+    for position, rule in targets.items():
+        by_round = rule.get("by_round")
+        target_count = rule.get("count", 0)
+        if by_round is None or current_round > by_round:
+            continue  # deadline already passed -- nothing left to force here
+        still_needed = target_count - my_counts.get(position, 0)
+        if still_needed <= 0:
+            continue
+        if _remaining_my_picks_before_round(draft_state, by_round) <= still_needed:
+            urgent.add(position)
+    return urgent
+
+
 def my_position_need(draft_state: DraftState, config: dict) -> dict[str, float]:
     """Unfilled-starter-slot demand for MY OWN roster, spread across each
     open slot's eligible positions -- the same heuristic
@@ -284,20 +364,25 @@ def _redundancy_penalty(position: str, my_counts: dict[str, int], config: dict) 
 
 
 def _early_round_discount(position: str, current_round: int, config: dict) -> tuple[float, bool]:
-    """Soft squash multiplier on K/DST's composite before a configured
-    round, and whether it was applied.
+    """Squash multiplier on K/DST's composite before a configured round,
+    and whether it was applied.
 
     Per league-manager feedback (2026-08-26): "kickers and defenses are
     pretty much a dime a dozen, rarely worth taking before round 17."
     Config-driven (estimation_assumptions.position_early_round_discount in
-    league_settings.yaml) rather than hardcoded, and deliberately a SOFT
-    multiplier rather than a hard block -- the league also has a
-    round-based fill requirement ("2 kickers and 2 defenses must be
-    picked prior to round 21") that isn't confirmed/wired in yet (league
-    manager is still tracking down the exact source). Once that lands, a
-    looming deadline should be able to override this discount; until
-    then, this only softens the recommendation, it doesn't forbid
-    drafting K/DST early by hand."""
+    league_settings.yaml) rather than hardcoded. This function only
+    returns the squash value + whether it applies; suggest_position()
+    additionally treats "applied" as a hard exclusion from recommendation
+    (same tier as REDUNDANCY -- see this module's docstring) as long as
+    any not-discounted, not-capped position is still available, since a
+    squash alone wasn't enough to reliably lose to a legitimately-worse
+    (negative-value) alternative. Still just a recommendation nudge, not
+    a block on manually drafting K/DST early by hand, and the league also
+    has a real round-based fill requirement ("2 kickers and 2 defenses
+    must be picked prior to round 21") that isn't confirmed/wired in yet
+    (league manager still tracking down the exact source) -- once added
+    to round_based_fill_targets, a looming deadline there will correctly
+    override this exclusion via the MANDATORY-DEADLINE-FILL/QUOTA tier."""
     rule = config.get("estimation_assumptions", {}).get("position_early_round_discount", {}).get(position)
     if not rule:
         return 1.0, False
@@ -313,6 +398,9 @@ def suggest_position(
     config: dict,
     history: Optional[pd.DataFrame] = None,
     years: Optional[list[int]] = None,
+    value_weight: Optional[float] = None,
+    need_weight: Optional[float] = None,
+    scarcity_weight: Optional[float] = None,
 ) -> PickSuggestion:
     """Recommend the position to draft next, plus a full breakdown of
     every other position considered (so the Draft Board can show "why").
@@ -326,6 +414,15 @@ def suggest_position(
     pass None or an empty frame to skip the scarcity signal entirely
     (falls back to value+need only -- still a fine recommendation, just
     without run-risk awareness).
+
+    `value_weight`/`need_weight`/`scarcity_weight` override this module's
+    VALUE_WEIGHT/NEED_WEIGHT/SCARCITY_WEIGHT constants for this call only,
+    when given (all three, or none -- partial overrides aren't validated
+    against summing to 1). Added 2026-08-26 so the Monte Carlo simulation
+    harness (see SESSION_NOTES) can A/B different weightings against the
+    same draft/opponent conditions without needing a code change per
+    variant tried; the Draft Board itself always calls this with the
+    defaults.
     """
     if draft_state.is_draft_complete:
         return PickSuggestion(recommended_position=None, reasoning="Draft complete.")
@@ -385,12 +482,15 @@ def suggest_position(
     scarcity_norm = _normalize({p: s.scarcity_ratio for p, s in scores.items()})
 
     current_round, _ = draft_state.round_and_slot_for_pick(draft_state.next_overall_pick)
+    w_value = VALUE_WEIGHT if value_weight is None else value_weight
+    w_need = NEED_WEIGHT if need_weight is None else need_weight
+    w_scarcity = SCARCITY_WEIGHT if scarcity_weight is None else scarcity_weight
 
     for position, s in scores.items():
         s.composite = (
-            VALUE_WEIGHT * value_norm[position]
-            + NEED_WEIGHT * need_norm[position]
-            + SCARCITY_WEIGHT * scarcity_norm[position]
+            w_value * value_norm[position]
+            + w_need * need_norm[position]
+            + w_scarcity * scarcity_norm[position]
         )
         redundancy_mult, at_cap = _redundancy_penalty(position, my_counts, config)
         discount_mult, discounted = _early_round_discount(position, current_round, config)
@@ -399,30 +499,42 @@ def suggest_position(
         s.composite *= redundancy_mult * discount_mult
 
     mandatory = _mandatory_deadline_positions(draft_state, config)
+    quota_deadline = _round_based_quota_positions(draft_state, config)
     for position, s in scores.items():
         s.mandatory_fill = position in mandatory
+        s.quota_deadline = position in quota_deadline
 
     ranked = sorted(scores.values(), key=lambda s: s.composite, reverse=True)
-    # A mandatory-deadline position (see _mandatory_deadline_positions)
+    # A mandatory-deadline or quota-deadline position (see
+    # _mandatory_deadline_positions()/_round_based_quota_positions())
     # overrides everything else, including the redundancy cap below --
-    # I'm out of chances to ever fill it otherwise. Checked first.
-    must_fill = [s for s in ranked if s.mandatory_fill]
+    # I'm out of chances to ever satisfy it otherwise. Checked first.
+    must_fill = [s for s in ranked if s.mandatory_fill or s.quota_deadline]
     if must_fill:
         top = must_fill[0]
     else:
-        # A capped position never outranks a legal (not-at-cap) one, no
-        # matter how its squashed composite compares numerically --
-        # multiplying by REDUNDANCY_PENALTY narrows the gap but a
-        # shallow-pool position's VOR can stay positive long after a
-        # skill position's has gone deeply negative past replacement
-        # level, so a squash alone doesn't reliably win the comparison
-        # (this is what the 2026-08-26 Monte Carlo run caught: K/DST/TE
-        # still got recommended most of the time even with the squash in
-        # place). Only fall back to an at-cap position when literally
-        # nothing else is available -- see REDUNDANCY_PENALTY's docstring
-        # for why that fallback still returns something nonzero.
-        not_at_cap = [s for s in ranked if not s.at_position_cap]
-        top = not_at_cap[0] if not_at_cap else ranked[0]
+        # Neither an at-cap position NOR an early-round-discounted one
+        # outranks a "clean" alternative, no matter how the squashed
+        # composite compares numerically -- a squash alone doesn't
+        # reliably win that comparison, since a shallow-pool position's
+        # VOR can stay positive long after a skill position's has gone
+        # deeply negative past replacement level (this is what the
+        # 2026-08-26 Monte Carlo run caught for the redundancy case, and a
+        # second run caught the identical failure mode for the early
+        # -round discount: K/DST kept getting recommended in rounds
+        # 11-15, well before the configured round-17 cutoff, once every
+        # other position's need was satisfied and its value had gone
+        # negative -- the discount narrowed the gap but a positive
+        # (if discounted) K/DST composite still beat a negative one).
+        # Real fantasy strategy backs this up too: an early "dead zone"
+        # pick is generally better spent on bench/handcuff depth than on
+        # a K/DST you'll need anyway later. Only fall back to a
+        # capped/discounted position when literally nothing else is
+        # available -- see REDUNDANCY_PENALTY's and
+        # _early_round_discount()'s docstrings for why that fallback
+        # still returns something nonzero.
+        clean = [s for s in ranked if not s.at_position_cap and not s.early_round_discounted]
+        top = clean[0] if clean else ranked[0]
     reasoning = _describe(top, horizon)
 
     return PickSuggestion(
@@ -439,6 +551,11 @@ def _describe(top: PositionScore, horizon: int) -> str:
         reasons.append(
             "you're out of picks left to ever fill this starter slot otherwise — "
             "this overrides value/need/scarcity entirely"
+        )
+    if top.quota_deadline:
+        reasons.append(
+            "you're about to run out of chances to hit your configured round-based "
+            "target for this position — this overrides value/need/scarcity entirely"
         )
     if top.at_position_cap:
         reasons.append(
