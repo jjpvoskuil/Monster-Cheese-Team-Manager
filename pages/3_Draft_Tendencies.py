@@ -111,6 +111,7 @@ draft_state = DraftState(
     rounds=config["draft"]["rounds"],
     my_team=config["league"]["team_name"],
     state_file=DRAFT_STATE_FILE,
+    reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
 )
 
 if draft_state.is_draft_complete:

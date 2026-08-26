@@ -56,6 +56,7 @@ draft_state = DraftState(
     rounds=config["draft"]["rounds"],
     my_team=config["league"]["team_name"],
     state_file=DRAFT_STATE_FILE,
+    reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
 )
 
 st.title(f"📋 My Roster — {config['league']['team_name']}")
@@ -75,10 +76,19 @@ if not my_picks:
 st.divider()
 st.subheader("Starting lineup")
 
+# Display-only relabeling -- doesn't touch eligibility/assignment logic
+# (src.roster_needs still sees "SUPERFLEX" and its real QB/RB/WR/TE
+# eligible list). Per league-manager feedback: this league's scoring
+# makes SUPERFLEX a near-certain QB start every week (see
+# config/league_settings.yaml's flex_position_splits.SUPERFLEX comment,
+# 90% QB), so labeling the slot "QB (Flex)" here reads more honestly than
+# the generic "SUPERFLEX" name while still being clearly a flex slot.
+SLOT_DISPLAY_NAMES = {"SUPERFLEX": "QB (Flex)"}
+
 rows = []
 for slot in starters:
     filled = slots.get(slot["slot"], [None] * slot["count"])
-    label_base = slot["slot"].replace("_", " ")
+    label_base = SLOT_DISPLAY_NAMES.get(slot["slot"], slot["slot"].replace("_", " "))
     for i, pick in enumerate(filled, start=1):
         label = label_base if slot["count"] == 1 else f"{label_base} {i}"
         if pick is not None:

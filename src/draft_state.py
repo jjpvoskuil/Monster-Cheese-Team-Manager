@@ -27,13 +27,17 @@ class Pick:
 
 class DraftState:
     def __init__(self, teams: list[str], rounds: int, my_team: str,
-                 state_file: str = "data/draft_state.json"):
+                 state_file: str = "data/draft_state.json",
+                 reverse_last_n_rounds: int = 0):
         if my_team not in teams:
             raise ValueError(f"my_team {my_team!r} must be one of {teams!r}")
         self.teams = list(teams)
         self.rounds = rounds
         self.my_team = my_team
         self.state_file = state_file
+        # See config/league_settings.yaml -> draft.reverse_last_n_rounds
+        # and _round_is_forward()'s docstring for what this does.
+        self.reverse_last_n_rounds = reverse_last_n_rounds
         self.picks: list[Pick] = []
         self._load_if_exists()
 
@@ -41,12 +45,39 @@ class DraftState:
     # Snake order
     # ------------------------------------------------------------------
 
+    def _round_is_forward(self, rnd0: int) -> bool:
+        """True if this (0-indexed) round drafts in team_order's listed
+        order (team_order[0] first); False if it drafts in reverse
+        (team_order[-1] first). Plain snake alternates every round,
+        starting forward in round 0 (rnd0 % 2 == 0).
+
+        This league's real rule (per league-manager feedback,
+        2026-08-26) is a special case for the final
+        `reverse_last_n_rounds` rounds: rather than just continuing
+        whatever alternation the rounds before it were already on, the
+        FIRST of those trailing rounds is forced to reverse order (the
+        team that picked last in round 1 picks first), and it snakes
+        normally from there through the rest of the trailing block. With
+        an even `rounds` total (this league: 22) and `reverse_last_n_rounds
+        = 2`, plain continuation would have made round 21 forward and
+        round 22 reverse anyway -- so this override actually FLIPS both
+        of those rounds relative to what unbroken alternation would give,
+        which is exactly why the league manager needed to call it out
+        explicitly rather than it falling out of the normal rule."""
+        total_rounds = self.rounds
+        normal_rounds = total_rounds - self.reverse_last_n_rounds
+        round_num = rnd0 + 1  # 1-indexed
+        if self.reverse_last_n_rounds > 0 and round_num > normal_rounds:
+            block_rnd0 = round_num - normal_rounds - 1  # 0-indexed within the trailing block
+            return block_rnd0 % 2 == 1  # block's first round (block_rnd0 == 0) is reversed
+        return rnd0 % 2 == 0
+
     def team_for_pick(self, overall_pick: int) -> str:
         """1-indexed overall pick number -> team on the clock."""
         n = len(self.teams)
         rnd0 = (overall_pick - 1) // n  # 0-indexed round
         pos_in_round = (overall_pick - 1) % n
-        if rnd0 % 2 == 0:
+        if self._round_is_forward(rnd0):
             idx = pos_in_round
         else:
             idx = n - 1 - pos_in_round

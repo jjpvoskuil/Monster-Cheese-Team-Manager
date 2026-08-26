@@ -46,6 +46,50 @@ def test_is_my_pick():
     assert ds.picks_until_my_turn() == 0
 
 
+def _reversing_state(reverse_last_n_rounds=2, rounds=22):
+    tmp = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+    tmp.close()
+    os.unlink(tmp.name)
+    return DraftState(
+        teams=TEAMS, rounds=rounds, my_team="Monster Cheese", state_file=tmp.name,
+        reverse_last_n_rounds=reverse_last_n_rounds,
+    )
+
+
+def test_reverse_last_n_rounds_defaults_to_off():
+    ds = _fresh_state()  # reverse_last_n_rounds defaults to 0
+    # Plain snake: round 21 (odd) is forward, so pick 201 (round 21's
+    # first pick) goes to TEAMS[0], same as every other odd round.
+    assert ds.team_for_pick(201) == TEAMS[0]
+
+
+def test_reverse_last_n_rounds_flips_the_final_two_rounds():
+    ds = _reversing_state(reverse_last_n_rounds=2, rounds=22)
+    # Round 21 would be forward under plain continuation -- the league's
+    # rule forces it to reverse instead: TEAMS[-1] ("team #10") picks
+    # first.
+    assert ds.team_for_pick(201) == TEAMS[-1]
+    assert ds.team_for_pick(210) == TEAMS[0]
+    # Round 22 snakes normally from round 21's last pick (TEAMS[0] picks
+    # back-to-back at the turn, same as any other round transition).
+    assert ds.team_for_pick(211) == TEAMS[0]
+    assert ds.team_for_pick(220) == TEAMS[-1]
+
+
+def test_reverse_last_n_rounds_does_not_disturb_earlier_rounds():
+    ds = _reversing_state(reverse_last_n_rounds=2, rounds=22)
+    plain = _fresh_state()
+    for overall in list(range(1, 21)) + [200]:  # rounds 1-20 unaffected
+        assert ds.team_for_pick(overall) == plain.team_for_pick(overall)
+
+
+def test_reverse_last_n_rounds_of_zero_is_a_no_op():
+    ds = _reversing_state(reverse_last_n_rounds=0, rounds=22)
+    plain = _fresh_state()
+    for overall in (1, 10, 11, 200, 201, 210, 211, 220):
+        assert ds.team_for_pick(overall) == plain.team_for_pick(overall)
+
+
 def test_upcoming_picks_returns_next_n_with_correct_teams():
     ds = _fresh_state()
     upcoming = ds.upcoming_picks(3)

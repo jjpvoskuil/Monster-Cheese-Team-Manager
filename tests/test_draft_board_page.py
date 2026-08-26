@@ -103,6 +103,51 @@ def test_clicking_a_tier_divider_row_does_not_log_a_phantom_pick():
     assert not os.path.exists(DRAFT_STATE_FILE)
 
 
+def test_reset_draft_requires_confirmation_and_clears_state():
+    at = AppTest.from_file(os.path.join(ROOT, "app.py"))
+    at.run(timeout=60)
+    at.switch_page("pages/1_Draft_Board.py")
+    at.run(timeout=60)
+
+    # Draft one pick first so there's something to reset.
+    grid = _grid(at)
+    at.session_state[grid.key] = {"selection": {"rows": [0], "columns": [], "cells": []}}
+    at.run(timeout=60)
+    assert os.path.exists(DRAFT_STATE_FILE)
+
+    reset_button = next(b for b in at.button if b.label == "Reset draft")
+    assert reset_button.disabled  # checkbox not checked yet -- can't click a live pick away by accident
+
+    confirm_checkbox = next(c for c in at.checkbox if c.key == "confirm_reset_draft")
+    confirm_checkbox.check().run(timeout=60)
+
+    reset_button = next(b for b in at.button if b.label == "Reset draft")
+    assert not reset_button.disabled
+    reset_button.click().run(timeout=60)
+    assert not at.exception
+
+    with open(DRAFT_STATE_FILE) as f:
+        state = json.load(f)
+    assert state["picks"] == []
+    # Grid's selection-widget nonce must also reset, so the very next grid
+    # render starts as a genuinely fresh, unselected widget rather than
+    # carrying forward whatever key/selection state predates the reset.
+    assert _grid(at).key == "player_grid_0"
+
+
+def test_superflex_is_labeled_qb_flex_on_my_roster_page():
+    at = AppTest.from_file(os.path.join(ROOT, "app.py"))
+    at.run(timeout=60)
+    at.switch_page("pages/4_My_Roster.py")
+    at.run(timeout=60)
+    assert not at.exception
+
+    lineup_df = at.dataframe[0].value
+    slots = list(lineup_df["Slot"])
+    assert any(s.startswith("QB (Flex)") for s in slots)
+    assert not any("SUPERFLEX" in s for s in slots)
+
+
 def test_my_roster_page_fills_in_as_picks_are_logged():
     at = AppTest.from_file(os.path.join(ROOT, "app.py"))
     at.run(timeout=60)

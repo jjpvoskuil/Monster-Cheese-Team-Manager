@@ -130,6 +130,7 @@ draft_state = DraftState(
     rounds=config["draft"]["rounds"],
     my_team=config["league"]["team_name"],
     state_file=DRAFT_STATE_FILE,
+    reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
 )
 
 players_df, is_sample = load_players()
@@ -190,9 +191,20 @@ with st.sidebar:
         st.rerun()
 
     with st.expander("Reset draft (danger zone)"):
-        st.warning("This clears the entire pick log.")
-        if st.button("Reset draft", type="primary"):
+        st.warning("This clears the entire pick log — cannot be undone.")
+        confirm_reset = st.checkbox("Yes, clear every logged pick", key="confirm_reset_draft")
+        if st.button(
+            "Reset draft", type="primary", disabled=not confirm_reset, key="reset_draft_button"
+        ):
             draft_state.reset()
+            # Force a brand-new, unselected grid widget post-reset too --
+            # not just cosmetic: without this, the grid keeps whatever key
+            # (and therefore whatever session_state) it had before the
+            # reset, and there's no reason to trust stale selection state
+            # against a completely different (now fully available) player
+            # pool. See the grid_pick_nonce comment further down this file.
+            st.session_state.grid_pick_nonce = 0
+            st.toast("✅ Draft reset — all picks cleared.")
             st.rerun()
 
     st.divider()

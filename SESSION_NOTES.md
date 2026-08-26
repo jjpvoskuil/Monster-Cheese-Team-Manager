@@ -146,10 +146,33 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   no-op, and My Roster fills in the right slot after 8 simulated picks.
   8 new tests in `tests/test_draft_state.py`/`test_roster_needs.py` for
   the two new pure-logic functions, 3 new `AppTest` tests for the pages.
-- `pytest` — 139/139 passing.
+- **Draft Board/My Roster follow-up fixes (2026-08-26)**: "Reset draft"
+  now requires checking a confirmation checkbox before the button
+  enables, and gives a visible `st.toast` on success (previous version
+  had zero visible confirmation and no safety gate — root cause of the
+  user's "I could not reset" report was never conclusively identified
+  via `AppTest`, since a from-scratch repro worked fine; this is a
+  hardening fix either way, and also resets `grid_pick_nonce` back to 0
+  so the grid gets a truly fresh widget after a reset). My Roster page
+  labels the SUPERFLEX slot "QB (Flex)" (display-only — underlying
+  eligibility is still QB/RB/WR/TE, unchanged). `DraftState` now takes a
+  `reverse_last_n_rounds` param (config: `draft.reverse_last_n_rounds:
+  2`) implementing the league's real final-2-rounds rule: round 21 is
+  forced to reverse (team_order's last team drafts first) rather than
+  continuing whatever alternation was already in progress, then round 22
+  snakes normally from there — see `src/draft_state.py`'s
+  `_round_is_forward()` docstring. Checked CBS's live rules page
+  (`https://maniacfl.football.cbssports.com/rules`) for a documented
+  by-round roster-fill requirement (e.g. "must draft a K by round N") —
+  **not found there**; the Rules/Warnings/Constitution sections only
+  cover the roster-slot/scoring/transaction settings already in
+  `config/league_settings.yaml`. Not yet implemented — waiting on the
+  league manager to supply the actual requirement.
+- `pytest` — 145/145 passing.
 - Deployed to Streamlit Cloud; user confirmed the Draft Board loads
-  correctly as of 2026-08-25 (UI overhaul above not yet re-confirmed live
-  on Streamlit Cloud — only locally/via AppTest so far).
+  correctly as of 2026-08-25 (2026-08-26 UI overhaul + follow-up fixes
+  above not yet re-confirmed live on Streamlit Cloud — only locally/via
+  AppTest so far).
 - Known gaps (not blocking): ESPN blending not done (would be a 4th
   source — see notes below); defensive
   PA/yards-allowed tables (only 3 tiers each on CBS's page) not yet
@@ -226,6 +249,71 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-26 — Draft Board follow-up: harden Reset, relabel SUPERFLEX, real final-round snake rule, checked CBS for round-fill rules
+League manager tried the new clickable-grid Draft Board locally ("I tried
+some picks and that seemed to work") but reported "I could not reset the
+draft," plus three more requests: label SUPERFLEX as "QB (Flex)" on My
+Roster since it's almost always a QB in this scoring system; the real
+draft's last 2 rounds reverse order (team #10 picks first, then snakes
+into the actual last round) rather than just continuing normal
+alternation; and there are per-round roster-fill requirements to
+incorporate, CBS's league page first, user to supply otherwise.
+
+**Reset draft bug**: tried to reproduce via a fresh `AppTest` run —
+drafting 2 picks then clicking "Reset draft" worked correctly (picks
+cleared to `[]`, no exception) with the code as it stood. Couldn't find
+or reproduce an actual defect. Rather than leave it unresolved, hardened
+the control anyway since the old version had a real UX gap regardless of
+root cause: one unconfirmed click instantly wiped the whole draft with
+zero visible feedback, so a working reset could easily read as "nothing
+happened." Now: a "Yes, clear every logged pick" checkbox gates the
+button (disabled until checked), a `st.toast` confirms success, and
+`grid_pick_nonce` resets to 0 so the very next grid render is a genuinely
+fresh, unselected widget rather than carrying forward whatever key state
+predates the reset. New `AppTest` test confirms the button is disabled
+pre-checkbox, enabled after, and clears state + resets the nonce on
+click. (Also worth knowing for whoever picks up an actual future repro:
+the user's local `data/draft_state.json` was found missing entirely
+afterward, consistent with them having manually deleted it as a
+workaround rather than the reset silently failing to write — that file
+is gitignored so this isn't visible from git history.)
+
+**SUPERFLEX → "QB (Flex)"**: display-only rename in
+`pages/4_My_Roster.py` (`SLOT_DISPLAY_NAMES` dict) — `src/roster_needs.py`
+still sees and assigns against the real "SUPERFLEX" slot name and its
+true QB/RB/WR/TE eligibility list, so opponent-need inference and the
+Suggested Pick panel are untouched. New `AppTest` test confirms the
+lineup table shows "QB (Flex)" and never "SUPERFLEX".
+
+**Real final-2-rounds snake rule**: added `DraftState.__init__`'s new
+`reverse_last_n_rounds` param and `_round_is_forward()` (see "Current
+state" above for the mechanics) plus
+`config/league_settings.yaml` → `draft.reverse_last_n_rounds: 2`, wired
+into all three pages that construct `DraftState` (Draft Board, Draft
+Tendencies, My Roster). Confirmed via unit tests against the real 22
+-round/10-team shape that: plain snake (`reverse_last_n_rounds=0`,
+the default — every existing test keeps passing unchanged) sends round
+21's first pick to `team_order[0]`; the real rule flips that to
+`team_order[-1]` and confirms round 22 snakes normally afterward (same
+team drafts back-to-back at the 210/211 turn, matching how every other
+round transition already works); and rounds 1-20 are provably identical
+between the two configurations (not just "look right" — directly
+diffed pick-by-pick against a `reverse_last_n_rounds=0` instance).
+
+**Round-based roster-fill requirements**: per the user's own suggested
+order of operations, checked CBS's live rules page first
+(`https://maniacfl.football.cbssports.com/rules`, via Claude in Chrome,
+same shared-login approach as the live-sync work) — Rules, Warnings, and
+Constitution sections all show only what's already captured in
+`config/league_settings.yaml` (roster slot minimums/maximums, the
+WR/TE-combo legality rule, scoring). No "must draft position X by round
+Y" text anywhere on the league's CBS pages. **Not implemented this
+session** — asked the league manager to supply the actual requirement
+(which positions, which round deadlines) since it isn't sourced from
+CBS.
+
+145/145 tests passing (was 139).
 
 ### 2026-08-26 — Connected the local clone folder to the session; local clone synced to latest
 Right after the UI overhaul below, user asked to connect the local
