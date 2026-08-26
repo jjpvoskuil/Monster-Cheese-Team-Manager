@@ -4,9 +4,10 @@ import tempfile
 import pytest
 import yaml
 
-from src.draft_state import DraftState
+from src.draft_state import DraftState, Pick
 from src.roster_needs import (
     aggregate_opponent_demand,
+    assign_roster_slots,
     opponent_needs_before_next_pick,
     positions_that_would_fill,
     team_position_counts,
@@ -102,3 +103,79 @@ def test_opponent_needs_before_next_pick_flags_teams_with_no_picks_yet():
     total = aggregate_opponent_demand(needs)
     assert total["RB"] > 0
     assert total["QB"] > 0
+
+
+# ---------------------------------------------------------------------
+# assign_roster_slots
+# ---------------------------------------------------------------------
+
+def _pick(overall_pick, name, position, nfl_team="XXX"):
+    return Pick(
+        overall_pick=overall_pick, round=overall_pick, pick_in_round=1,
+        team="Monster Cheese", player_name=name, position=position, nfl_team=nfl_team,
+    )
+
+
+def test_assign_roster_slots_fills_dedicated_before_flex():
+    _, starters = _real_starters()
+    picks = [
+        _pick(1, "QB1", "QB"),
+        _pick(2, "RB1", "RB"),
+        _pick(3, "RB2", "RB"),
+        _pick(4, "RB3", "RB"),
+    ]
+    slots, bench = assign_roster_slots(picks, starters)
+    assert [p.player_name if p else None for p in slots["QB"]] == ["QB1"]
+    assert [p.player_name if p else None for p in slots["RB"]] == ["RB1", "RB2", "RB3"]
+    # Dedicated slots ate everything -- flex slots still fully empty.
+    assert slots["WR_TE_FLEX"] == [None, None, None]
+    assert slots["SUPERFLEX"] == [None]
+    assert bench == []
+
+
+def test_assign_roster_slots_extra_players_fill_flex_then_bench():
+    _, starters = _real_starters()
+    picks = [
+        _pick(1, "QB1", "QB"),
+        _pick(2, "QB2", "QB"),  # 2nd QB -> SUPERFLEX
+        _pick(3, "RB1", "RB"),
+        _pick(4, "RB2", "RB"),
+        _pick(5, "RB3", "RB"),
+        _pick(6, "RB4", "RB"),  # 4th RB -> FLEX
+        _pick(7, "WR1", "WR"),
+        _pick(8, "TE1", "TE"),
+        _pick(9, "K1", "K"),
+        _pick(10, "DST1", "DST"),
+        _pick(11, "RB5", "RB"),  # nothing left to fill -> bench
+    ]
+    slots, bench = assign_roster_slots(picks, starters)
+    assert slots["QB"][0].player_name == "QB1"
+    assert [p.player_name for p in slots["RB"]] == ["RB1", "RB2", "RB3"]
+    assert slots["TE"][0].player_name == "TE1"  # dedicated TE slot is more restrictive, claims TE1 first
+    assert slots["K"][0].player_name == "K1"
+    assert slots["DST"][0].player_name == "DST1"
+    # Only WR1 is left eligible for WR_TE_FLEX (TE1 already claimed above) --
+    # fills 1 of 3 instances, the other 2 stay empty.
+    assert [p.player_name if p else None for p in slots["WR_TE_FLEX"]] == ["WR1", None, None]
+    assert slots["SUPERFLEX"][0].player_name == "QB2"  # 2nd QB spills into SUPERFLEX
+    assert slots["FLEX"][0].player_name == "RB4"  # 4th RB spills into FLEX
+    assert [p.player_name for p in bench] == ["RB5"]  # nothing left to fill -- bench
+
+
+def test_assign_roster_slots_preserves_config_declared_order():
+    _, starters = _real_starters()
+    slots, _ = assign_roster_slots([], starters)
+    assert list(slots.keys()) == [s["slot"] for s in starters]
+    for slot in starters:
+        assert slots[slot["slot"]] == [None] * slot["count"]
+
+
+def test_assign_roster_slots_bench_is_leftover_in_draft_order():
+    _, starters = _real_starters()
+    # 3 Ks: dedicated K slot takes the 1st, FLEX (K-eligible) takes the
+    # 2nd, and the 3rd has nowhere left to go -- true bench.
+    picks = [_pick(1, "K1", "K"), _pick(2, "K2", "K"), _pick(3, "K3", "K")]
+    slots, bench = assign_roster_slots(picks, starters)
+    assert slots["K"][0].player_name == "K1"
+    assert slots["FLEX"][0].player_name == "K2"
+    assert [p.player_name for p in bench] == ["K3"]

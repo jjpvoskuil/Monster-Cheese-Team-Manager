@@ -12,8 +12,9 @@ a much stronger signal than either fact alone.
 from __future__ import annotations
 
 from collections import Counter
+from typing import Optional
 
-from src.draft_state import DraftState
+from src.draft_state import DraftState, Pick
 
 
 def team_position_counts(picks: list) -> dict[str, int]:
@@ -70,6 +71,51 @@ def positions_that_would_fill(unfilled_slots: dict[str, int], starters: list[dic
         for pos in eligible:
             demand[pos] += share
     return demand
+
+
+def assign_roster_slots(
+    picks: list[Pick], starters: list[dict]
+) -> tuple[dict[str, list[Optional[Pick]]], list[Pick]]:
+    """Assign one team's drafted picks to named starting-lineup slots, for
+    the My Roster page's "show the full team by position" view.
+
+    Same greedy fill order as unfilled_starter_slots() above (most
+    position-restrictive slots -- fewest eligible positions -- filled
+    first, so e.g. a dedicated QB slot claims a QB before SUPERFLEX gets
+    the chance to), and within a slot, earliest-drafted-first among
+    eligible players. Returns (slots, bench):
+      - slots: {slot_name: [Pick | None, ...]}, one entry per that slot's
+        declared `count`, in the ORDER starters are declared in config
+        (display order) -- not the internal most-restrictive-first fill
+        order. None marks a slot instance nothing has filled yet.
+      - bench: drafted picks left over after every slot is filled as much
+        as possible (extra depth, or the position's dedicated/flex slots
+        are already full) -- in draft order.
+
+    This is the same "if this team stopped drafting right now" heuristic
+    unfilled_starter_slots() documents, just returning WHICH player fills
+    each slot instead of only a per-slot leftover count.
+    """
+    remaining = sorted(picks, key=lambda p: p.overall_pick)
+    slots_sorted = sorted(starters, key=lambda s: len(s["eligible"]))
+    used_ids: set[int] = set()
+    assigned_by_slot: dict[str, list[Optional[Pick]]] = {}
+    for slot in slots_sorted:
+        filled: list[Optional[Pick]] = []
+        for _ in range(slot["count"]):
+            match = next(
+                (p for p in remaining if id(p) not in used_ids and p.position in slot["eligible"]),
+                None,
+            )
+            if match is not None:
+                used_ids.add(id(match))
+            filled.append(match)
+        assigned_by_slot[slot["slot"]] = filled
+    # Re-key in config's declared order for display, now that fill order
+    # (most-restrictive-first) no longer matters.
+    slots = {s["slot"]: assigned_by_slot[s["slot"]] for s in starters}
+    bench = [p for p in remaining if id(p) not in used_ids]
+    return slots, bench
 
 
 def opponent_needs_before_next_pick(draft_state: DraftState, config: dict) -> dict[str, Counter]:

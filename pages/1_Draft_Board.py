@@ -1,11 +1,15 @@
 """
-Draft Board — ranked available players, manual pick logging, live draft
-status and roster tracking. This is the tool actually used live on draft
-day. Manual pick entry (this page's "Log a pick" form) always works and
-needs nothing else running; picks can ALSO arrive here automatically via
-a live CBS sync (see src/live_sync.py) run by an active Claude session
-during the draft — both write to the same data/draft_state.json, so this
-page doesn't need to know or care which one produced a given pick.
+Draft Board — ranked available players, live draft status, and the
+sidebar's round-by-round pick history + upcoming-picks lookahead. This is
+the tool actually used live on draft day. The main player grid IS the
+manual pick-logging mechanism: clicking any available player's row logs
+that pick for whichever team is currently on the clock (see the grid's
+on_select handling below) -- no separate "log a pick" form. Picks can
+ALSO arrive here automatically via a live CBS sync (see src/live_sync.py)
+run by an active Claude session during the draft — both write to the
+same data/draft_state.json, so this page doesn't need to know or care
+which one produced a given pick. My own roster (by starting-lineup slot)
+lives on its own page -- see pages/4_My_Roster.py.
 """
 
 from __future__ import annotations
@@ -131,7 +135,9 @@ draft_state = DraftState(
 players_df, is_sample = load_players()
 
 # ---------------------------------------------------------------------
-# Sidebar: draft status, team names, my roster, undo/reset
+# Sidebar: draft status, picks-by-round history, upcoming picks, team
+# names, undo/reset. My own roster by starting-lineup slot has its own
+# page now (pages/4_My_Roster.py) -- linked at the bottom of this sidebar.
 # ---------------------------------------------------------------------
 
 with st.sidebar:
@@ -190,15 +196,37 @@ with st.sidebar:
             st.rerun()
 
     st.divider()
-    st.subheader(f"My roster — {config['league']['team_name']}")
-    my_picks = draft_state.my_roster()
-    if not my_picks:
-        st.caption("No picks yet.")
+    st.subheader("Picks by round")
+    if not draft_state.picks:
+        st.caption("No picks logged yet.")
     else:
-        roster_df = pd.DataFrame(
-            [{"Rd": p.round, "Player": p.player_name, "Pos": p.position} for p in my_picks]
+        # Most recent pick first -- this is a live ticker, not a
+        # scorecard, so what just happened belongs at the top.
+        by_round_df = pd.DataFrame(
+            [
+                {"Rd": p.round, "Pick": p.overall_pick, "Team": p.team, "Player": p.player_name, "Pos": p.position}
+                for p in sorted(draft_state.picks, key=lambda p: p.overall_pick, reverse=True)
+            ]
         )
-        st.dataframe(roster_df, hide_index=True, use_container_width=True)
+        st.dataframe(by_round_df, hide_index=True, use_container_width=True, height=260)
+
+    st.subheader("Next 10 picks")
+    upcoming = draft_state.upcoming_picks(10)
+    if not upcoming:
+        st.caption("Draft complete." if draft_state.is_draft_complete else "No upcoming picks.")
+    else:
+        upcoming_df = pd.DataFrame(
+            [
+                {
+                    "Pick": u["overall_pick"],
+                    "Rd": u["round"],
+                    "Team": f"🎯 {u['team']}" if u["team"] == draft_state.my_team else u["team"],
+                }
+                for u in upcoming
+            ]
+        )
+        st.dataframe(upcoming_df, hide_index=True, use_container_width=True, height=260)
+    st.page_link("pages/4_My_Roster.py", label="Full roster by position →", icon="📋")
 
     with st.expander("Rename opponent teams"):
         for i, name in enumerate(st.session_state.team_names):
@@ -208,7 +236,7 @@ with st.sidebar:
             st.session_state.team_names[i] = new_name
 
 # ---------------------------------------------------------------------
-# Main: ranked available players + log-a-pick
+# Main: ranked available players -- clicking a row logs that pick
 # ---------------------------------------------------------------------
 
 st.title("🏈 Draft Board")
@@ -411,48 +439,51 @@ display_view = view[display_cols].rename(columns={
     "name": "Player", "position": "Pos", "nfl_team": "Team",
     "score_total": "Proj Pts", "vor": "VOR", "tier": "Tier", "num_sources": "# Sources",
 })
-if len(pos_filter) == 1:
+has_tier_dividers = len(pos_filter) == 1
+if has_tier_dividers:
     display_view = add_tier_divider_rows(display_view, tier_col="Tier", label_col="Player")
 
-st.dataframe(
-    display_view,
-    hide_index=True,
-    use_container_width=True,
-    height=500,
-)
+# A brand-new dataframe display each rerun (via display_view's row indices
+# possibly changing as picks are logged) needs a fresh selection widget
+# key each time we act on a click -- otherwise Streamlit's selection state
+# for the OLD key would appear to still be "row 3 selected" against a grid
+# whose row 3 is now a different player, re-triggering the pick every
+# subsequent rerun. Bumping this nonce after each processed click forces a
+# brand-new, unselected widget instance. See src/draft_state.py's
+# log_pick_on_the_clock and the analogous session_state-assignment gotcha
+# already documented on the suggestion-override button above.
+if "grid_pick_nonce" not in st.session_state:
+    st.session_state.grid_pick_nonce = 0
 
-st.divider()
-st.subheader("Log a pick")
-
-with st.form("log_pick_form", clear_on_submit=True):
-    lc1, lc2, lc3 = st.columns([2, 2, 1])
-    with lc1:
-        player_choice = st.selectbox(
-            "Player", options=[""] + view["name"].tolist(), index=0,
-            help="Pick from ranked available players, or type a name manually below "
-                 "(useful for kickers/DSTs not in your projection file).",
-        )
-        manual_name = st.text_input("...or type a player name manually")
-    with lc2:
-        team_choice = st.selectbox(
-            "Team", options=st.session_state.team_names,
-            index=st.session_state.team_names.index(draft_state.on_the_clock)
-            if not draft_state.is_draft_complete else 0,
-        )
-    with lc3:
-        st.write("")
-        st.write("")
-        submitted = st.form_submit_button("Log pick", use_container_width=True, type="primary")
-
-    if submitted:
-        name = manual_name.strip() or player_choice
-        if not name:
-            st.error("Enter or select a player name.")
-        else:
-            row = players_df[players_df["name"] == name]
-            position = row["position"].iat[0] if not row.empty else ""
-            nfl_team = row["nfl_team"].iat[0] if not row.empty else ""
-            pick = draft_state.log_pick(team_choice, name, position=position, nfl_team=nfl_team)
+if draft_state.is_draft_complete:
+    st.dataframe(display_view, hide_index=True, use_container_width=True, height=500)
+else:
+    st.caption(
+        f"👆 Click any player's row to log that pick for **{draft_state.on_the_clock}** "
+        f"(whoever's on the clock — not just your own picks)."
+    )
+    grid_event = st.dataframe(
+        display_view,
+        hide_index=True,
+        use_container_width=True,
+        height=500,
+        on_select="rerun",
+        selection_mode="single-row",
+        key=f"player_grid_{st.session_state.grid_pick_nonce}",
+    )
+    selected_rows = list(grid_event.selection["rows"]) if grid_event and grid_event.selection else []
+    if selected_rows:
+        picked_row = display_view.iloc[selected_rows[0]]
+        picked_name = picked_row.get("Player")
+        # Tier-divider rows (only inserted when has_tier_dividers) have
+        # None in every column except a "— Tier N —" label in Player --
+        # clicking one shouldn't log a phantom pick.
+        if picked_name and not str(picked_name).startswith("— Tier"):
+            match = players_df[players_df["name"] == picked_name]
+            position = match["position"].iat[0] if not match.empty else ""
+            nfl_team = match["nfl_team"].iat[0] if not match.empty else ""
+            pick = draft_state.log_pick_on_the_clock(picked_name, position=position, nfl_team=nfl_team)
+            st.session_state.grid_pick_nonce += 1
             st.toast(f"Logged: {pick.team} took {pick.player_name} (Rd {pick.round}, Pick {pick.overall_pick})")
             st.rerun()
 

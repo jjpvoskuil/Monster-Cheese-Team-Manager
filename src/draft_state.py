@@ -129,6 +129,27 @@ class DraftState:
         self.save()
         return p
 
+    def upcoming_picks(self, n: int) -> list[dict]:
+        """The next up to n picks starting from next_overall_pick, each as
+        {overall_pick, round, pick_in_round, team}. Capped at total_picks
+        (returns fewer than n near the end of the draft); empty list once
+        the draft is complete. Used by the Draft Board sidebar's "next N
+        picks" lookahead panel."""
+        if self.is_draft_complete:
+            return []
+        start = self.next_overall_pick
+        end = min(start + n - 1, self.total_picks)
+        result = []
+        for overall in range(start, end + 1):
+            rnd, slot = self.round_and_slot_for_pick(overall)
+            result.append({
+                "overall_pick": overall,
+                "round": rnd,
+                "pick_in_round": slot,
+                "team": self.team_for_pick(overall),
+            })
+        return result
+
     def drafted_player_names(self) -> set[str]:
         return {p.player_name for p in self.picks}
 

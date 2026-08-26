@@ -115,9 +115,41 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   recommendation, so it's a one-click return rather than having to
   remember/re-pick the original suggestion. 14 new tests in
   `tests/test_pick_suggestion.py`.
-- `pytest` — 128/128 passing.
+- **Draft Board UI overhaul (2026-08-26)**: the ranked-players grid is now
+  the pick-logging mechanism itself — click any available player's row and
+  that pick logs for whoever's currently on the clock (any team, not just
+  Monster Cheese; this is how every team's pick gets entered manually when
+  live sync isn't running). The old "Log a pick" form (manual
+  team-dropdown + player-search) is gone. Sidebar's "My roster" section is
+  gone too — replaced with two live-updating panels: "Picks by round"
+  (most-recent-first, scrollable) and "Next 10 picks" (upcoming teams on
+  the clock, 🎯 marks Monster Cheese's own upcoming turns). My roster now
+  has its own page, `pages/4_My_Roster.py` — full starting lineup by named
+  slot (QB, RB 1/2/3, WR_TE_FLEX 1/2/3, etc., via new
+  `src/roster_needs.assign_roster_slots()`), empty slots shown with their
+  eligible positions, plus a bench list of drafted-but-unslotted players.
+  New `DraftState.upcoming_picks(n)` powers the sidebar lookahead. Known
+  Streamlit gotcha handled: `st.dataframe`'s row-selection state persists
+  across reruns tied to its widget `key` — without bumping the key after
+  each processed click, a stale "row 0 selected" would re-fire against
+  the next rerun's grid (which now has a different player at row 0,
+  since the drafted one is filtered out), silently drafting the wrong
+  player. Fixed via a `grid_pick_nonce` counter in the key, same spirit as
+  the pre-existing suggestion-override-button callback pattern. Verified
+  with real 2026 data via `AppTest` (new `tests/test_draft_board_page.py`,
+  entered through `app.py` + `switch_page()` — a page tested standalone
+  via `AppTest.from_file()` can't resolve `st.page_link()` to a sibling
+  page, since the multipage registry isn't attached to a lone script):
+  clicking the top-ranked player logs it to the real snake order's first
+  team (not Monster Cheese), the grid's key advances so it can't
+  re-trigger, clicking a tier-divider row (single-position filter) is a
+  no-op, and My Roster fills in the right slot after 8 simulated picks.
+  8 new tests in `tests/test_draft_state.py`/`test_roster_needs.py` for
+  the two new pure-logic functions, 3 new `AppTest` tests for the pages.
+- `pytest` — 139/139 passing.
 - Deployed to Streamlit Cloud; user confirmed the Draft Board loads
-  correctly as of 2026-08-25.
+  correctly as of 2026-08-25 (UI overhaul above not yet re-confirmed live
+  on Streamlit Cloud — only locally/via AppTest so far).
 - Known gaps (not blocking): ESPN blending not done (would be a 4th
   source — see notes below); defensive
   PA/yards-allowed tables (only 3 tiers each on CBS's page) not yet
@@ -154,6 +186,87 @@ carry their own Authorization header. Ask the user for a fresh PAT each
 time; don't assume an old one from the log below is still valid.
 
 ## Log
+
+### 2026-08-26 — Draft Board UI overhaul: clickable grid, sidebar round/upcoming panels, separate My Roster page
+League manager's ask, picking back up after the paused dry-run session
+below (confirmed mock draft 2832630 was no longer live — dry-run resume
+deferred, this session went to other requested work instead): "make the
+grid selectable so that I can just click on a player and it is drafted...
+get rid of the log a pick section... show a scrollable list by round of
+the teams and their picks and also the upcoming teams to pick for the
+next 10 picks... should update as picks are logged... remove my roster
+from the left toolbar... create a separate page for my roster."
+
+**`pages/1_Draft_Board.py`**: the main ranked-players `st.dataframe` now
+uses `on_select="rerun", selection_mode="single-row"`; selecting a row
+calls `draft_state.log_pick_on_the_clock()` for whoever `on_the_clock`
+currently is (not gated on `is_my_pick` — the grid is now the general
+pick-entry mechanism for the whole draft, same role the old "Log a pick"
+form played). Ignores clicks on tier-divider rows (checks for the
+"— Tier N —" label `add_tier_divider_rows()` inserts). The "Log a pick"
+form is deleted entirely. Sidebar's "My roster" section is deleted;
+replaced with "Picks by round" (all picks, most-recent-first, in a
+height-bounded `st.dataframe` so it scrolls in place) and "Next 10 picks"
+(from new `DraftState.upcoming_picks(n)`, 🎯-marks Monster Cheese's own
+upcoming turns) — both just re-read `draft_state` fresh, so they update
+automatically on the next rerun after any pick (same "no new wiring
+needed" pattern the Suggested Pick panel already relies on). A
+`st.page_link` at the bottom points to the new roster page.
+
+**New `pages/4_My_Roster.py`**: full starting lineup by named slot
+(`src/roster_needs.assign_roster_slots()` — same most-restrictive-slot
+-first greedy fill `unfilled_starter_slots()` already used for opponent
+-need inference, extended to return WHICH drafted player fills each slot
+instance rather than just a leftover count), empty slots captioned with
+their eligible positions, plus a bench table for drafted players that
+don't fill a starter slot yet.
+
+**Streamlit gotcha hit and fixed**: `st.dataframe` selection state
+persists across reruns under its widget `key`. Without changing the key
+after processing a click, the NEXT rerun's grid (now missing the
+just-drafted player, so every later row shifted up one) would still see
+"row 0 selected" in session state and immediately re-log whatever player
+now sits at row 0 — an infinite mis-drafting loop, not just a UI
+annoyance. Fixed with a `grid_pick_nonce` counter folded into the key
+(`player_grid_{nonce}`), bumped every time a selection is processed, so
+each new grid render starts with a genuinely empty, unselected widget.
+Same root cause class as the pre-existing suggestion-override-button
+`session_state` gotcha documented in the 2026-08-25 entry below (assigning
+into a widget's `session_state` key doesn't behave when it happens after
+that widget's already run — the fix here is different, since there's no
+`on_click` callback for a `st.dataframe` selection, but the underlying
+lesson — widget state doesn't just reset itself — is the same).
+
+**Testing**: 8 new unit tests (`DraftState.upcoming_picks()` in
+`tests/test_draft_state.py`; `assign_roster_slots()` in
+`tests/test_roster_needs.py`) plus 3 new `AppTest`-based page tests in
+new `tests/test_draft_board_page.py`, run against the real 2026 player
+pool and real snake order (not fixtures) — this is the first session to
+commit `AppTest` page coverage rather than only running it ad hoc.
+Non-obvious harness finding worth remembering: `st.page_link()` between
+sibling pages only resolves inside the real multipage registry, which
+only exists when `AppTest` is entered via `AppTest.from_file("app.py")`
++ `.switch_page(...)` — calling `AppTest.from_file("pages/1_Draft_Board.py")`
+directly throws `KeyError: 'url_pathname'` the moment it hits that
+`page_link` call, even though the exact same code runs fine in the real
+deployed app. Confirmed via the new tests: clicking the top-ranked
+player logs it to the real draft order's actual first team (Mississippi
+Swamp Ass, not Monster Cheese) — proof the grid dispatches to whoever's
+on the clock, not hardcoded to "me"; the grid's key advances after that
+click; a tier-divider-row click is a no-op; and after 8 simulated picks
+(reaching Monster Cheese's real round-1 slot), My Roster's "RB 1" slot
+and the sidebar's "Picks by round" table both show the right player.
+139/139 tests passing (was 128). Also smoke-tested by actually running
+`streamlit run app.py` and confirming an HTTP 200 with no errors in the
+log — not just `AppTest`.
+
+**Not done this session**: the paused mock-draft dry run (see the entry
+right below) — user confirmed draft 2832630 had gone stale/not live, and
+we deliberately switched to this UI work instead of starting a fresh mock
+draft. Still outstanding for next time. This UI overhaul also hasn't been
+re-deployed to / re-confirmed on Streamlit Cloud yet, only run locally
+and via `AppTest` — worth a quick live check before draft day given how
+central the grid-click flow now is.
 
 ### 2026-08-26 — Started a user-driven dry run (local clone + mock draft join), paused mid-setup
 League manager's request: "I'd like to do a dry run with a mock draft where

@@ -46,6 +46,40 @@ def test_is_my_pick():
     assert ds.picks_until_my_turn() == 0
 
 
+def test_upcoming_picks_returns_next_n_with_correct_teams():
+    ds = _fresh_state()
+    upcoming = ds.upcoming_picks(3)
+    assert [u["overall_pick"] for u in upcoming] == [1, 2, 3]
+    assert [u["team"] for u in upcoming] == [TEAMS[0], TEAMS[1], TEAMS[2]]
+    assert upcoming[0]["round"] == 1 and upcoming[0]["pick_in_round"] == 1
+
+
+def test_upcoming_picks_advances_as_picks_are_logged():
+    ds = _fresh_state()
+    ds.log_pick_on_the_clock("Filler 1")
+    upcoming = ds.upcoming_picks(2)
+    assert [u["overall_pick"] for u in upcoming] == [2, 3]
+
+
+def test_upcoming_picks_caps_at_total_picks_near_draft_end():
+    ds = _fresh_state()
+    ds.rounds = 1  # 10 total picks
+    for _ in range(8):
+        ds.log_pick_on_the_clock(f"Filler {ds.next_overall_pick}")
+    upcoming = ds.upcoming_picks(10)
+    assert len(upcoming) == 2
+    assert [u["overall_pick"] for u in upcoming] == [9, 10]
+
+
+def test_upcoming_picks_empty_when_draft_complete():
+    ds = _fresh_state()
+    ds.rounds = 1
+    for _ in range(10):
+        ds.log_pick_on_the_clock(f"Filler {ds.next_overall_pick}")
+    assert ds.is_draft_complete
+    assert ds.upcoming_picks(10) == []
+
+
 def test_persistence_round_trip():
     tmp = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
     tmp.close()
