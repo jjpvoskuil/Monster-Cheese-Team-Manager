@@ -155,6 +155,74 @@ time; don't assume an old one from the log below is still valid.
 
 ## Log
 
+### 2026-08-26 — Started a user-driven dry run (local clone + mock draft join), paused mid-setup
+League manager's request: "I'd like to do a dry run with a mock draft where
+I do the picks instead of you. Let's walk through that process before we
+actually run it." Chose to watch the real Draft Board update locally
+(rather than Claude just relaying suggestions in chat) — closest to the
+actual draft-day experience.
+
+**Local clone set up.** `~/MFL/monster-cheese-team-manager` on the user's
+Mac, cloned from `github.com/jjpvoskuil/Monster-Cheese-Team-Manager`, venv
+created, deps installed, `streamlit run app.py` confirmed running with no
+errors at `localhost:8501`. **Important gotcha for next time:** cloning (or
+any git operation involving lock files) does NOT work through the
+`device_bash` remote-devices bridge — it partially clones then fails with
+`unable to unlink '.../.git/config.lock': Operation not permitted`, and the
+bridge also can't `rm -rf` the mess afterward (no delete permission by
+default, and the delete-permission tool wasn't available this session
+either). Fix: have the user run `git clone`/venv setup themselves directly
+in Terminal.app, not via `device_bash` — their real Terminal has no
+bridge/locking quirks. `device_bash` is still fine for simple non-git file
+reads/writes (e.g. the live-sync JSON files later).
+
+**Mock draft joined, then a real architecture problem found.** Joined a
+fresh live CBS mock draft ("MC Sync Test", draft id `2832630`, 10 teams/14
+rounds standard roster) — user took slot 8. Original plan (from Phase 1
+work) was for Claude to join the SAME room in a different slot via Claude
+in Chrome, as an independent "spectator" team. **That doesn't work**:
+Claude in Chrome runs in the user's own logged-in Chrome/CBS session, so
+"joining slot 1" didn't add a second team — it just moved the user's OWN
+team from slot 8 to slot 1 (caught immediately, reverted back to slot 8, no
+lasting harm). CBS only allows one team per logged-in account per draft.
+
+**Revised plan (agreed with user, not yet executed): Option 1 — no second
+team needed.** Claude just stays in the same browser session (already
+"logged in as the user" by nature of Claude in Chrome) and reads the live
+results panel directly from the room the user is actually drafting in — no
+separate join, no autopilot-for-Claude's-own-slot step required. Simpler
+than the original Phase 1 assumption.
+
+**Draft room URL, found but not yet exercised end-to-end:** the lobby
+"details" page's "Click Here To Draft Now!" button is a JS `window.open`
+call to a *relative* path (`/draft/live/room`) that only resolves correctly
+via an actual click (direct navigation to that path on the lobby domain
+redirects back to the lobby) — following it landed on a **separate
+per-draft subdomain**: `https://mockdraft30-2832630.football.cbssports.com/draft/live/room2`
+(pattern: `mockdraft<N>-<draftId>.football.cbssports.com/draft/live/room2`).
+Next session should navigate straight to that pattern once a draft ID is
+known, rather than clicking through the lobby again.
+
+**Paused here** — user had to step away right as the live draft room
+finished loading, before any live-sync polling was actually exercised.
+Draft "MC Sync Test" (id 2832630) is likely still live with the user in
+slot 8; if picks lapse while nobody's watching, CBS's own autopilot fills
+in for that slot (harmless for a practice draft — same as prior test
+drafts left running). **Next step on resume:** confirm whether that draft
+is still open or has finished/expired; if it has, just start a fresh mock
+draft. Then: user picks manually in their own tab, Claude periodically (on
+request, e.g. "check now") switches the results view to "All Results",
+extracts the panel via the documented `get_page_text` technique, runs
+`parse_live_room_dump()` → `sync_new_picks()` → `write_sync_status()`, and
+pushes the updated `data/draft_state.json`/`data/live_sync_status.json` to
+the user's local clone via `SendUserFile` → `device_commit_files`
+(`~/MFL/monster-cheese-team-manager/data/`). User then refreshes
+`localhost:8501` to see the Suggested Pick panel update (Streamlit doesn't
+auto-poll external file changes, so this refresh step doesn't go away).
+Still undecided/not yet asked: sync after every single pick vs. only when
+it's getting close to the user's turn — worth deciding before the next
+attempt.
+
 ### 2026-08-25 — Test-drove the full live-sync + suggested-pick pipeline against a SECOND real CBS mock draft
 League manager's request, after the Suggested Pick feature shipped:
 "Lets test drive this with a mock draft to see how it goes." Chose the
