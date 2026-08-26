@@ -321,6 +321,31 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
     mattered far more than how value/need/scarcity are blended.
   - Full detail saved at `/tmp/sim/results_v2.json` (cloud workspace,
     not committed).
+- **QB quota round-tightness sweep (2026-08-26)**: league manager asked
+  to try tightening/loosening the new QB `round_based_fill_targets` rule
+  and bump the simulation to 25 trials per variant (up from 12-20). Swept
+  `by_round` in {2, 3, 4, 5, 6, 7, 9, 12} (count=2) plus a count=3 variant
+  at round 7, all against the same `no_quota` control, 25 trials each,
+  same opponent-behavior seeds across variants, using the team-vs-league
+  optimal-lineup-points comparison built for the prior sweep. Clean,
+  consistent curve: results improve steadily as the deadline tightens
+  from round 12 down through round 6 (avg league rank 3.52 → 1.64 of 10;
+  top-3 rate 48% → 96%; no_quota itself sat at 5.80/32%), then flatten
+  across rounds 4-6 (all ~1.5-2.0 avg rank, 88-96% top-3) before giving a
+  little back at rounds 3 and especially 2 (round 2: 2.64 avg rank, 72%
+  top-3) — forcing the 2nd QB too early starts costing the elite RB/WR
+  value concentrated in the first couple rounds instead (consistent with
+  the existing VOR analysis). The count=3-by-round-7 variant also did
+  well (2.12/84%) but not as well as tightening the round instead.
+  **Changed the shipped rule from round 7 to round 6** — sits inside the
+  flat sweet-spot band, keeps a little more schedule flexibility than
+  round 4-5 as a buffer against real-world surprises the simulation can't
+  model (projection error, injuries, in-draft runs), while capturing
+  essentially all of the measured improvement over the original round-7
+  guess. Full rank distributions and the comparison table are in the
+  2026-08-26 Log entry below. No code changes needed beyond the config
+  value — the round-based-quota mechanism itself already supported this
+  from the prior fix.
 - `pytest` — 184/184 passing.
 - Deployed to Streamlit Cloud; user confirmed the Draft Board loads
   correctly as of 2026-08-25 (2026-08-26 UI overhaul + follow-up fixes
@@ -402,6 +427,52 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-26 — QB quota round-tightness sweep (25 trials/variant): tightened round 7 -> 6
+Follow-up to the round-based-quota entry below. League manager asked to
+try tightening/loosening the new QB rule and bump trials from ~15-20 to
+25. Swept `by_round` (count=2) at 2, 3, 4, 5, 6, 7 (shipped), 9, 12, plus
+a count=3-at-round-7 variant, each 25 trials against the same `no_quota`
+control and opponent-behavior seeds, comparing simulated Monster
+Cheese's optimal-lineup points against the other 9 teams:
+
+```
+MODEL          avg_rank  top3_rate  avg_pts  2ndQB_rate  avg_2ndQB_rd
+no_quota           5.80      32.0%   6719.7        40.0%          16.7
+quota_r12_c2       3.52      48.0%   6860.4       100.0%          11.4
+quota_r9_c2        2.92      68.0%   6874.7       100.0%           9.0
+current (r7_c2)    2.36      72.0%   6894.7       100.0%           7.0
+quota_r7_c3        2.12      84.0%   6896.7       100.0%           6.0
+quota_r3_c2        2.08      88.0%   6907.9       100.0%           3.0
+quota_r5_c2        2.00      92.0%   6913.0       100.0%           5.0
+quota_r2_c2        2.64      72.0%   6898.7       100.0%           2.0
+quota_r6_c2        1.64      96.0%   6930.3       100.0%           6.0
+quota_r4_c2        1.52      96.0%   6925.8       100.0%           4.0
+```
+
+(avg_rank/avg_pts = Monster Cheese's rank/projected starting-lineup
+points among all 10 simulated teams, lower rank = better, 25 trials each)
+
+Reading the curve in round order (12 -> 2): steady, consistent
+improvement from round 12 down through round 6, then a flat sweet-spot
+band across roughly rounds 4-6, then a small give-back at rounds 3 and
+especially 2 — full rank distributions confirm this isn't just averaging
+noise (round 4: 16/25 trials landed at rank 1, worst was rank 4; round 2:
+only 6/25 at rank 1, worst was rank 7). Interpretation: forcing the 2nd
+QB too early starts sacrificing the elite RB/WR value concentrated in
+the first couple rounds (matches the existing VOR analysis doc), while
+waiting too long risks the startable-QB pool drying up. The count=3 -by
+-round-7 variant landed in between (2.12/84%) — tightening the ROUND
+mattered more than tightening the COUNT.
+
+**Changed the shipped config** (`config/league_settings.yaml`'s
+`estimation_assumptions.round_based_fill_targets.QB.by_round`) from 7 to
+6 — inside the flat sweet spot, with a little more schedule buffer than
+rounds 4-5 for real-world surprises (projection error, injuries, an
+unexpected run) that this points-projection-only simulation can't
+capture. No code changes needed — the mechanism already supported any
+`by_round`/`count` value. 184/184 tests still passing (no test asserts
+the shipped config's specific number, only a self-contained fixture).
 
 ### 2026-08-26 — Round-based QB quota + comparing simulated teams' projected points against the whole league
 Follow-up to the redundancy/overdraft entry below. League manager flagged

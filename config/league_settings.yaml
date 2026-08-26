@@ -356,6 +356,22 @@ estimation_assumptions:
       # though QB's raw VOR rarely looks urgent in the value/need/
       # scarcity composite alone (see docs/draft_insights.md) -- this is
       # a deliberate strategic override, not derived from any raw stat.
-      # Tune `by_round`/`count` if draft-day behavior suggests otherwise.
-      by_round: 7
+      #
+      # by_round tightened from 7 to 6 on 2026-08-26 after a Monte Carlo
+      # sweep (same-day follow-up, see SESSION_NOTES) tried by_round in
+      # {2,3,4,5,6,7,9,12} plus a count=3 variant, ranking each simulated
+      # Monster Cheese roster's optimal-lineup points against the other 9
+      # teams (25 trials per setting): results improved steadily from
+      # round 12 down through round 6 (avg league rank 3.52 -> 1.64 of
+      # 10, top-3 rate 48% -> 96%), then FLATTENED across 4-6 and started
+      # giving a little back again at 3-2 (round 4: 1.52/96%; round 2:
+      # 2.64/72%) -- forcing the 2nd QB too early starts costing the
+      # elite RB/WR value available in the first couple rounds instead.
+      # Round 6 sits inside that flat sweet-spot band with a bit more
+      # schedule flexibility than round 4-5 (useful buffer against
+      # projection error/injury surprises the simulation can't see) while
+      # capturing essentially all of the improvement over the original
+      # round-7 guess. Revisit if real draft-day behavior looks different
+      # from this projection-based simulation.
+      by_round: 6
       count: 2
