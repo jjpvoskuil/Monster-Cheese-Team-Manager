@@ -79,9 +79,9 @@ st.subheader("Starting lineup")
 # Display-only relabeling -- doesn't touch eligibility/assignment logic
 # (src.roster_needs still sees "SUPERFLEX" and its real QB/RB/WR/TE
 # eligible list). Per league-manager feedback: this league's scoring
-# makes SUPERFLEX a near-certain QB start every week (see
+# makes SUPERFLEX an automatic QB start every week (see
 # config/league_settings.yaml's flex_position_splits.SUPERFLEX comment,
-# 90% QB), so labeling the slot "QB (Flex)" here reads more honestly than
+# 100% QB), so labeling the slot "QB (Flex)" here reads more honestly than
 # the generic "SUPERFLEX" name while still being clearly a flex slot.
 SLOT_DISPLAY_NAMES = {"SUPERFLEX": "QB (Flex)"}
 
@@ -111,6 +111,84 @@ for slot in starters:
             })
 
 st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+
+st.divider()
+st.subheader("Draft Requirements")
+st.caption(
+    'Per the "Maniac Football League Draft Sheet" (loaded 2026-08-27): '
+    "these categories must be filled by round 20 -- rounds 21-22 can be any position."
+)
+
+targets = config.get("estimation_assumptions", {}).get("round_based_fill_targets", [])
+if not targets:
+    st.caption("No draft requirements configured.")
+else:
+    # Reuses the same generic slot-filling heuristic as the Starting
+    # Lineup table above (src.roster_needs.assign_roster_slots), just
+    # pointed at the requirements list instead of roster.starters -- same
+    # "if the draft stopped right now" caveat applies, and a drafted
+    # player is claimed by the most position-restrictive unmet category
+    # first (e.g. "TE (Mandatory)" before the broader "WR/TE" bucket), so
+    # nobody is double-counted across overlapping categories.
+    REQUIREMENT_DISPLAY_NAMES = {
+        "QB": "QB",
+        "K": "K",
+        "DEF": "DEF",
+        "RB_REQUIREMENT": "RB",
+        "WR_TE_REQUIREMENT": "WR/TE",
+        "RB_WR_TE_REQUIREMENT": "RB, WR, or TE",
+        "TE_MANDATORY": "TE (Mandatory)",
+        "ANY_POSITION_REQUIREMENT": "Any Position",
+    }
+    by_slot_name = {t["slot"]: t for t in targets}
+    req_slots, _req_bench = assign_roster_slots(my_picks, targets)
+
+    req_rows = []
+    unmet_by_round: dict[int, int] = {}
+    for slot_name, filled in req_slots.items():
+        target = by_slot_name[slot_name]
+        label_base = REQUIREMENT_DISPLAY_NAMES.get(slot_name, slot_name.replace("_", " ").title())
+        still_needed = sum(1 for p in filled if p is None)
+        if still_needed:
+            by_round = target.get("by_round")
+            unmet_by_round[by_round] = unmet_by_round.get(by_round, 0) + still_needed
+        for i, pick in enumerate(filled, start=1):
+            label = label_base if target["count"] == 1 else f"{label_base} {i}"
+            if pick is not None:
+                req_rows.append({
+                    "Requirement": label, "Player": pick.player_name, "Pos": pick.position,
+                    "Rd": pick.round, "Pick": pick.overall_pick,
+                })
+            else:
+                req_rows.append({
+                    "Requirement": label, "Player": "— empty —", "Pos": "/".join(target["eligible"]),
+                    "Rd": None, "Pick": None,
+                })
+    st.dataframe(pd.DataFrame(req_rows), hide_index=True, use_container_width=True)
+
+    # Warn as round 20 approaches with any by-round-20 requirement category
+    # still unmet -- per league-manager request (2026-08-27): "The app
+    # should give me a warning if I am near round 20 and haven't met the
+    # requirements yet." Only categories with a round-20 deadline trigger
+    # this banner -- the QB category's own, much tighter round-6 deadline
+    # is a separate strategic nudge the Suggested Pick panel already
+    # surfaces (src.pick_suggestion's mandatory/quota-deadline overrides).
+    round_20_unmet = unmet_by_round.get(20, 0)
+    if round_20_unmet:
+        if draft_state.is_draft_complete:
+            current_round = config["draft"]["rounds"]
+        else:
+            current_round, _ = draft_state.round_and_slot_for_pick(draft_state.next_overall_pick)
+        if current_round > 20:
+            st.error(
+                f"🚫 Round 20's deadline has passed and {round_20_unmet} league draft "
+                f"requirement(s) are still unmet."
+            )
+        elif current_round >= 18:
+            st.warning(
+                f"⚠️ Round {current_round} of {config['draft']['rounds']} — {round_20_unmet} "
+                f"league draft requirement(s) still need to be filled before round 20 ends."
+            )
 
 st.divider()
 st.subheader(f"Bench ({len(bench)})")

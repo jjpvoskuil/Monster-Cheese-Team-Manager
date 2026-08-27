@@ -124,14 +124,15 @@ def test_automatic_tiers_on_real_data_are_not_absurdly_wide():
 
 
 def test_superflex_demand_is_now_overwhelmingly_qb():
-    """Regression for the 2026-08-25 league-manager feedback: this scoring
-    system makes QB the superflex slot's near-automatic fill, so most teams
-    start 2 QBs almost every week. QB demand should reflect that (~1.9
-    QBs/team: 1 dedicated + ~0.9 of the superflex slot), not the old
-    ~1.55/team split."""
+    """Regression for the 2026-08-25 league-manager feedback (revised
+    2026-08-27 to 100% -- see league_settings.yaml's SUPERFLEX comment):
+    this scoring system makes QB the superflex slot's automatic fill, so
+    every team is expected to start 2 QBs every week. QB demand should
+    reflect that (2.0 QBs/team: 1 dedicated + 1.0 of the superflex slot),
+    not the old ~1.55/team or ~1.9/team splits."""
     with open(CONFIG_PATH) as f:
         config = yaml.safe_load(f)
     demand = compute_position_demand(config)
     teams = config["league"]["teams"]
-    assert demand["QB"] == pytest.approx(teams * 1 + teams * 0.90)
+    assert demand["QB"] == pytest.approx(teams * 1 + teams * 1.0)
     assert demand["QB"] / teams > 1.8

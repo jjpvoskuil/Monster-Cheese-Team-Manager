@@ -103,13 +103,30 @@ roster:
 
   # Aggregate active-roster min/max per position, as CBS's "Roster Limits"
   # table reports it (informational cross-check against the slot list above)
+  #
+  # DST and TE updated 2026-08-27 -- the real "Maniac Football League
+  # Draft Sheet" the league manager uploaded that day requires 2 DEF and
+  # allows TE beyond the 1 dedicated slot (its "WR/TE" bucket, 5 slots,
+  # is explicitly WR-or-TE) by round 20 -- see draft_requirements below.
+  # That directly conflicted with this table's original DST max of 1 and
+  # TE max of 1 (both captured 2026-08-24 from CBS's rules page, before
+  # the draft sheet existed) -- raised both here so the redundancy-cap
+  # mechanism in src/pick_suggestion.py doesn't block satisfying the real
+  # requirement. NOT independently re-verified against CBS's UI since --
+  # flagging this specifically: if CBS's platform genuinely, technically
+  # enforces "at most 1 DST ever rostered" as a hard constraint (as
+  # opposed to this just being a stale/imprecise cross-check number),
+  # drafting a 2nd DEF per the draft sheet would be impossible in
+  # practice, not just suboptimal, and the draft sheet's "2 DEF" would
+  # need a different interpretation. Re-confirm on CBS if it matters
+  # before draft day.
   position_active_limits:
     QB: {min: 1, max: 2}
     RB: {min: 3, max: 5}
-    TE: {min: 1, max: 1}
+    TE: {min: 1, max: 2}
     WR_TE: {min: 3, max: 5}
     K: {min: 1, max: 3}
-    DST: {min: 1, max: 1}
+    DST: {min: 1, max: 2}
 
   validation:
     illegal_roster_score: 0  # "Illegal rosters score zero points in standings"
@@ -297,22 +314,22 @@ estimation_assumptions:
       TE: 0.15
       K: 0.05
     SUPERFLEX:
-      # Overwhelmingly QB, per league manager feedback (2026-08-25): this
-      # league's passing yardage/TD bonuses are rich enough (up to 38 pts
-      # for 600+ pass yards, bonus for 26+ yd scores) that a good QB nearly
-      # always beats a good RB/WR/TE in this slot -- every team should be
-      # expected to start 2 QBs (1 dedicated + 1 superflex) almost every
-      # week, not just "usually." Previously 0.55/0.20/0.20/0.05 (a much
-      # softer QB lean); revised up. The small residual on RB/WR/TE isn't a
-      # claim that ~10% of teams will genuinely start a non-QB here -- it's
-      # a deliberate buffer so a single flex position isn't modeled as
-      # 100% certain, which would make replacement level (and therefore
-      # VOR) brittle to one bad assumption. Tune further if draft-day
-      # behavior looks different.
-      QB: 0.90
-      RB: 0.04
-      WR: 0.04
-      TE: 0.02
+      # 100% QB, per league-manager feedback (2026-08-27): "while we don't
+      # have to start 2 QBs it is always the best choice if 2 are available
+      # on that game day" -- treat a 2nd QB here as a mandatory lineup
+      # choice whenever one is rosterable, not just a strong preference.
+      # Previously 0.90/0.04/0.04/0.02 (a small deliberate buffer against
+      # modeling this slot as 100% certain); revised to 1.0 straight QB per
+      # this explicit instruction. This league's passing yardage/TD bonuses
+      # are rich enough (up to 38 pts for 600+ pass yards, bonus for 26+ yd
+      # scores) that a good QB essentially always beats a good RB/WR/TE
+      # here -- every team should be expected to start 2 QBs (1 dedicated +
+      # 1 superflex) every week. Tune back down if draft-day behavior looks
+      # different.
+      QB: 1.0
+      RB: 0.0
+      WR: 0.0
+      TE: 0.0
   position_early_round_discount:
     # Per league-manager feedback (2026-08-26): "kickers and defenses are
     # pretty much a dime a dozen, rarely worth taking before round 17."
@@ -331,47 +348,91 @@ estimation_assumptions:
     K: {before_round: 17, multiplier: 0.2}
     DST: {before_round: 17, multiplier: 0.2}
   round_based_fill_targets:
-    # "Must have N of this position by round R" targets that
-    # src/pick_suggestion.py's suggest_position() force-prioritizes once
-    # you're down to your last chance(s) to hit them -- see
-    # _round_based_quota_positions()'s docstring. Two DIFFERENT kinds of
-    # entry belong here; keep them clearly labeled:
+    # "Must have N players eligible for this category by round R" targets
+    # that src/pick_suggestion.py's suggest_position() force-prioritizes
+    # (via the grouped-by-deadline urgency check in
+    # _round_based_quota_positions()) once you're down to your last
+    # chance(s) to hit them as a GROUP, and that my_position_need() also
+    # feeds into the ongoing value/need/scarcity composite as soft demand
+    # all draft long, not just at the deadline -- see both functions'
+    # docstrings.
     #
-    #   1. SELF-IMPOSED STRATEGY TARGETS -- not a CBS rule, just a
-    #      deliberate heuristic the league manager wants enforced.
-    #   2. REAL CBS REQUIREMENTS -- an actual league rule with real
-    #      consequences if missed. NONE confirmed yet as of 2026-08-26:
-    #      the league manager mentioned "2 kickers and 2 defenses have to
-    #      be picked prior to round 21" but is still tracking down the
-    #      exact source/wording -- add K/DST entries here once confirmed
-    #      (they'd also let position_early_round_discount's K/DST
-    #      suppression above get overridden as round 21 approaches).
+    # SHAPE (changed 2026-08-27 from a dict keyed by position to this
+    # list, to support multi-eligible categories like "WR or TE" and
+    # "RB, WR, or TE" that a single position key can't represent):
+    #   - slot: <unique label, same spirit as roster.starters' slot names>
+    #     eligible: [<positions that count toward this category>]
+    #     count: <how many needed>
+    #     by_round: <deadline round, inclusive>
     #
-    # Current entries (all category 1, self-imposed):
-    QB:
-      # Per league-manager feedback (2026-08-26): "not having 2 [QBs] in
-      # the first 7 rounds or so would be a disaster." This league's
-      # superflex scoring makes a 2nd QB nearly as valuable as the 1st,
-      # and the startable-QB pool can dry up well before round 22 even
-      # though QB's raw VOR rarely looks urgent in the value/need/
-      # scarcity composite alone (see docs/draft_insights.md) -- this is
-      # a deliberate strategic override, not derived from any raw stat.
-      #
-      # by_round tightened from 7 to 6 on 2026-08-26 after a Monte Carlo
-      # sweep (same-day follow-up, see SESSION_NOTES) tried by_round in
-      # {2,3,4,5,6,7,9,12} plus a count=3 variant, ranking each simulated
-      # Monster Cheese roster's optimal-lineup points against the other 9
-      # teams (25 trials per setting): results improved steadily from
-      # round 12 down through round 6 (avg league rank 3.52 -> 1.64 of
-      # 10, top-3 rate 48% -> 96%), then FLATTENED across 4-6 and started
-      # giving a little back again at 3-2 (round 4: 1.52/96%; round 2:
-      # 2.64/72%) -- forcing the 2nd QB too early starts costing the
-      # elite RB/WR value available in the first couple rounds instead.
-      # Round 6 sits inside that flat sweet-spot band with a bit more
-      # schedule flexibility than round 4-5 (useful buffer against
-      # projection error/injury surprises the simulation can't see) while
-      # capturing essentially all of the improvement over the original
-      # round-7 guess. Revisit if real draft-day behavior looks different
-      # from this projection-based simulation.
-      by_round: 6
+    # Entries below are ALL real CBS league requirements now (source: the
+    # "Maniac Football League Draft Sheet" the league manager uploaded
+    # 2026-08-27 -- 10 rows x 2 columns of by-round-20 requirements, plus
+    # 2 unconstrained "Bonus Round" picks at 21/22 that are deliberately
+    # NOT modeled here since "any position" imposes no real constraint):
+    #   QB, QB, K, K, DEF, DEF, RB x5, WR/TE x5, "RB/WR/TE" x1,
+    #   "TE (Mandatory)" x1, "Any Position" x2 = 20 items by round 20.
+    # Read via soffice+pdftoppm (pandoc's markdown conversion collapsed
+    # the two-column table into ambiguous flat text). Interpreted as a
+    # required ROSTER COMPOSITION by round 20 (not a literal pick-by-pick
+    # order -- taking K/DEF in the first few picks, as the table's row
+    # position would literally suggest, would contradict everything
+    # established about K/DST early-round value this session), per the
+    # league manager's own framing: "All the positions at the top must be
+    # filled by the end of round 20 and then 21 and 22 can be any
+    # position."
+    #
+    # NOTE: this doc's "2 DEF" and flexible-TE requirement is what
+    # motivated raising roster.position_active_limits' DST/TE max above
+    # (see that block's comment for the unresolved DST=1-vs-2 conflict
+    # against the separate CBS rules-page capture -- still needs
+    # re-confirming on CBS before draft day).
+    - slot: QB
+      eligible: [QB]
       count: 2
+      by_round: 6
+      # Kept at the empirically-tuned round 6 (tighter than the
+      # requirement doc's implied round-20 deadline) -- per league-manager
+      # feedback (2026-08-26): "not having 2 [QBs] in the first 7 rounds
+      # or so would be a disaster." A 25-trial-per-setting Monte Carlo
+      # sweep (2026-08-26, see SESSION_NOTES) tried by_round in
+      # {2,3,4,5,6,7,9,12} plus a count=3 variant: results improved
+      # steadily from round 12 down through round 6 (avg league rank
+      # 3.52 -> 1.64 of 10, top-3 rate 48% -> 96%), FLATTENED across 4-6,
+      # then started giving a little back at 3-2 (forcing QB2 too early
+      # costs elite RB/WR value). Round 6 sits in that flat sweet-spot
+      # band with more schedule buffer than 4-5. The requirement doc's
+      # own round-20 deadline for QB is far looser than this and is
+      # superseded by this tighter, simulation-backed target.
+    - slot: K
+      eligible: [K]
+      count: 2
+      by_round: 20
+    - slot: DEF
+      eligible: [DST]
+      count: 2
+      by_round: 20
+    - slot: RB_REQUIREMENT
+      eligible: [RB]
+      count: 5
+      by_round: 20
+    - slot: WR_TE_REQUIREMENT
+      eligible: [WR, TE]
+      count: 5
+      by_round: 20
+    - slot: RB_WR_TE_REQUIREMENT
+      eligible: [RB, WR, TE]
+      count: 1
+      by_round: 20
+    - slot: TE_MANDATORY
+      eligible: [TE]
+      count: 1
+      by_round: 20
+    - slot: ANY_POSITION_REQUIREMENT
+      eligible: [QB, RB, WR, TE, K, DST]
+      count: 2
+      by_round: 20
+      # Included for accurate slot-budget bookkeeping in the grouped
+      # round-20 urgency check (it's still 2 of your 20 by-round-20 picks)
+      # even though, being eligible for literally anything, it never by
+      # itself forces a specific position.

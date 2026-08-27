@@ -38,12 +38,41 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   web" button (live re-fetch); CBS does not (requires a logged-in
   session — re-pull manually, see below).
 - SUPERFLEX demand assumption (`config/league_settings.yaml` →
-  `estimation_assumptions.flex_position_splits.SUPERFLEX`) is now 90% QB
-  (was 55%), per league-manager feedback that this scoring system makes a
-  good QB nearly always the right superflex fill — every team should
-  expect to start ~2 QBs almost every week. QB league-wide demand is now
-  ~19 (10 dedicated + ~9 of the superflex slot), up from ~15.5, which
-  raises QB's replacement level and lowers early-QB VOR accordingly.
+  `estimation_assumptions.flex_position_splits.SUPERFLEX`) is now 100% QB
+  (was 90%, originally 55%), per league-manager feedback (2026-08-27):
+  "while we don't have to start 2 QBs it is always the best choice if 2
+  are available." QB league-wide demand is now ~20 (10 dedicated + 10 of
+  the superflex slot), up from ~19, which raises QB's replacement level
+  and lowers early-QB VOR accordingly.
+- **Real league draft requirements loaded (2026-08-27)**: the league
+  manager's "Maniac Football League Draft Sheet" is now wired into
+  `config/league_settings.yaml`'s `estimation_assumptions.
+  round_based_fill_targets` (changed shape from a dict keyed by position
+  to a LIST of `{slot, eligible, count, by_round}` categories, so
+  multi-eligible requirements like "WR or TE" and "RB, WR, or TE" can be
+  represented) — by round 20: 2 QB (kept at the tighter, simulation-tuned
+  round-6 deadline rather than the doc's own looser round-20 one), 2 K,
+  2 DEF, 5 RB, 5 WR/TE, 1 RB-or-WR-or-TE, 1 mandatory TE, 2 any-position;
+  rounds 21-22 unconstrained. `src/pick_suggestion.py`'s
+  `_round_based_quota_positions()` now groups categories by shared
+  deadline and checks the GROUP's total remaining need against remaining
+  picks before that deadline (catches a combined shortfall across several
+  categories even when no single one looks urgent alone), and
+  `my_position_need()` now also draws soft demand from unfilled
+  requirement categories all draft long, not just at the hard deadline.
+  `pages/4_My_Roster.py` has a new "Draft Requirements" section (same
+  per-category fill-progress table style as Starting Lineup) plus a
+  warning banner from round 18 on and an error banner past round 20 if
+  requirements are still unmet. **Flagged, unresolved**: this doc's "2
+  DEF" and TE-flexibility requirement conflicted with the existing
+  `roster.position_active_limits` (DST max 1, TE max 1, captured
+  2026-08-24 from a different CBS page) — raised both caps to 2 so the
+  redundancy mechanism doesn't block satisfying the real requirement, but
+  this hasn't been re-confirmed against CBS's actual platform behavior;
+  if CBS technically hard-caps DST at 1, drafting a 2nd DEF may be
+  impossible in practice, not just suboptimal. Re-confirm before draft
+  day if it matters. See the dated log entry below for the full Monte
+  Carlo comparison re-run against this config.
 - Both the Draft Board and Projections pages now compute position tiers
   (`src/projections.py`'s `compute_tiers()`) — same-position players
   clustered by point drop-off. Manual override (points, e.g. "10") is an
@@ -427,6 +456,121 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-27 — Real draft requirements doc loaded, DST/TE cap conflict, SUPERFLEX 100%, My Roster requirements UI, Monte Carlo re-run
+League manager uploaded the real "Maniac Football League Draft Sheet"
+(`.docx`) and asked to load it, treat a 2nd QB as effectively mandatory
+whenever available (SUPERFLEX split 90% -> 100% QB), add a Draft
+Requirements view + round-20 warning to My Roster, and re-run the Monte
+Carlo comparison.
+
+**Reading the doc**: `pandoc -t markdown` collapsed the two-column
+requirements table into ambiguous flat text — switched to
+`soffice.py --headless --convert-to pdf` + `pdftoppm -jpeg` + `Read` on
+the resulting image, which showed the true structure clearly: 10 rows x
+2 columns (QB/QB, K/K, DEF/DEF, RB/WR-TE x5, "RB-WR-TE"/"TE (Mandatory)")
+= 20 items, plus 2 unconstrained "Bonus Round" picks at 21/22. Interpreted
+as a required ROSTER COMPOSITION by round 20 (not literal pick order —
+taking K/DEF in the first few picks, as the row position would literally
+suggest, would contradict everything already established about K/DST
+early-round value), matching the league manager's own framing: "All the
+positions at the top must be filled by the end of round 20."
+
+**Config** (`config/league_settings.yaml`): `round_based_fill_targets`
+changed shape from a dict keyed by position to a list of `{slot,
+eligible, count, by_round}` entries — needed because several real
+categories are multi-eligible ("WR or TE", "RB, WR, or TE") in a way a
+single position key can't represent. 8 entries now: QB (kept at the
+tighter, simulation-tuned round-6 deadline, not the doc's own looser
+round-20 one), K x2/round20, DEF x2/round20, RB x5/round20, WR/TE
+x5/round20, RB-or-WR-or-TE x1/round20, TE-mandatory x1/round20,
+any-position x2/round20 (included for slot-budget bookkeeping even
+though it never forces a specific position). Also raised
+`roster.position_active_limits` DST max 1->2 and TE max 1->2 to match
+this doc's "2 DEF" and TE-flexibility requirements — **this conflicts
+with the existing caps (captured 2026-08-24 from CBS's rules page) and
+is NOT re-confirmed against CBS's actual platform behavior; flagging
+again here since it matters for draft day** — if CBS truly hard-caps DST
+at 1, a 2nd DEF may be impossible to legally roster, not just
+suboptimal. `flex_position_splits.SUPERFLEX` QB weight raised 0.90 ->
+1.0 per explicit request ("it is always the best choice if 2 are
+available... treat those as mandatory").
+
+**`src/pick_suggestion.py`**: `_round_based_quota_positions()` rewritten
+to consume the new list shape via `src.roster_needs.
+unfilled_starter_slots()` (so a drafted player isn't double-counted
+across overlapping categories, e.g. a TE satisfies "TE (Mandatory)"
+before "WR/TE" gets a claim on it), and to GROUP unfilled categories by
+shared `by_round` deadline, checking the group's TOTAL remaining need
+against remaining picks before that shared deadline rather than each
+category independently — needed because 7 of the 8 configured categories
+share the same round-20 deadline, and an independent check can miss a
+combined shortfall (e.g. needing K:2 + DEF:2 + RB:1 with exactly 5 picks
+left before round 20 looks fine for each alone, but the combined need
+already exhausts the combined remaining picks). `my_position_need()` now
+also folds in soft demand from unfilled requirement categories (even
+split, no flex-splits weighting) so they nudge the ongoing
+value/need/scarcity composite all draft long, not just at the hard
+deadline. 3 new tests covering the grouped-urgency logic specifically
+(double-counting avoidance, a combined-shortfall-not-visible-alone case,
+and its negative control with real slack) — 187 total in the suite before
+the page-test additions below.
+
+**`pages/4_My_Roster.py`**: new "Draft Requirements" section, same
+per-category fill-progress table style as Starting Lineup (reuses
+`assign_roster_slots()` against the requirements list instead of
+`roster.starters`), plus a warning banner from round 18 on and an error
+banner past round 20 if any round-20-deadline category is still unmet
+(the QB category's own tighter round-6 deadline is a separate signal the
+Suggested Pick panel already surfaces, so it doesn't drive this banner).
+2 new `AppTest` tests logging picks directly through `DraftState` (much
+faster than clicking through the grid) to reach round 19 and round 21
+and confirm the warning/error banners fire correctly. Also fixed an
+existing test (`test_my_roster_page_fills_in_as_picks_are_logged`) that
+hardcoded an assumption about which slot the real top-of-board player at
+pick 8 would land in — that shifted once the config changes above moved
+real players' relative VOR rankings, so the test now just confirms the
+drafted player appears in exactly one lineup slot rather than assuming
+it's specifically RB. Full suite: 189 passed.
+
+**Monte Carlo re-run** (`/tmp/sim/simulate_v2.py`, updated for the new
+config shape — `config_with_qb_quota()` now rebuilds the requirements
+list rather than assigning a dict key): 15 trials/model against the full
+new config (real by-round-20 requirements active for every model except
+`no_quota`):
+
+```
+MODEL             avg_rank  top3_rate   avg_pts  avg_QBs  2ndQB_rate  avg_2ndQB_rd  empty_slot_trials  n
+current               1.40      93.3%    6954.6     2.00      100.0%           6.0                  0  15
+no_quota              5.60      33.3%    6730.5     1.27       26.7%          12.5                  0  15
+need_heavy            1.27     100.0%    6957.2     2.00      100.0%           6.0                  0  15
+scarcity_heavy        1.53      93.3%    6943.4     2.00      100.0%           6.0                  0  15
+value_heavy           1.47      93.3%    6944.8     2.00      100.0%           6.0                  0  15
+quota_r5_c2           1.40     100.0%    6952.1     2.00      100.0%           5.0                  0  15
+quota_r9_c2           2.20      80.0%    6911.2     2.00      100.0%           9.0                  0  15
+quota_r12_c2          3.87      53.3%    6835.2     2.00      100.0%          11.5                  0  15
+quota_r7_c3           1.33     100.0%    6956.3     2.00      100.0%           6.0                  0  15
+```
+
+Takeaways: `no_quota` (QB target AND real requirements both stripped, as
+a pure value/need/scarcity baseline) collapses to avg_rank 5.60/33%
+top-3 — strong confirmation that the requirements-forcing mechanism as a
+whole (not just the QB piece) is doing real work, not just window
+dressing. Every other model — regardless of value/need/scarcity weight
+blend, and across the whole QB-deadline sweep from round 5 to round 12 —
+finished with **zero empty starter slots across all 135 trials**,
+including under the raised DST/TE caps, which is a good robustness
+signal for the requirements integration. The shipped round-6 QB deadline
+remains near-optimal (1.40/93%), essentially tied with round 5
+(1.40/100%) and round 7-with-3-QBs (1.33/100%) and clearly ahead of
+looser deadlines (round 9: 2.20/80%; round 12: 3.87/53%) — no change
+made to the QB deadline itself. `early_KDST` pathological-flag counts
+were dropped from this table's printed columns in the writeup above
+(unlike the 2026-08-26 runs, a nonzero count here can now legitimately
+mean the round-20 requirement group forced an early K/DST pick on
+purpose, not a bug — the flag wasn't redesigned to distinguish the two
+causes, so raw counts aren't a meaningful regression signal anymore;
+worth revisiting if this harness gets formalized into the repo).
 
 ### 2026-08-26 — QB quota round-tightness sweep (25 trials/variant): tightened round 7 -> 6
 Follow-up to the round-based-quota entry below. League manager asked to

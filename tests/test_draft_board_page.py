@@ -169,9 +169,14 @@ def test_my_roster_page_fills_in_as_picks_are_logged():
     at.run(timeout=60)
     assert not at.exception
 
+    # Don't assume WHICH slot the top-of-board player lands in -- that
+    # depends on the player's real position plus the current
+    # value/replacement-level config (e.g. flex_position_splits), which
+    # this test shouldn't need to know or keep in sync with. Just confirm
+    # the drafted player shows up in exactly one starting-lineup slot.
     lineup_df = at.dataframe[0].value
-    rb1_row = lineup_df[lineup_df["Slot"] == "RB 1"].iloc[0]
-    assert rb1_row["Player"] == my_player
+    matching_rows = lineup_df[lineup_df["Player"] == my_player]
+    assert len(matching_rows) == 1
 
     # Sidebar's "picks by round" table on the Draft Board should show all
     # 8 picks, most recent first -- confirms the sidebar and the roster
@@ -184,3 +189,64 @@ def test_my_roster_page_fills_in_as_picks_are_logged():
     )
     assert len(picks_by_round.value) == 8
     assert picks_by_round.value.iloc[0]["Team"] == "Monster Cheese"
+
+
+def _write_draft_state_directly(rounds_to_log):
+    """Log picks straight through src.draft_state.DraftState against the
+    real config/team order and save to the live draft_state.json, instead
+    of clicking through the Draft Board grid -- much faster for tests that
+    just need "N picks logged" and don't care about realistic value/need
+    behavior (e.g. exercising round-deadline UI on My Roster)."""
+    import yaml
+
+    from src.draft_state import DraftState
+
+    with open(os.path.join(ROOT, "config", "league_settings.yaml")) as f:
+        config = yaml.safe_load(f)
+    teams = config["draft"]["team_order"]
+    ds = DraftState(
+        teams=teams,
+        rounds=config["draft"]["rounds"],
+        my_team=config["league"]["team_name"],
+        state_file=DRAFT_STATE_FILE,
+        reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
+    )
+    for _ in range(rounds_to_log * len(teams)):
+        # Every pick (mine included) is an RB filler -- leaves the K/DEF/
+        # WR-TE/TE-mandatory draft-requirement categories entirely unmet
+        # while still satisfying the RB-eligible categories, so the
+        # round-20 warning/error banners below have something real to
+        # report on.
+        ds.log_pick_on_the_clock("Filler", position="RB")
+    return ds, config
+
+
+def test_my_roster_page_warns_near_round_20_with_unmet_requirements():
+    ds, config = _write_draft_state_directly(rounds_to_log=18)
+    current_round, _ = ds.round_and_slot_for_pick(ds.next_overall_pick)
+    assert current_round == 19  # within the near-round-20 warning window
+
+    at = AppTest.from_file(os.path.join(ROOT, "app.py"))
+    at.run(timeout=60)
+    at.switch_page("pages/4_My_Roster.py")
+    at.run(timeout=60)
+    assert not at.exception
+
+    assert len(at.warning) == 1
+    assert "round 20" in at.warning[0].value.lower()
+    assert not at.error
+
+
+def test_my_roster_page_errors_once_round_20_deadline_has_passed():
+    ds, config = _write_draft_state_directly(rounds_to_log=20)
+    current_round, _ = ds.round_and_slot_for_pick(ds.next_overall_pick)
+    assert current_round == 21  # past the round-20 deadline
+
+    at = AppTest.from_file(os.path.join(ROOT, "app.py"))
+    at.run(timeout=60)
+    at.switch_page("pages/4_My_Roster.py")
+    at.run(timeout=60)
+    assert not at.exception
+
+    assert len(at.error) == 1
+    assert "round 20" in at.error[0].value.lower()

@@ -224,7 +224,9 @@ def test_remaining_my_picks_before_round_is_zero_once_past_the_deadline_round():
 QUOTA_CONFIG = {
     **CONFIG,
     "estimation_assumptions": {
-        "round_based_fill_targets": {"QB": {"by_round": 7, "count": 2}}
+        "round_based_fill_targets": [
+            {"slot": "QB", "eligible": ["QB"], "count": 2, "by_round": 7}
+        ]
     },
 }
 
@@ -259,6 +261,53 @@ def test_round_based_quota_positions_flags_qb_on_the_last_realistic_chance():
     # Monster Cheese has 1 QB; only 1 more Monster Cheese pick (64, round 7)
     # remains before the round-7 deadline -- last realistic chance for QB2.
     assert "QB" in _round_based_quota_positions(ds, QUOTA_CONFIG)
+
+
+def test_round_based_quota_positions_does_not_double_count_overlapping_categories():
+    # Two categories that both accept RB (a dedicated RB category and a
+    # broader RB/WR/TE category) must draw from the SAME pool of drafted
+    # RBs, not each count the same picks independently.
+    targets = [
+        {"slot": "RB_REQUIREMENT", "eligible": ["RB"], "count": 2, "by_round": 20},
+        {"slot": "RB_WR_TE_REQUIREMENT", "eligible": ["RB", "WR", "TE"], "count": 1, "by_round": 20},
+    ]
+    config = {**CONFIG, "estimation_assumptions": {"round_based_fill_targets": targets}}
+    ds = _fresh_state(rounds=20)
+    ds.log_pick("Monster Cheese", "RB1", position="RB")
+    ds.log_pick("Monster Cheese", "RB2", position="RB")
+    ds.log_pick("Monster Cheese", "RB3", position="RB")
+    # 3 drafted RBs: the most-restrictive dedicated RB category (needs 2)
+    # claims 2 of them first, leaving 1 RB to satisfy the broader
+    # RB/WR/TE category (needs 1) -- both fully met, nothing double-spent.
+    assert _round_based_quota_positions(ds, config) == set()
+
+
+def test_round_based_quota_positions_groups_categories_sharing_one_deadline():
+    # Neither category looks urgent when checked against the FULL
+    # remaining-picks-before-deadline count on its own (3 < 5 for each),
+    # but their COMBINED remaining need (6) already exceeds the combined
+    # remaining picks (5) -- checking them as a group must catch this even
+    # though no single category is individually out of slack.
+    targets = [
+        {"slot": "K", "eligible": ["K"], "count": 3, "by_round": 5},
+        {"slot": "DEF", "eligible": ["DST"], "count": 3, "by_round": 5},
+    ]
+    config = {**CONFIG, "estimation_assumptions": {"round_based_fill_targets": targets}}
+    ds = _fresh_state(rounds=15)  # 5 Monster Cheese picks remain before round 5
+    urgent = _round_based_quota_positions(ds, config)
+    assert urgent == {"K", "DST"}
+
+
+def test_round_based_quota_positions_grouped_categories_not_urgent_with_real_slack():
+    # Same shared-deadline shape as above, but with real slack: combined
+    # need (4) stays under combined remaining picks (5).
+    targets = [
+        {"slot": "K", "eligible": ["K"], "count": 2, "by_round": 5},
+        {"slot": "DEF", "eligible": ["DST"], "count": 2, "by_round": 5},
+    ]
+    config = {**CONFIG, "estimation_assumptions": {"round_based_fill_targets": targets}}
+    ds = _fresh_state(rounds=15)
+    assert _round_based_quota_positions(ds, config) == set()
 
 
 # ---------------------------------------------------------------------

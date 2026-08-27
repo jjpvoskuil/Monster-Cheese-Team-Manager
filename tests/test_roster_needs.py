@@ -83,13 +83,15 @@ def test_positions_that_would_fill_uses_flex_splits_when_given():
     # Bug this fixes (SESSION_NOTES 2026-08-26): an unfilled SUPERFLEX
     # used to contribute an even 0.25 to QB, same as RB/WR/TE -- despite
     # this league's own modeling assumption (used elsewhere for VOR) that
-    # SUPERFLEX is ~90% likely to actually be started as a 2nd QB. That
-    # made "need" nearly blind to a real, still-open 2nd-QB requirement.
+    # SUPERFLEX is overwhelmingly likely to actually be started as a 2nd
+    # QB (100% as of 2026-08-27 -- see league_settings.yaml's SUPERFLEX
+    # comment). That made "need" nearly blind to a real, still-open
+    # 2nd-QB requirement.
     demand = positions_that_would_fill({"SUPERFLEX": 1}, starters, flex_splits)
-    assert demand["QB"] == pytest.approx(0.90)
-    assert demand["RB"] == pytest.approx(0.04)
-    assert demand["WR"] == pytest.approx(0.04)
-    assert demand["TE"] == pytest.approx(0.02)
+    assert demand["QB"] == pytest.approx(1.0)
+    assert demand["RB"] == pytest.approx(0.0)
+    assert demand["WR"] == pytest.approx(0.0)
+    assert demand["TE"] == pytest.approx(0.0)
 
 
 def test_positions_that_would_fill_flex_splits_still_sum_to_the_slots_need():

@@ -61,18 +61,23 @@ apply, checked in this order (most drastic first):
     of the season, so this overrides value/need/scarcity entirely, no
     exceptions -- see _mandatory_deadline_positions()'s docstring.
   - ROUND-BASED QUOTA DEADLINE (checked alongside MANDATORY-DEADLINE,
-    same override tier): a generalization of the above for a configured
-    "must have N of this position by round R" target (config's
-    estimation_assumptions.round_based_fill_targets), for when N doesn't
-    match a dedicated slot's count. Added after the league manager
-    pointed out that even getting a QB by round 22 isn't good enough --
-    in a superflex league like this one, not having 2 QBs within roughly
-    the first 7 rounds is a real strategic problem (the startable-QB pool
-    dries up), which is a self-imposed target, not something derivable
-    from roster.starters alone. The same config shape is meant to also
-    hold the league's real "2 kickers and 2 defenses must be picked prior
-    to round 21" rule once confirmed -- see
-    _round_based_quota_positions()'s docstring.
+    same override tier): a generalization of the above for configured
+    "must have N (of one or more eligible positions) by round R"
+    categories (config's estimation_assumptions.round_based_fill_targets
+    -- a list of {slot, eligible, count, by_round} entries, the same
+    shape as roster.starters), for requirements that don't map to a
+    dedicated roster.starters slot. Originally added for a self-imposed
+    "2 QBs in the first ~7 rounds" target; extended 2026-08-27 once the
+    league manager uploaded the real "Maniac Football League Draft Sheet"
+    requirements document, which adds 7 more real by-round-20 categories
+    (2 K, 2 DEF, 5 RB, 5 WR/TE, 1 RB-or-WR-or-TE, 1 mandatory TE, 2 any-
+    position). Categories sharing a deadline are checked as a GROUP, not
+    independently, so a combined shortfall across several categories is
+    still caught even when no single category looks urgent alone -- see
+    _round_based_quota_positions()'s docstring for why and how. The same
+    unfilled categories also feed my_position_need() as soft demand all
+    draft long, not just at the hard deadline -- see that function's
+    docstring.
   - REDUNDANCY (checked next): once my own drafted count at a position
     meets or exceeds config's roster.position_active_limits max (QB/RB/
     TE/K/DST -- see _position_cap()), that position's NEED is zeroed (a
@@ -268,44 +273,82 @@ def _remaining_my_picks_before_round(draft_state: DraftState, round_limit: int) 
 
 
 def _round_based_quota_positions(draft_state: DraftState, config: dict) -> set[str]:
-    """Positions with a configured "must have N by round R" target (config's
-    estimation_assumptions.round_based_fill_targets) where I'm down to my
-    last chance(s) to hit it.
+    """Positions belonging to a configured "must have N by round R"
+    requirement category (config's estimation_assumptions.
+    round_based_fill_targets) where I'm down to my last chance(s) to hit
+    it -- or to hit the GROUP of categories sharing that same deadline.
 
     Added 2026-08-26 per league-manager feedback: _mandatory_deadline_
     positions() above only forces a fill once I'm on my literal LAST pick
     of the entire draft -- correct for "never miss a legally required
     slot," but too permissive for a strategic target like "get 2 QBs in
-    the first ~7 rounds or it's a disaster" (this league's superflex
-    scoring makes a good 2nd QB nearly as valuable as a 1st, and waiting
-    risks the startable-QB pool drying up well before round 22). This
-    mechanism is deliberately generic so the same config shape can also
-    hold the league's real "2 kickers and 2 defenses must be picked prior
-    to round 21" rule once the league manager confirms its exact wording
-    -- see the config comment for which entries are true CBS rules vs.
-    self-imposed strategy targets.
+    the first ~7 rounds or it's a disaster." Extended 2026-08-27 once the
+    league manager uploaded the real "Maniac Football League Draft Sheet"
+    requirements document: round_based_fill_targets is now a LIST of
+    {slot, eligible, count, by_round} categories (the same shape as
+    roster.starters, reused deliberately -- see below), because several
+    real requirement categories share ONE eligible position across
+    multiple entries (RB appears in both a dedicated 5-RB category and a
+    1-slot "RB, WR, or TE" category) or share ONE deadline across many
+    categories (7 of the 8 configured entries are all due by round 20).
 
-    A target's `count` need not match roster.starters' dedicated slot
-    count for that position (e.g. QB's dedicated slot is 1, but a
-    round_based_fill_targets QB target of 2 reflects wanting a 2nd for
-    SUPERFLEX too) -- this deliberately does NOT reuse
-    _mandatory_deadline_positions()'s starters-derived logic."""
-    targets = config.get("estimation_assumptions", {}).get("round_based_fill_targets", {})
+    Two things a naive per-entry check would get wrong, both fixed here:
+
+      1. DOUBLE-COUNTING a drafted player across overlapping categories.
+         Fixed by reusing src.roster_needs.unfilled_starter_slots() --
+         exactly the same greedy, most-restrictive-slot-first allocator
+         used for roster.starters above, just pointed at this
+         requirements list instead. A drafted TE is claimed by the
+         single-eligible "TE (Mandatory)" category before the broader
+         "WR/TE" category gets a chance at it, so still-needed counts
+         reflect one real pool of drafted players, not eight independent
+         re-countings of the same picks.
+
+      2. UNDERSTATING urgency when several categories share one deadline.
+         Checking each round-20 category's remaining need against my
+         TOTAL remaining picks before round 20 independently can miss a
+         combined shortfall -- e.g. needing K:2 + DEF:2 + RB:1 with
+         exactly 5 picks left before round 20 looks fine for each
+         category alone (each has slack against the full 5), even though
+         the COMBINED need (5) already exhausts the combined remaining
+         picks (5) and there's zero real slack left. Fixed by GROUPING
+         unfilled categories by their shared `by_round` deadline and
+         checking the group's TOTAL still-needed count against remaining
+         picks before that shared deadline -- once a group is out of
+         slack, every eligible position across the whole group is forced,
+         not just whichever single category happens to look worst alone.
+
+    A category's `count`/`eligible` need not match roster.starters' own
+    dedicated slot for that position (e.g. QB's dedicated starter slot is
+    1, but this list's QB category targets 2, for SUPERFLEX too) -- this
+    deliberately does NOT reuse _mandatory_deadline_positions()'s
+    starters-derived logic, and draws from a separate, independently
+    configured list."""
+    targets = config.get("estimation_assumptions", {}).get("round_based_fill_targets", [])
     if not targets:
         return set()
     my_counts = team_position_counts(draft_state.my_roster())
     current_round, _ = draft_state.round_and_slot_for_pick(draft_state.next_overall_pick)
-    urgent: set[str] = set()
-    for position, rule in targets.items():
-        by_round = rule.get("by_round")
-        target_count = rule.get("count", 0)
+    unfilled = unfilled_starter_slots(my_counts, targets)  # {slot_name: still_needed}
+    if not unfilled:
+        return set()
+    by_slot_name = {t["slot"]: t for t in targets}
+
+    # Group still-unfilled categories by shared, not-yet-passed deadline.
+    groups: dict[int, list[str]] = {}
+    for slot_name in unfilled:
+        target = by_slot_name[slot_name]
+        by_round = target.get("by_round")
         if by_round is None or current_round > by_round:
             continue  # deadline already passed -- nothing left to force here
-        still_needed = target_count - my_counts.get(position, 0)
-        if still_needed <= 0:
-            continue
-        if _remaining_my_picks_before_round(draft_state, by_round) <= still_needed:
-            urgent.add(position)
+        groups.setdefault(by_round, []).append(slot_name)
+
+    urgent: set[str] = set()
+    for by_round, slot_names in groups.items():
+        group_still_needed = sum(unfilled[s] for s in slot_names)
+        if _remaining_my_picks_before_round(draft_state, by_round) <= group_still_needed:
+            for slot_name in slot_names:
+                urgent.update(by_slot_name[slot_name]["eligible"])
     return urgent
 
 
@@ -317,12 +360,35 @@ def my_position_need(draft_state: DraftState, config: dict) -> dict[str, float]:
     WR_TE_FLEX) are weighted by config's flex_position_splits rather than
     split evenly across eligible positions -- see
     positions_that_would_fill()'s docstring for why an even split badly
-    understates a slot like SUPERFLEX's real QB need in this league."""
+    understates a slot like SUPERFLEX's real QB need in this league.
+
+    Also folds in a second, SOFT demand source (added 2026-08-27): unfilled
+    categories from config's estimation_assumptions.round_based_fill_targets
+    (this league's real by-round-20 draft requirements -- see
+    _round_based_quota_positions()'s docstring for the full shape/rationale).
+    That function only forces a pick once a deadline GROUP is truly out of
+    slack; this lets an unfilled requirement category (say, still needing a
+    2nd DEF) nudge the ongoing value/need/scarcity composite well before
+    that hard deadline, the same way an unfilled roster.starters slot
+    already does. Uses the same unfilled_starter_slots() allocator as
+    roster.starters above so a drafted player isn't double-counted across
+    overlapping categories (e.g. a drafted TE satisfies "TE (Mandatory)"
+    before "WR/TE" gets a claim on it). Unlike roster.starters, no
+    flex_splits weighting applies here -- these categories don't have a
+    directly analogous "which position actually gets started" ambiguity
+    the way SUPERFLEX does, so an even split across each category's
+    eligible positions is used instead."""
     starters = config["roster"]["starters"]
     flex_splits = config.get("estimation_assumptions", {}).get("flex_position_splits", {})
     counts = team_position_counts(draft_state.my_roster())
     unfilled = unfilled_starter_slots(counts, starters)
-    return dict(positions_that_would_fill(unfilled, starters, flex_splits))
+    demand = positions_that_would_fill(unfilled, starters, flex_splits)
+
+    targets = config.get("estimation_assumptions", {}).get("round_based_fill_targets", [])
+    if targets:
+        targets_unfilled = unfilled_starter_slots(counts, targets)
+        demand.update(positions_that_would_fill(targets_unfilled, targets))
+    return dict(demand)
 
 
 def _normalize(raw: dict[str, float]) -> dict[str, float]:
