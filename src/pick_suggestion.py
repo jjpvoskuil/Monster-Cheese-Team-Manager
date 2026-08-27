@@ -90,7 +90,12 @@ apply, checked in this order (most drastic first):
     alone can't guarantee it loses to an alternative whose own value has
     gone negative. Only falls back to an at-cap position when every
     position is at cap, so a fully maxed-out board can still recommend
-    something.
+    something. This exclusion applies within the MANDATORY/QUOTA tier too
+    (added 2026-08-27, see suggest_position()'s must_fill handling) -- a
+    multi-eligible quota category being urgent doesn't mean an already
+    -capped member of it (e.g. TE within "WR or TE") should win against an
+    uncapped one (WR) just because the override tier's raw composite
+    comparison doesn't otherwise know to skip it.
   - EARLY-ROUND DISCOUNT (checked alongside REDUNDANCY, same exclusion
     tier): K and DST specifically get a squash before a configured round
     (config's estimation_assumptions.position_early_round_discount), per
@@ -577,7 +582,43 @@ def suggest_position(
     # I'm out of chances to ever satisfy it otherwise. Checked first.
     must_fill = [s for s in ranked if s.mandatory_fill or s.quota_deadline]
     if must_fill:
-        top = must_fill[0]
+        # Still prefer a not-at-cap option WITHIN the must-fill set when
+        # one exists (added 2026-08-27 after a Monte Carlo run caught
+        # Monster Cheese drafting up to 6 TEs in a single simulated draft,
+        # well past the configured position_active_limits max of 2). Most
+        # of this league's real by-round-20 requirement categories share
+        # ONE deadline (round 20), so an unfilled WR_TE_REQUIREMENT
+        # (eligible WR or TE) gets grouped with several others into one
+        # big urgent bucket, and this branch used to just take the single
+        # highest-composite position across that WHOLE bucket with no cap
+        # check at all -- unlike the ordinary (non-must-fill) path below,
+        # which already excludes at-cap positions first. Once TE hit its
+        # cap, its composite gets squashed by REDUNDANCY_PENALTY (0.05x)
+        # same as always, but a shallow position's VOR can still stay
+        # mildly positive long after WR's has cratered well past
+        # replacement level in the late rounds this quota tends to fire
+        # in -- so 0.05 x (small positive TE composite) kept beating a
+        # deeply negative WR composite even though WR was the intended way
+        # to satisfy that same requirement category. Falls back to the
+        # full must_fill list (capped position and all) only if EVERY
+        # urgent position is at cap -- e.g. a single-eligible mandatory
+        # slot (TE_MANDATORY) that's somehow still unfilled despite TE
+        # being at cap, which the requirement itself doesn't allow us to
+        # skip.
+        #
+        # Deliberately does NOT also exclude early_round_discounted here,
+        # unlike the ordinary path below -- tried that first, and a
+        # same-seed Monte Carlo A/B (see SESSION_NOTES) showed it makes
+        # things worse (avg league rank 1.28 -> 2.12 of 10, worst-case
+        # rank 4 -> 7): K/DST's early-round discount is a pure TIMING
+        # preference ("not ideal yet, but still full value"), unlike the
+        # redundancy cap's "this many more contribute ~nothing" -- once a
+        # shared round-20 deadline group is genuinely out of slack, it's
+        # correct to grab a merely-early K/DST now rather than force a
+        # worse-value alternative from elsewhere in the same group just to
+        # respect a soft timing preference that was never a hard "don't."
+        clean_must_fill = [s for s in must_fill if not s.at_position_cap]
+        top = clean_must_fill[0] if clean_must_fill else must_fill[0]
     else:
         # Neither an at-cap position NOR an early-round-discounted one
         # outranks a "clean" alternative, no matter how the squashed

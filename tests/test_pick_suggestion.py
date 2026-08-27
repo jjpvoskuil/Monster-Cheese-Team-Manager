@@ -711,6 +711,83 @@ def test_suggest_position_zeroes_need_for_a_capped_position_even_if_a_flex_slot_
     assert te_score.at_position_cap is True
 
 
+def test_suggest_position_quota_group_prefers_uncapped_member_over_capped_one():
+    # Regression test for the 2026-08-27 Monte Carlo finding: Monster
+    # Cheese drafted up to 6 TEs in a single simulated draft, well past
+    # the configured position_active_limits max of 2. Root cause: this
+    # league's real requirements bundle several categories under one
+    # shared round-20 deadline (see config's round_based_fill_targets), so
+    # an unfilled "5 WR or TE" category gets grouped into one urgent
+    # bucket with TE eligible alongside WR -- and unlike the ordinary
+    # (non-must-fill) ranking path, the must-fill override tier used to
+    # pick the single highest RAW composite across that whole bucket with
+    # no cap check at all. Once TE hit its cap its composite is squashed
+    # by REDUNDANCY_PENALTY (0.05x), but a shallow position's VOR can stay
+    # mildly positive long after WR's has cratered past replacement level
+    # in the late rounds this quota tends to fire in -- so the squashed
+    # TE composite still numerically beat a deeply negative WR composite.
+    ds = _fresh_state(rounds=20)
+    ds.log_pick("Monster Cheese", "TE1", position="TE")
+    ds.log_pick("Monster Cheese", "TE2", position="TE")  # TE now at its cap (max 2)
+    # 170 filler picks -> exactly 3 Monster Cheese picks left before round
+    # 20's deadline, matching this category's remaining need (5 - 2
+    # already-TE = 3) precisely enough to make the group genuinely urgent
+    # (asserted below via quota_deadline) -- not just numerically close.
+    for _ in range(170):
+        ds.log_pick_on_the_clock("Filler", position="RB")
+    board = _board([
+        _player("TE3", "TE", vor=1.0, vor_rank=40, tier=3),  # thin pool never craters
+        _player("WR1", "WR", vor=-80.0, vor_rank=200, tier=5),  # deep past replacement level
+    ])
+    config = {
+        **CONFIG,
+        "roster": {**CONFIG["roster"], "position_active_limits": {"TE": {"min": 1, "max": 2}}},
+        "estimation_assumptions": {
+            "round_based_fill_targets": [
+                {"slot": "WR_TE_REQUIREMENT", "eligible": ["WR", "TE"], "count": 5, "by_round": 20},
+            ]
+        },
+    }
+    suggestion = suggest_position(board, ds, config, history=None)
+    te_score = next(s for s in suggestion.all_scores if s.position == "TE")
+    wr_score = next(s for s in suggestion.all_scores if s.position == "WR")
+    assert te_score.quota_deadline is True and wr_score.quota_deadline is True  # group is genuinely urgent
+    assert te_score.at_position_cap is True
+    assert te_score.composite > 0  # the squash alone would still make TE look attractive
+    assert suggestion.recommended_position == "WR"  # prefers the uncapped quota member anyway
+
+
+def test_suggest_position_quota_group_falls_back_to_capped_member_if_that_is_all_thats_urgent():
+    # Sole-eligible mandatory category (TE_MANDATORY-style, eligible=[TE]
+    # only) with no uncapped alternative in the group -- the requirement
+    # itself can't be skipped, so this must still force TE despite the cap.
+    ds = _fresh_state(rounds=20)
+    ds.log_pick("Monster Cheese", "TE1", position="TE")
+    ds.log_pick("Monster Cheese", "TE2", position="TE")  # TE already at cap
+    # 185 filler picks -> exactly 1 Monster Cheese pick left before round
+    # 20's deadline, matching this category's remaining need (3 - 2
+    # already-TE = 1) exactly, so the group is genuinely urgent.
+    for _ in range(185):
+        ds.log_pick_on_the_clock("Filler", position="RB")
+    board = _board([
+        _player("TE3", "TE", vor=1.0, vor_rank=40, tier=3),
+        _player("WR1", "WR", vor=500.0, vor_rank=1, tier=1),  # not part of this category at all
+    ])
+    config = {
+        **CONFIG,
+        "roster": {**CONFIG["roster"], "position_active_limits": {"TE": {"min": 1, "max": 2}}},
+        "estimation_assumptions": {
+            "round_based_fill_targets": [
+                {"slot": "TE_MANDATORY", "eligible": ["TE"], "count": 3, "by_round": 20},
+            ]
+        },
+    }
+    suggestion = suggest_position(board, ds, config, history=None)
+    te_score = next(s for s in suggestion.all_scores if s.position == "TE")
+    assert te_score.quota_deadline is True  # group is genuinely urgent
+    assert suggestion.recommended_position == "TE"
+
+
 def test_suggest_position_early_round_discount_lifts_once_past_the_configured_round():
     ds = _fresh_state(rounds=22)
     for _ in range(170):  # completes rounds 1-17; the 171st pick starts round 18

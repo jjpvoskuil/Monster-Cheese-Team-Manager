@@ -338,13 +338,20 @@ estimation_assumptions:
     # _early_round_discount()'s docstring. You can still draft either by
     # hand any time; this only affects the algorithm's own recommendation.
     #
-    # NOTE: the league also has a round-based fill requirement -- "2
-    # kickers and 2 defenses have to be picked prior to round 21" -- that
-    # is NOT yet confirmed/wired in (league manager is still tracking down
-    # the exact source/wording as of 2026-08-26). Once that's added, it
-    # should be able to override this discount as the deadline approaches
-    # (e.g. force K/DST back up if round 20 arrives and the requirement
-    # isn't met yet). Revisit this block then.
+    # UPDATE (2026-08-27): the real requirement is now confirmed and wired
+    # in below -- round_based_fill_targets' K/DEF entries (2 each by round
+    # 20, from the real "Maniac Football League Draft Sheet"). That
+    # correctly overrides this discount once its shared round-20 deadline
+    # group runs out of slack (src/pick_suggestion.py's
+    # _round_based_quota_positions()) -- confirmed via Monte Carlo
+    # (2026-08-27) that K/DEF still get force-prioritized as needed even
+    # while this early-round discount would otherwise apply; see that
+    # function's and suggest_position()'s docstrings for why the
+    # must-fill override tier deliberately does NOT also exclude
+    # early-round-discounted positions the way the ordinary ranking path
+    # does (tried it, a same-seed sim comparison showed it makes things
+    # worse -- a real deadline is worth overriding a soft timing
+    # preference for).
     K: {before_round: 17, multiplier: 0.2}
     DST: {before_round: 17, multiplier: 0.2}
   round_based_fill_targets:

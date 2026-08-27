@@ -73,6 +73,57 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   impossible in practice, not just suboptimal. Re-confirm before draft
   day if it matters. See the dated log entry below for the full Monte
   Carlo comparison re-run against this config.
+- **Monte Carlo simulation harness now committed (2026-08-27)**:
+  `scripts/simulate_draft.py` + `src/lineup_value.py` (formalizes the
+  prior sessions' `/tmp/sim/simulate*.py` scratch scripts, which were
+  never committed and had to be rebuilt from scratch this session after
+  being lost between sessions). Same core methodology as before: Monster
+  Cheese always drafts via the real `suggest_position()`/
+  `top_available_players()`, opponents sample a position from real
+  historical per-round tendencies then take best-available VOR, and every
+  team's OPTIMAL starting-lineup points (proper `scipy.optimize.
+  linear_sum_assignment` weighted-bipartite-matching solve, not draft
+  -order greedy fill) are compared after each simulated draft. Re-running
+  it against yesterday's real 8-category round-20 requirement set found
+  and fixed a real bug: `suggest_position()`'s mandatory/quota-deadline
+  override tier (`must_fill`) took the single highest-composite position
+  across an ENTIRE urgent multi-eligible bucket with no redundancy-cap
+  check at all, unlike the ordinary ranking path -- since most of this
+  league's real requirements share one round-20 deadline and get grouped
+  together, an unfilled "5 WR or TE" category could let an
+  already-at-cap TE (composite squashed by REDUNDANCY_PENALTY but still
+  positive) beat a legitimately-intended-but-deeply-negative-VOR WR,
+  leading to Monster Cheese drafting up to 6 TEs in one simulated draft
+  -- well past the configured `position_active_limits` max of 2. Fixed by
+  preferring a not-at-cap option within the must-fill set (falls back to
+  a capped one only if every urgent option is capped, e.g. a truly
+  sole-eligible mandatory slot). Confirmed the fix's SCOPE mattered a lot:
+  an initial version that ALSO excluded early-round-discounted (K/DST)
+  options from must-fill measurably hurt performance (avg league rank
+  1.28 -> 2.12 of 10, worst-case rank 4 -> 7, same 25 trials/seeds) --
+  K/DST's early-round discount is a soft timing preference, not a
+  "contributes nothing" statement like the redundancy cap, so a genuine
+  looming deadline should still override it. Also confirmed (20 trials
+  each, same seeds): fully uncapping TE (removing it from
+  `_CAPPABLE_POSITIONS` given it's WR_TE_FLEX-eligible) performs slightly
+  WORSE than the current cap=2 (avg rank 1.25 vs 1.10, avg pts 6949 vs
+  6968) and lets Monster Cheese roster up to 9 TEs -- keeping the
+  existing cap is correct, not just legacy caution; reweighting
+  value/need/scarcity (need_heavy/scarcity_heavy/value_heavy vs. shipped
+  0.45/0.30/0.25) again landed within noise of each other, reconfirming
+  the 2026-08-26 finding still holds against the new requirement set --
+  no weight change made. A `no_quota` ablation against the full new
+  8-category requirement set shows just how much the round-based-quota
+  mechanism as a whole is now carrying: avg rank 5.0 of 10 (top-3 25%,
+  worst 9th) and only 65% ever landing a 2nd QB at all (avg round ~17
+  when they did) vs. the shipped config's avg rank 1.28 (top-3 96%,
+  100% 2nd QB by round 6). 2 new tests in `test_lineup_value.py`, 2 new
+  regression tests in `test_pick_suggestion.py` (deliberately verified
+  against the pre-fix code to confirm they actually catch the bug, not
+  just numerically coincide with the fix). 196/196 tests passing.
+  `scripts/simulate_draft.py --help` documents CLI usage; `scipy` added
+  to `requirements-dev.txt` (dev/sim-only dependency, not needed by the
+  deployed Streamlit app itself).
 - Both the Draft Board and Projections pages now compute position tiers
   (`src/projections.py`'s `compute_tiers()`) — same-position players
   clustered by point drop-off. Manual override (points, e.g. "10") is an
@@ -456,6 +507,64 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-27 — Confirmed real draft requirements against config/UI, committed the Monte Carlo harness, found+fixed a real TE-overdraft bug
+League manager restated the real round-20 requirements and starting
+lineup in plain language to double-check the app has them right: by
+round 20, 2 QB / 5 RB / 5 WR-or-TE / 2 K / 2 DEF / 1 mandatory TE
+(beyond the 5 WR/TE) / 1 additional RB-or-WR-or-TE / 2 any-position (20
+total), rounds 21-22 unconstrained; starting lineup 2 QB / 3 RB / 3
+WR-or-TE / 1 TE / 1 K / 1 DEF / 1 RB-or-WR-or-TE-or-K (12 total). Checked
+line-by-line against `config/league_settings.yaml`'s
+`round_based_fill_targets` (8 categories) and `roster.starters` (the
+2nd "QB" is the SUPERFLEX slot, labeled "QB (Flex)" on My Roster and
+modeled at 100% QB demand per yesterday's change) -- **exact match, no
+config changes needed**. Read `pages/4_My_Roster.py` end to end -- its
+"Starting lineup" and "Draft Requirements" sections already render every
+one of these categories correctly (also confirmed no changes needed).
+
+Then, per the request to "rerun monte carlos and tweaks to the
+[pick-suggestion] logic to maximize our projected season points":
+committed a real simulation harness (`scripts/simulate_draft.py` +
+`src/lineup_value.py`) since the prior sessions' `/tmp/sim/simulate*.py`
+scratch scripts were never committed and had been lost. Full
+methodology, the bug found (and why the fix had to be scoped narrowly --
+an over-broad first attempt measurably hurt points), and the validation
+results (weight-reweighting sweep, a `no_quota` ablation, a TE-fully
+-uncapped experiment) are in the "Current state" bullet above (search
+"Monte Carlo simulation harness now committed") -- short version:
+
+- **Bug**: the round-based quota override (`must_fill` in
+  `suggest_position()`) could force-draft an already-capped position
+  (e.g. a 3rd-6th TE) over the intended uncapped alternative (WR) in the
+  same multi-eligible category, because most of this league's real
+  requirements share one round-20 deadline and get grouped into one
+  urgent bucket, and the override tier's raw composite comparison had no
+  cap check at all. Fixed in `src/pick_suggestion.py`.
+- **Result** (25 trials, same seeds as the 2026-08-26 sweeps): back to
+  the same strong baseline as before this requirement set existed --
+  avg league rank **1.28 of 10** (96% top-3, worst-case 4th), 100% hit
+  2 QBs by round 6 and all round-20 requirements every trial. A
+  `no_quota` ablation shows the round-based-quota mechanism as a whole is
+  now doing a lot of work against the richer 8-category requirement set:
+  without it, avg rank drops to **5.0 of 10** (top-3 25%, worst 9th,
+  only 65% ever get a 2nd QB at all).
+- Reconfirmed (20 trials each) that reweighting value/need/scarcity
+  still doesn't matter (all variants within noise of the shipped
+  0.45/0.30/0.25) -- no weight change made.
+- Also tested fully uncapping TE (it's WR_TE_FLEX-eligible, unlike
+  K/DST) in case the configured cap of 2 was itself too conservative for
+  pure point-maximization -- it wasn't: slightly WORSE (avg rank 1.25 vs
+  1.10, avg points 6949 vs 6968) and let Monster Cheese roster up to 9
+  TEs. Kept the existing cap.
+- 4 new tests (2 in new `tests/test_lineup_value.py`, 2 regression tests
+  in `tests/test_pick_suggestion.py` -- verified against the pre-fix code
+  to confirm they actually catch the bug). 196/196 tests passing.
+  `scipy` added to `requirements-dev.txt` (sim-only, not needed by the
+  deployed app). Also updated a stale comment in
+  `config/league_settings.yaml`'s `position_early_round_discount` block
+  that still said the K/DEF-by-round-20 rule wasn't confirmed/wired in
+  yet -- it was, as of yesterday.
 
 ### 2026-08-27 — Real draft requirements doc loaded, DST/TE cap conflict, SUPERFLEX 100%, My Roster requirements UI, Monte Carlo re-run
 League manager uploaded the real "Maniac Football League Draft Sheet"
