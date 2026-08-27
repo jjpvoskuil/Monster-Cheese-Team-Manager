@@ -124,6 +124,30 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   `scripts/simulate_draft.py --help` documents CLI usage; `scipy` added
   to `requirements-dev.txt` (dev/sim-only dependency, not needed by the
   deployed Streamlit app itself).
+- **Sidebar nav switched to `st.navigation()` (2026-08-27, cosmetic)**:
+  `app.py` used to BE the landing page (league-settings summary + draft
+  countdown), which under Streamlit's classic `pages/`-directory
+  auto-discovery made the sidebar's top entry show the literal filename
+  "app" -- confusing, since it's really league settings. `app.py` is now
+  a thin router: it calls `st.set_page_config()` once, declares every
+  page's title + icon explicitly via `st.Page(...)`, and hands off to
+  `st.navigation(pages).run()`. The old landing content moved verbatim to
+  new `pages/0_League_Settings.py` (title "League Settings", icon ⚙️,
+  the default page). Every other page kept its filename/URL/content
+  unchanged -- only each page's own `st.set_page_config()` call was
+  removed (it can only be called once per app run now, so it lives solely
+  in `app.py`) and it picked up an explicit icon it didn't have in the
+  sidebar before (classic mode only reads a page's icon from an emoji
+  *in the filename*, e.g. "1_🏈_Draft_Board.py", which this repo's
+  plain-English filenames never used): Draft Board 🏈, Projections 📊,
+  Draft Tendencies 📈, My Roster 📋. `st.page_link()` calls between pages
+  (e.g. Draft Board <-> My Roster) still use the same `pages/*.py` path
+  strings as before and didn't need changes. Run command is unchanged
+  (`streamlit run app.py`) -- verified locally (headless smoke-test boot)
+  and via the existing `AppTest`-based page tests
+  (`tests/test_draft_board_page.py`, entered via `app.py` +
+  `switch_page()` same as before), all 7 still pass unmodified against
+  the new router. 196/196 tests passing overall.
 - Both the Draft Board and Projections pages now compute position tiers
   (`src/projections.py`'s `compute_tiers()`) — same-position players
   clustered by point drop-off. Manual override (points, e.g. "10") is an
@@ -507,6 +531,23 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-27 — Cosmetic: renamed the "app" sidebar page to League Settings, added per-page icons
+League manager noticed the sidebar's top nav entry just said "app" (a
+literal artifact of `app.py` being both the multipage entrypoint AND the
+landing page under Streamlit's classic `pages/`-directory auto
+-discovery) and asked to rename it plus add icons across the pages. Full
+detail in the "Current state" bullet above (search "Sidebar nav switched
+to st.navigation()"); short version: switched `app.py` to a thin
+`st.navigation()` router with an explicit title+icon per page, moved the
+old landing-page content to new `pages/0_League_Settings.py` ("League
+Settings", ⚙️), and gave the other four pages icons in the sidebar for
+the first time (classic mode only picks those up from an emoji in the
+filename, which this repo never used): 🏈 Draft Board, 📊 Projections, 📈
+Draft Tendencies, 📋 My Roster. No page content, URLs, or the
+`streamlit run app.py` command changed. Verified via a headless smoke
+-test boot and the existing `AppTest` page tests (unmodified, all 7 still
+pass against the new router) -- 196/196 tests passing overall.
 
 ### 2026-08-27 — Confirmed real draft requirements against config/UI, committed the Monte Carlo harness, found+fixed a real TE-overdraft bug
 League manager restated the real round-20 requirements and starting

@@ -50,8 +50,6 @@ LIVE_REFRESH = {
     "fantasypros": {"fetch": fetch_fantasypros_all, "csv": os.path.join(DATA_DIR, "fantasypros_2026.csv")},
 }
 
-st.set_page_config(page_title="Projections — Monster Cheese", page_icon="📊", layout="wide")
-
 
 def _data_files() -> list[str]:
     if not os.path.isdir(DATA_DIR):

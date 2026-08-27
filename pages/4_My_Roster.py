@@ -31,8 +31,6 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
 DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
 
-st.set_page_config(page_title="My Roster — Monster Cheese", page_icon="📋", layout="wide")
-
 
 @st.cache_resource
 def get_config():

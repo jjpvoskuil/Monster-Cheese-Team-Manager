@@ -61,8 +61,6 @@ def _data_files(data_dir: str) -> list[str]:
         if os.path.splitext(name)[1].lower() in DATA_EXTENSIONS
     )
 
-st.set_page_config(page_title="Draft Board — Monster Cheese", page_icon="🏈", layout="wide")
-
 
 @st.cache_resource
 def get_config():

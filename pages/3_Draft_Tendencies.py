@@ -37,8 +37,6 @@ CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
 DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
 DRAFT_HISTORY_CSV = os.path.join(ROOT, "data", "draft_history", "draft_history.csv")
 
-st.set_page_config(page_title="Draft Tendencies — Monster Cheese", page_icon="📈", layout="wide")
-
 
 @st.cache_resource
 def get_config():
