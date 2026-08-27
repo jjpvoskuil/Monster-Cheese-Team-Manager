@@ -532,6 +532,23 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-08-27 — Added a full-pick-log export to the Monte Carlo harness, delivered a sample draft as an Excel workbook
+League manager asked to see the actual pick-by-pick results of a
+simulated draft (who got picked in each round/slot, by which team, what
+position) rather than just the aggregate rank/points stats
+`scripts/simulate_draft.py` reports. Added `--dump-picks-seed`/
+`--dump-picks-csv` to that script (pass `--trials 0` to skip the
+aggregate run and just export one trial's full 220-pick log as CSV --
+`simulate_one_draft()` gained an optional `capture_picks` flag that
+records every `Pick` in order with proj. points/VOR looked up from the
+board). Used it to regenerate the exact seed-1000 trial already reported
+in chat (Monster Cheese rank 1/10, 6912.8 pts) and built a 4-sheet Excel
+workbook from it (not committed -- one-off deliverable, regenerable any
+time from any seed): a Read Me, a round x team "Draft Board Grid" (Monster
+Cheese's column highlighted), a flat "Full Draft Log" of all 220 picks,
+and a "Monster Cheese Picks" sheet with just this team's 22. No app code
+touched; 196/196 tests still passing.
+
 ### 2026-08-27 — Cosmetic: renamed the "app" sidebar page to League Settings, added per-page icons
 League manager noticed the sidebar's top nav entry just said "app" (a
 literal artifact of `app.py` being both the multipage entrypoint AND the

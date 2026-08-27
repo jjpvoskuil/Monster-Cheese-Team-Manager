@@ -37,6 +37,13 @@ Usage:
         --label need_heavy
     python scripts/simulate_draft.py --trials 25 --out /tmp/results.json
 
+To export one single simulated draft's full 220-pick log (round, team,
+player, position) as a CSV -- e.g. for a spreadsheet -- add
+--dump-picks-seed/--dump-picks-csv (use --trials 0 to skip the aggregate
+run and just dump the one trial):
+    python scripts/simulate_draft.py --trials 0 \\
+        --dump-picks-seed 1000 --dump-picks-csv /tmp/draft_log.csv
+
 Same `--seed` across variants reproduces the exact same opponent-behavior
 random draws for every trial (Monster Cheese's own decisions are the only
 thing that can differ between two runs with the same seed), which is what
@@ -107,6 +114,7 @@ class TrialResult:
     my_position_counts: dict[str, int] = field(default_factory=dict)
     unmet_round20_requirements: int = 0
     second_qb_round: "int | None" = None
+    picks: "list[dict] | None" = None  # only populated when capture_picks=True
 
 
 def _opponent_pick(
@@ -143,6 +151,7 @@ def simulate_one_draft(
     value_weight: "float | None" = None,
     need_weight: "float | None" = None,
     scarcity_weight: "float | None" = None,
+    capture_picks: bool = False,
 ) -> TrialResult:
     my_team = config["league"]["team_name"]
     draft_state = DraftState(
@@ -219,6 +228,24 @@ def simulate_one_draft(
     if len(qb_picks) >= 2:
         second_qb_round = qb_picks[1].round
 
+    picks_log = None
+    if capture_picks:
+        vor_lookup = board.set_index("name")["vor"].to_dict() if "vor" in board.columns else {}
+        picks_log = [
+            {
+                "overall_pick": p.overall_pick,
+                "round": p.round,
+                "pick_in_round": p.pick_in_round,
+                "team": p.team,
+                "player_name": p.player_name,
+                "position": p.position,
+                "nfl_team": p.nfl_team,
+                "proj_points": round(score_lookup.get(p.player_name, 0.0), 1),
+                "vor": round(vor_lookup.get(p.player_name, 0.0), 1),
+            }
+            for p in sorted(draft_state.picks, key=lambda p: p.overall_pick)
+        ]
+
     return TrialResult(
         seed=seed,
         my_rank=my_rank,
@@ -226,6 +253,7 @@ def simulate_one_draft(
         all_points=all_points,
         my_position_counts=my_counts,
         unmet_round20_requirements=unmet_count,
+        picks=picks_log,
         second_qb_round=second_qb_round,
     )
 
@@ -305,6 +333,11 @@ def main() -> None:
     ap.add_argument("--scarcity-weight", type=float, default=None)
     ap.add_argument("--label", type=str, default="run")
     ap.add_argument("--out", type=str, default=None, help="write full JSON results here")
+    ap.add_argument(
+        "--dump-picks-seed", type=int, default=None,
+        help="run ONE additional trial at this seed and write its full 220-pick draft log to --dump-picks-csv",
+    )
+    ap.add_argument("--dump-picks-csv", type=str, default=None, help="path for --dump-picks-seed's pick log CSV")
     args = ap.parse_args()
 
     config = load_config(CONFIG_PATH)
@@ -312,20 +345,36 @@ def main() -> None:
     history_df = load_draft_history(DRAFT_HISTORY_CSV)
     hist_counts = counts_by_round(history_df) if not history_df.empty else pd.DataFrame()
 
-    summary = run_trials(
-        board, config, history_df, hist_counts,
-        trials=args.trials, base_seed=args.seed,
-        value_weight=args.value_weight, need_weight=args.need_weight, scarcity_weight=args.scarcity_weight,
-        label=args.label,
-    )
+    if args.trials > 0:
+        summary = run_trials(
+            board, config, history_df, hist_counts,
+            trials=args.trials, base_seed=args.seed,
+            value_weight=args.value_weight, need_weight=args.need_weight, scarcity_weight=args.scarcity_weight,
+            label=args.label,
+        )
 
-    print("\n=== Summary ===")
-    print(json.dumps({k: v for k, v in summary.items() if k != "trial_results"}, indent=2))
+        print("\n=== Summary ===")
+        print(json.dumps({k: v for k, v in summary.items() if k != "trial_results"}, indent=2))
 
-    if args.out:
-        with open(args.out, "w") as f:
-            json.dump(summary, f, indent=2)
-        print(f"\nFull results written to {args.out}")
+        if args.out:
+            with open(args.out, "w") as f:
+                json.dump(summary, f, indent=2)
+            print(f"\nFull results written to {args.out}")
+
+    if args.dump_picks_seed is not None:
+        if not args.dump_picks_csv:
+            raise SystemExit("--dump-picks-seed requires --dump-picks-csv")
+        result = simulate_one_draft(
+            board, config, history_df, hist_counts, args.dump_picks_seed,
+            value_weight=args.value_weight, need_weight=args.need_weight, scarcity_weight=args.scarcity_weight,
+            capture_picks=True,
+        )
+        pd.DataFrame(result.picks).to_csv(args.dump_picks_csv, index=False)
+        print(
+            f"\nWrote {len(result.picks)}-pick draft log (seed {args.dump_picks_seed}) to "
+            f"{args.dump_picks_csv} -- Monster Cheese rank {result.my_rank}/10, "
+            f"{result.my_points:.1f} optimal-lineup pts"
+        )
 
 
 if __name__ == "__main__":
