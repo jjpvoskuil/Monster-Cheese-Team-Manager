@@ -711,6 +711,41 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-08-28 — Punch list #2: new "League Rosters" page (every team's roster + projected points + starting-lineup totals)
+
+New page `pages/6_League_Rosters.py` (registered in `app.py` as "League
+Rosters", 🏆). Punch-list item #2: "Create a page that shows the entire
+roster of each team in the league that fills as we are drafting ... add
+a column to each roster to who the project points for all the players
+and the total for each team. Have a breakdown of total points for the
+roster and a second for the projected starting line up for each team."
+Closed both on the live deployed site (via the claude-in-chrome
+scroll/click technique documented in the entry below) and in the
+git-mirrored `data/punch_list.json`.
+
+Reused two existing pieces rather than building new math: the Draft
+Board's real-data-preferred/sample-fallback `load_players()` pattern
+(so this page's points always match the Draft Board's), and
+`src.lineup_value.optimal_lineup_points()` (already built for the Monte
+Carlo simulator, never previously wired into a page) for the
+"starting lineup" total — a proper assignment-problem optimization over
+ALL of a team's drafted players, deliberately NOT the same as
+`src.roster_needs.assign_roster_slots()`'s draft-order heuristic that
+`pages/4_My_Roster.py` uses for its own "Starting lineup" section. Page
+shows a league-wide summary table (Team / Picks / Roster Pts / Starting
+Lineup Pts, sorted by the latter) plus a per-team expander with each
+drafted player's own projected-points column; a player whose name
+doesn't match anything in the projections board scores 0 and is called
+out in a caption rather than silently vanishing (join is by exact name
+against `players_df.set_index("name")["score_total"]`).
+
+5 new tests in `tests/test_league_rosters_page.py`, following the same
+AppTest-via-`app.py`-entrypoint pattern as `test_draft_board_page.py`
+(a standalone `AppTest.from_file()` on a `pages/*.py` script throws
+`KeyError: 'url_pathname'` on this page's own `st.page_link()` too —
+same pre-existing harness limitation as Draft Board/My Roster, confirmed
+again here, not a regression). Full suite 254/254.
+
 ### 2026-08-28 — Punch list #4: added FantasyPoints.com as a 4th projections source; #3: login-gated "Log in & refresh" buttons for CBS + FantasyPoints; punch list now git-mirrored
 Three related pieces of work from one session, punch-list items #3 and #4
 (closed both — see below).

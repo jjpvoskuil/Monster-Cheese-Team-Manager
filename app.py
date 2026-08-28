@@ -42,6 +42,7 @@ pages = [
     st.Page("pages/3_Draft_Tendencies.py", title="Draft Tendencies", icon="📈"),
     st.Page("pages/4_My_Roster.py", title="My Roster", icon="📋"),
     st.Page("pages/5_Development.py", title="Development", icon="🛠️"),
+    st.Page("pages/6_League_Rosters.py", title="League Rosters", icon="🏆"),
 ]
 
 st.navigation(pages).run()
