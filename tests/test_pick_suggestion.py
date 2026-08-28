@@ -10,6 +10,7 @@ from src.pick_suggestion import (
     _describe,
     _early_round_discount,
     _mandatory_deadline_positions,
+    _not_before_round_blocked,
     _position_cap,
     _redundancy_penalty,
     _remaining_my_picks,
@@ -362,6 +363,36 @@ EARLY_DISCOUNT_CONFIG = {
     }
 }
 
+NOT_BEFORE_ROUND_CONFIG = {
+    "estimation_assumptions": {
+        "position_not_before_round": {
+            "K": {"not_before_round": 17, "starting_at_count": 1},
+            "DST": {"not_before_round": 17, "starting_at_count": 2},
+        }
+    }
+}
+
+
+def test_not_before_round_blocked_applies_to_every_k_before_the_configured_round():
+    # K's starting_at_count is 1 -- blocks the 1st K just as much as the 2nd.
+    assert _not_before_round_blocked("K", 5, {}, NOT_BEFORE_ROUND_CONFIG) is True
+    assert _not_before_round_blocked("K", 5, {"K": 1}, NOT_BEFORE_ROUND_CONFIG) is True
+
+
+def test_not_before_round_blocked_lifts_at_the_configured_round():
+    assert _not_before_round_blocked("K", 17, {}, NOT_BEFORE_ROUND_CONFIG) is False
+
+
+def test_not_before_round_blocked_leaves_the_first_dst_unrestricted():
+    # DST's starting_at_count is 2 -- the 1st DST is untouched, only the
+    # 2nd-and-later is blocked.
+    assert _not_before_round_blocked("DST", 5, {}, NOT_BEFORE_ROUND_CONFIG) is False
+    assert _not_before_round_blocked("DST", 5, {"DST": 1}, NOT_BEFORE_ROUND_CONFIG) is True
+
+
+def test_not_before_round_blocked_does_not_apply_to_an_unconfigured_position():
+    assert _not_before_round_blocked("RB", 1, {}, NOT_BEFORE_ROUND_CONFIG) is False
+
 
 def test_early_round_discount_applies_before_configured_round():
     mult, applied = _early_round_discount("K", 5, EARLY_DISCOUNT_CONFIG)
@@ -397,6 +428,15 @@ def test_describe_mentions_early_round_discount_when_top_pick_is_discounted():
         scarcity_ratio=0.0, early_round_discounted=True,
     )
     assert "not worth taking this early" in _describe(score, horizon=5)
+
+
+def test_describe_mentions_not_before_round_floor_when_top_pick_is_blocked():
+    score = PositionScore(
+        position="K", composite=0.01, value_raw=5.0, need_raw=0.0,
+        predicted_picks=0.0, remaining_top_tier=1, remaining_players=1,
+        scarcity_ratio=0.0, not_before_round_blocked=True,
+    )
+    assert "can't come this early" in _describe(score, horizon=5)
 
 
 # ---------------------------------------------------------------------
@@ -799,6 +839,116 @@ def test_suggest_position_early_round_discount_lifts_once_past_the_configured_ro
     suggestion = suggest_position(board, ds, discount_config, history=None)
     k_score = next(s for s in suggestion.all_scores if s.position == "K")
     assert k_score.early_round_discounted is False
+
+
+def test_suggest_position_never_recommends_k_before_round_17_when_a_clean_alternative_exists():
+    # Regression test for the league-manager's 2026-08-28 request: "For our
+    # team only, add a rule that the second defense and the 2 kickers
+    # cannot come before round 17." Same hard-exclusion shape as the
+    # early-round-discount tests above, but with no fallback-via-squash --
+    # this is an absolute floor, not a value nudge.
+    ds = _fresh_state(rounds=20)
+    board = _board([
+        _player("K1", "K", vor=500.0, vor_rank=1, tier=1),
+        _player("RB1", "RB", vor=1.0, vor_rank=80, tier=3),
+    ])
+    config = {**CONFIG, "estimation_assumptions": NOT_BEFORE_ROUND_CONFIG["estimation_assumptions"]}
+    suggestion = suggest_position(board, ds, config, history=None)
+    k_score = next(s for s in suggestion.all_scores if s.position == "K")
+    assert k_score.not_before_round_blocked is True
+    assert k_score.composite > 0  # the raw composite would clearly win otherwise
+    assert suggestion.recommended_position == "RB"
+
+
+def test_suggest_position_falls_back_to_a_not_before_round_blocked_position_when_nothing_else_is_available():
+    ds = _fresh_state(rounds=20)
+    board = _board([_player("K1", "K", vor=5.0, vor_rank=1, tier=1)])
+    config = {**CONFIG, "estimation_assumptions": NOT_BEFORE_ROUND_CONFIG["estimation_assumptions"]}
+    suggestion = suggest_position(board, ds, config, history=None)
+    assert suggestion.recommended_position == "K"
+    assert suggestion.all_scores[0].not_before_round_blocked is True
+
+
+def test_suggest_position_lets_the_first_dst_through_but_blocks_the_second():
+    config = {**CONFIG, "estimation_assumptions": NOT_BEFORE_ROUND_CONFIG["estimation_assumptions"]}
+    board = _board([
+        _player("DST1", "DST", vor=500.0, vor_rank=1, tier=1),
+        _player("RB1", "RB", vor=1.0, vor_rank=80, tier=3),
+    ])
+    ds = _fresh_state(rounds=20)
+    suggestion = suggest_position(board, ds, config, history=None)
+    dst_score = next(s for s in suggestion.all_scores if s.position == "DST")
+    assert dst_score.not_before_round_blocked is False
+    assert suggestion.recommended_position == "DST"  # 1st DST is unrestricted
+
+    ds.log_pick("Monster Cheese", "DST1", position="DST")
+    board2 = _board([
+        _player("DST2", "DST", vor=500.0, vor_rank=1, tier=1),
+        _player("RB1", "RB", vor=1.0, vor_rank=80, tier=3),
+    ])
+    suggestion2 = suggest_position(board2, ds, config, history=None)
+    dst_score2 = next(s for s in suggestion2.all_scores if s.position == "DST")
+    assert dst_score2.not_before_round_blocked is True  # now drafting the 2nd
+    assert suggestion2.recommended_position == "RB"
+
+
+def test_suggest_position_not_before_round_floor_lifts_once_past_the_configured_round():
+    ds = _fresh_state(rounds=20)
+    for _ in range(160):  # completes rounds 1-16; the 161st pick starts round 17
+        ds.log_pick_on_the_clock("Filler", position="RB")
+    current_round, _ = ds.round_and_slot_for_pick(ds.next_overall_pick)
+    assert current_round == 17
+    board = _board([_player("K1", "K", vor=5.0, vor_rank=10, tier=1)])
+    config = {**CONFIG, "estimation_assumptions": NOT_BEFORE_ROUND_CONFIG["estimation_assumptions"]}
+    suggestion = suggest_position(board, ds, config, history=None)
+    k_score = next(s for s in suggestion.all_scores if s.position == "K")
+    assert k_score.not_before_round_blocked is False
+
+
+QUOTA_AND_FLOOR_CONFIG = {
+    **CONFIG,
+    "estimation_assumptions": {
+        "round_based_fill_targets": [
+            {"slot": "K_REQ", "eligible": ["K"], "count": 2, "by_round": 17},
+        ],
+        "position_not_before_round": {
+            "K": {"not_before_round": 17, "starting_at_count": 1},
+        },
+    },
+}
+
+
+def test_suggest_position_not_before_round_floor_overrides_a_quota_deadline():
+    # Synthetic scenario: production config's real K quota deadline is
+    # round 20 -- three rounds after this floor lifts -- so this exact
+    # collision never happens in a real draft (see
+    # _not_before_round_blocked()'s docstring). Still worth proving the
+    # override logic directly, independent of whether today's config
+    # happens to exercise it.
+    ds = _fresh_state(rounds=17)
+    for _ in range(150):  # completes rounds 1-15; the 151st pick starts round 16
+        ds.log_pick_on_the_clock("Filler", position="RB")
+    current_round, _ = ds.round_and_slot_for_pick(ds.next_overall_pick)
+    assert current_round == 16
+    board = _board([
+        _player("K1", "K", vor=500.0, vor_rank=1, tier=1),
+        _player("RB1", "RB", vor=1.0, vor_rank=80, tier=3),
+    ])
+    suggestion = suggest_position(board, ds, QUOTA_AND_FLOOR_CONFIG, history=None)
+    k_score = next(s for s in suggestion.all_scores if s.position == "K")
+    assert k_score.quota_deadline is True  # the deadline really is urgent here
+    assert k_score.not_before_round_blocked is True  # floor still active (round 16 < 17)
+    assert suggestion.recommended_position == "RB"  # floor wins over the deadline
+
+
+def test_suggest_position_falls_back_to_a_blocked_quota_position_if_it_is_the_only_urgent_option():
+    ds = _fresh_state(rounds=17)
+    for _ in range(150):
+        ds.log_pick_on_the_clock("Filler", position="RB")
+    board = _board([_player("K1", "K", vor=5.0, vor_rank=1, tier=1)])
+    suggestion = suggest_position(board, ds, QUOTA_AND_FLOOR_CONFIG, history=None)
+    assert suggestion.recommended_position == "K"
+    assert suggestion.all_scores[0].not_before_round_blocked is True
 
 
 # ---------------------------------------------------------------------

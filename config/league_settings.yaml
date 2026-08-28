@@ -354,6 +354,30 @@ estimation_assumptions:
     # preference for).
     K: {before_round: 17, multiplier: 0.2}
     DST: {before_round: 17, multiplier: 0.2}
+
+  # Hard "cannot come before round R" floor for the league manager's OWN
+  # team only (Monster Cheese) -- distinct from position_early_round_discount
+  # above, which is a soft VALUE squash that still falls back to K/DST when
+  # nothing else is available. This is an absolute exclusion from
+  # recommendation with (almost) no fallback -- see
+  # src/pick_suggestion.py's _not_before_round_blocked() and
+  # suggest_position()'s handling. Added 2026-08-28 per league-manager
+  # feedback: "For our team only, add a rule that the second defense and
+  # the 2 kickers cannot come before round 17." `starting_at_count`
+  # controls which occurrence of this position the floor first applies to
+  # (1 = every pick of this position is blocked before the floor round;
+  # 2 = only the 2nd-and-later is blocked, leaving the 1st unrestricted)
+  # -- K's floor applies to both kickers (starting_at_count: 1), DST's
+  # floor applies only starting at the 2nd (starting_at_count: 2, leaving
+  # the 1st DST free to be drafted whenever value/need/scarcity says so).
+  # Deliberately scoped to MY OWN recommendation engine only -- opponents
+  # are modeled separately via historical draft tendencies
+  # (src/draft_tendencies.py), not this module, so this floor has no
+  # effect on how opponent behavior is simulated/predicted.
+  position_not_before_round:
+    K: {not_before_round: 17, starting_at_count: 1}
+    DST: {not_before_round: 17, starting_at_count: 2}
+
   round_based_fill_targets:
     # "Must have N players eligible for this category by round R" targets
     # that src/pick_suggestion.py's suggest_position() force-prioritizes

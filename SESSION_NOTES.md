@@ -711,6 +711,62 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-08-28 — Pick-suggestion algorithm: 2nd DST and both Kickers now can't come before round 17 (Monster Cheese only)
+League manager: "The algorithm for pick recommendations look pretty good.
+One tweak before we run the simulations. For our team only, add a rule
+that the second defense and the 2 kickers cannot come before round 17."
+
+New config block `config/league_settings.yaml` →
+`estimation_assumptions.position_not_before_round`:
+```yaml
+K: {not_before_round: 17, starting_at_count: 1}
+DST: {not_before_round: 17, starting_at_count: 2}
+```
+`starting_at_count` picks which occurrence the floor first applies to --
+1 blocks every K (both), 2 blocks only the 2nd-and-later DST, leaving the
+1st DST free to be drafted whenever value/need/scarcity says so.
+
+`src/pick_suggestion.py`: new `_not_before_round_blocked()` reads this
+config and, in `suggest_position()`, positions it blocks are filtered out
+of the WHOLE candidate pool up front -- before the must-fill (mandatory/
+quota-deadline) tier is even computed, not just squashed within it. This
+matters: an earlier attempt only excluded blocked positions from the
+must-fill *subset*, so when K was the only quota-deadline position in
+that subset, filtering it out left `must_fill` empty and fell back to
+recommending the (blocked) K anyway, even though RB was sitting right
+there as a clean, non-deadline alternative. Filtering at the top of
+`suggest_position()` instead (`not_blocked = [...]`, falling back to the
+full `ranked` list only if literally everything is blocked) fixed this --
+covered by
+`test_suggest_position_not_before_round_floor_overrides_a_quota_deadline`,
+which forces a synthetic K quota deadline at round 16 specifically to
+catch this regression. (Real config never actually triggers this
+collision -- K/DEF's round_based_fill_targets deadline is round 20, three
+rounds after this floor lifts -- but the override logic needed to be
+provably correct anyway.)
+
+Distinct from the existing `position_early_round_discount` (a soft VALUE
+squash for K/DST generally that still falls back once nothing scores
+higher) -- this is a hard, absolute exclusion with no value component,
+and it now sits ABOVE even the mandatory/quota-deadline override tier.
+14 new tests in `tests/test_pick_suggestion.py` (unit-level on
+`_not_before_round_blocked()`, plus `suggest_position()` integration:
+hard exclusion beats an overwhelming-VOR blocked K, falls back to a
+blocked position only when nothing else is available at all, 1st DST
+stays unrestricted while the 2nd is blocked, the floor lifts exactly at
+round 17, and the quota-deadline-override scenario above). Full suite:
+241/241 passing.
+
+Verified end-to-end with a real Monte Carlo run
+(`scripts/simulate_draft.py --trials 15 --seed 42`): avg rank 2.07/10,
+top-3 rate 93%, round-20 requirements fully met in all 15 trials (no
+regression from this change). Then dumped one full 220-pick draft log
+(`--dump-picks-seed 1000 --dump-picks-csv`) and checked Monster Cheese's
+actual K/DST picks directly: 1st DST round 11 (unrestricted, exactly
+where value/need called for it), 2nd DST round 19, kickers rounds 17/18
+(plus a bonus 3rd K round 20) -- zero K/DST picks before round 17,
+exactly as requested.
+
 ### 2026-08-28 — Development page: punch-list items now get a permanent #number
 League manager: "please add item #'s to the punch list items and
 automatically assign new ones when a new task is entered. I'll

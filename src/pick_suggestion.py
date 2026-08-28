@@ -113,6 +113,18 @@ apply, checked in this order (most drastic first):
     need reconciling once the league's real "2 kickers and 2 defenses
     must be picked prior to round 21" rule is confirmed and added to
     round_based_fill_targets; see _early_round_discount()'s docstring.
+  - NOT-BEFORE-ROUND FLOOR (added 2026-08-28, checked above even
+    MANDATORY-DEADLINE-FILL/QUOTA): the reconciliation the note above
+    anticipated. Per league-manager feedback: "For our team only, add a
+    rule that the second defense and the 2 kickers cannot come before
+    round 17." Config-driven (estimation_assumptions.
+    position_not_before_round) and, unlike EARLY-ROUND DISCOUNT, an
+    absolute exclusion with no value squash and (essentially) no
+    fallback -- see _not_before_round_blocked()'s docstring for the
+    fallback's defensive-only rationale. Scoped to MY team's own
+    recommendations only; opponents remain modeled purely through
+    historical draft tendencies (src/draft_tendencies.py), never through
+    this module.
 
 This module deliberately does NOT pick a player -- src/pick_suggestion.py
 recommends a position and hands back that position's top-N available
@@ -183,6 +195,7 @@ class PositionScore:
     early_round_discounted: bool = False  # K/DST early-round discount applied (squashed + excluded unless nothing else is available)
     mandatory_fill: bool = False  # I'm about to run out of picks to ever fill this dedicated slot
     quota_deadline: bool = False  # I'm about to run out of picks to hit a configured round_based_fill_target
+    not_before_round_blocked: bool = False  # a configured "cannot come before round R" floor applies right now (my team only)
 
 
 @dataclass
@@ -463,6 +476,47 @@ def _early_round_discount(position: str, current_round: int, config: dict) -> tu
     return 1.0, False
 
 
+def _not_before_round_blocked(
+    position: str, current_round: int, my_counts: dict[str, int], config: dict,
+) -> bool:
+    """True if drafting another `position` for MY OWN team right now would
+    violate a configured hard "cannot come before round R" floor (config's
+    estimation_assumptions.position_not_before_round) -- added 2026-08-28
+    per league-manager feedback: "For our team only, add a rule that the
+    second defense and the 2 kickers cannot come before round 17."
+
+    Distinct from _early_round_discount() above, which is a soft VALUE
+    squash that still falls back to K/DST once nothing else scores higher
+    (see that function's and suggest_position()'s docstrings for why a
+    squash alone isn't reliable). This is an absolute exclusion with no
+    value component at all -- suggest_position() drops a blocked position
+    from consideration entirely, at every tier (including a mandatory/
+    quota deadline), only falling back to it if literally every candidate
+    is blocked. That fallback is a defensive last resort, not an expected
+    path: with round_based_fill_targets' K/DEF deadlines both set to round
+    20 -- three rounds after this floor lifts -- there's always slack left
+    by round 17 in a normal draft.
+
+    `starting_at_count` (default 1) controls which occurrence of this
+    position the floor first applies to: 1 blocks every pick of it before
+    the floor round (used for K -- both kickers), 2 blocks only the
+    2nd-and-later (used for DST -- the 1st DST stays unrestricted).
+    Scoped to MY roster only -- opponents are modeled separately via
+    historical draft tendencies (src/draft_tendencies.py), not this
+    recommendation engine, matching the league manager's explicit "for
+    our team only" framing."""
+    rules = config.get("estimation_assumptions", {}).get("position_not_before_round", {})
+    rule = rules.get(position)
+    if not rule:
+        return False
+    not_before = rule.get("not_before_round")
+    if not_before is None or current_round >= not_before:
+        return False
+    starting_at_count = rule.get("starting_at_count", 1)
+    about_to_draft_nth = my_counts.get(position, 0) + 1
+    return about_to_draft_nth >= starting_at_count
+
+
 def suggest_position(
     available: pd.DataFrame,
     draft_state: DraftState,
@@ -574,13 +628,28 @@ def suggest_position(
     for position, s in scores.items():
         s.mandatory_fill = position in mandatory
         s.quota_deadline = position in quota_deadline
+        s.not_before_round_blocked = _not_before_round_blocked(position, current_round, my_counts, config)
 
     ranked = sorted(scores.values(), key=lambda s: s.composite, reverse=True)
+
+    # A hard not-before-round floor (see _not_before_round_blocked())
+    # overrides EVERYTHING below, including a mandatory/quota deadline --
+    # the league manager's instruction is an absolute "cannot come before
+    # round 17," not a preference to be weighed against urgency. Filtered
+    # out of the whole candidate pool up front, not just the must-fill
+    # subset, so a deadline-forced pick still prefers a non-blocked
+    # alternative (e.g. RB) over a blocked one (e.g. K) rather than being
+    # trapped into "only K is in the must-fill set, so K it is." Only
+    # falls back to including blocked positions if NOTHING at all
+    # qualifies -- a recommendation is never dropped entirely.
+    not_blocked = [s for s in ranked if not s.not_before_round_blocked]
+    pool = not_blocked if not_blocked else ranked
+
     # A mandatory-deadline or quota-deadline position (see
     # _mandatory_deadline_positions()/_round_based_quota_positions())
     # overrides everything else, including the redundancy cap below --
     # I'm out of chances to ever satisfy it otherwise. Checked first.
-    must_fill = [s for s in ranked if s.mandatory_fill or s.quota_deadline]
+    must_fill = [s for s in pool if s.mandatory_fill or s.quota_deadline]
     if must_fill:
         # Still prefer a not-at-cap option WITHIN the must-fill set when
         # one exists (added 2026-08-27 after a Monte Carlo run caught
@@ -639,9 +708,10 @@ def suggest_position(
         # capped/discounted position when literally nothing else is
         # available -- see REDUNDANCY_PENALTY's and
         # _early_round_discount()'s docstrings for why that fallback
-        # still returns something nonzero.
-        clean = [s for s in ranked if not s.at_position_cap and not s.early_round_discounted]
-        top = clean[0] if clean else ranked[0]
+        # still returns something nonzero. (not_before_round_blocked was
+        # already filtered out of `pool` above, before this tier split.)
+        clean = [s for s in pool if not s.at_position_cap and not s.early_round_discounted]
+        top = clean[0] if clean else pool[0]
     reasoning = _describe(top, horizon)
 
     return PickSuggestion(
@@ -663,6 +733,11 @@ def _describe(top: PositionScore, horizon: int) -> str:
         reasons.append(
             "you're about to run out of chances to hit your configured round-based "
             "target for this position — this overrides value/need/scarcity entirely"
+        )
+    if top.not_before_round_blocked:
+        reasons.append(
+            "normally can't come this early for your team — recommended anyway because "
+            "nothing else qualified right now"
         )
     if top.at_position_cap:
         reasons.append(
