@@ -124,6 +124,22 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   `scripts/simulate_draft.py --help` documents CLI usage; `scipy` added
   to `requirements-dev.txt` (dev/sim-only dependency, not needed by the
   deployed Streamlit app itself).
+- **New "Development" page — in-app punch list (2026-08-28)**: league
+  manager wants to input, edit, and close punch-list items directly in
+  the app as it keeps getting refined, rather than tracking them
+  elsewhere. New `src/punch_list.py` (`PunchList`/`PunchListItem`, same
+  atomic JSON persistence pattern as `src/draft_state.py`, saved to
+  `data/punch_list.json`, gitignored — it's live user data, not repo
+  content) supports add/update/close/reopen/delete with title (required),
+  optional details, and a High/Medium/Low priority. New
+  `pages/5_Development.py` (sidebar icon 🛠️, added to `app.py`'s page
+  list): a form to add items, an editable list of open items sorted by
+  priority then oldest-first (inline title/details/priority fields per
+  expander, with Save/Close/Delete buttons), and a collapsed "Closed"
+  section with one-click reopen. 10 new tests in `test_punch_list.py`;
+  216/216 tests passing. Verified via headless `AppTest` runs of the new
+  page both empty and with open + closed items populated (no exceptions
+  either way; the test data was removed afterward, real file untouched).
 - **Live Draft Tracker, redesigned + moved to the top (2026-08-28,
   supersedes the 2026-08-27 version below)**: the league manager asked
   for a second pass — wanted the tracker at the VERY top of Draft
@@ -579,6 +595,41 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-28 — New Development page: in-app punch list (add/edit/close)
+League manager: "lets also create a development page so that I can
+input, edit, close punch list items as I continue to refine the app."
+
+Built `src/punch_list.py`: a small `PunchList` class (add/update/close/
+reopen/delete, `open_items()`/`closed_items()`) backed by
+`PunchListItem` dataclasses (id, title, description, priority
+High/Medium/Low, status Open/Closed, created_at/updated_at/closed_at),
+persisted to `data/punch_list.json` with the exact same
+write-to-tmp-then-`os.replace()` atomic pattern `DraftState.save()`
+uses, so a crash mid-write can't corrupt it. Added the file to
+`.gitignore` alongside `data/draft_state.json` -- it's the league
+manager's own live data, not something that belongs in the repo.
+
+New `pages/5_Development.py`, registered in `app.py`'s `st.navigation()`
+list with icon 🛠️: an "Add an item" form (title, optional details,
+priority) at the top; an "Open" section below it, one `st.expander` per
+item sorted by priority (High first) then oldest-first, with editable
+title/details/priority fields and Save / Close / Delete buttons inline;
+a collapsed "Closed" section at the bottom, newest-closed-first, each
+with a one-click Reopen. No football-specific logic in this page at
+all -- it's app upkeep tooling, kept alongside the other pages so it's
+always one click away while using the app.
+
+10 new tests in `tests/test_punch_list.py` (create/strip/validate,
+partial updates leave other fields untouched, close/reopen round-trip,
+delete, unknown-id errors on every mutating op, persistence round-trip,
+missing-file starts empty). 216/216 tests passing overall. Verified the
+actual page renders via headless `AppTest`, twice: once against an
+empty list, once with two real items added (one open, one closed) to
+exercise the edit-form and reopen-button code paths — no exceptions
+either time. The test items were added directly to `data/punch_list.json`
+and removed again afterward; nothing left behind since the league
+manager hadn't started using the page for real yet.
 
 ### 2026-08-28 — Live Draft Tracker redesign: moved to top, actual-as-delta, consider-now/can-wait
 Second pass on yesterday's feature, per league-manager feedback: "I
