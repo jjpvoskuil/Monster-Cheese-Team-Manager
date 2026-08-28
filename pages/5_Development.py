@@ -39,7 +39,9 @@ st.title("🛠️ Development")
 st.caption(
     "A running punch list for this app itself — ideas, tweaks, and bugs "
     "you notice while using it. Add items below as you go; edit or close "
-    "them any time."
+    "them any time. Each item gets a permanent **#number** the moment "
+    "it's added — reference it (\"work on #7\") when asking Claude to "
+    "pick up an item; numbers are never reused, even after deleting."
 )
 
 punch_list = get_punch_list()
@@ -62,7 +64,7 @@ with st.form("add_punch_list_item", clear_on_submit=True):
             st.warning("Title is required.")
         else:
             added = punch_list.add(new_title, new_description, new_priority)
-            st.success(f'Added "{added.title}"')
+            st.success(f'Added #{added.number} — "{added.title}"')
             st.rerun()
 
 st.divider()
@@ -80,7 +82,7 @@ if not open_items:
     st.caption("Nothing open — add an item above.")
 else:
     for item in open_items:
-        with st.expander(f"{PRIORITY_BADGE.get(item.priority, item.priority)} — {item.title}"):
+        with st.expander(f"#{item.number} · {PRIORITY_BADGE.get(item.priority, item.priority)} — {item.title}"):
             edit_title = st.text_input("Title", value=item.title, key=f"title_{item.id}")
             edit_description = st.text_area("Details", value=item.description, key=f"desc_{item.id}")
             edit_priority = st.selectbox(
@@ -120,7 +122,10 @@ with st.expander(f"Closed ({len(closed_items)})", expanded=False):
     else:
         for item in closed_items:
             label_col, reopen_col = st.columns([6, 1])
-            label_col.markdown(f"~~**{item.title}**~~ &nbsp; {PRIORITY_BADGE.get(item.priority, item.priority)}")
+            label_col.markdown(
+                f"**#{item.number}** &nbsp; ~~**{item.title}**~~ &nbsp; "
+                f"{PRIORITY_BADGE.get(item.priority, item.priority)}"
+            )
             if item.description:
                 label_col.caption(item.description)
             if item.closed_at:

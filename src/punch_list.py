@@ -28,6 +28,7 @@ def _now() -> str:
 class PunchListItem:
     id: str
     title: str
+    number: Optional[int] = None  # stable, human-facing reference (#1, #2, ...) -- see PunchList.add()
     description: str = ""
     priority: str = "Medium"
     status: str = "Open"
@@ -40,6 +41,8 @@ class PunchList:
     def __init__(self, state_file: str = "data/punch_list.json"):
         self.state_file = state_file
         self.items: list[PunchListItem] = []
+        self.next_number = 1  # persisted -- see save()/_load_if_exists() -- only ever counts up,
+        # so a number is never reused even after its item is deleted.
         self._load_if_exists()
 
     # ------------------------------------------------------------------
@@ -53,8 +56,10 @@ class PunchList:
         if priority not in VALID_PRIORITIES:
             raise ValueError(f"priority must be one of {VALID_PRIORITIES}, got {priority!r}")
         item = PunchListItem(
-            id=uuid.uuid4().hex[:8], title=title, description=description.strip(), priority=priority,
+            id=uuid.uuid4().hex[:8], title=title, number=self.next_number,
+            description=description.strip(), priority=priority,
         )
+        self.next_number += 1
         self.items.append(item)
         self.save()
         return item
@@ -64,6 +69,14 @@ class PunchList:
             if item.id == item_id:
                 return item
         raise KeyError(f"No punch-list item with id {item_id!r}")
+
+    def get_by_number(self, number: int) -> PunchListItem:
+        """Look up an item by its human-facing #N -- the reference you'd
+        use when telling Claude (or a teammate) "work on #7"."""
+        for item in self.items:
+            if item.number == number:
+                return item
+        raise KeyError(f"No punch-list item numbered #{number}")
 
     def update(
         self, item_id: str, title: Optional[str] = None, description: Optional[str] = None,
@@ -122,7 +135,10 @@ class PunchList:
 
     def save(self) -> None:
         os.makedirs(os.path.dirname(self.state_file) or ".", exist_ok=True)
-        payload = {"items": [asdict(i) for i in self.items]}
+        payload = {
+            "next_number": self.next_number,
+            "items": [asdict(i) for i in self.items],
+        }
         tmp = self.state_file + ".tmp"
         with open(tmp, "w") as f:
             json.dump(payload, f, indent=2)
@@ -139,3 +155,21 @@ class PunchList:
                 # crash the page, just start from an empty list.
                 return
         self.items = [PunchListItem(**i) for i in payload.get("items", [])]
+
+        # Migrate any items saved before #-numbering existed (number is
+        # None): assign them sequential numbers in creation order, oldest
+        # first, so existing items get stable, sensible #s rather than
+        # staying unnumbered.
+        unnumbered = [i for i in self.items if i.number is None]
+        if unnumbered:
+            unnumbered.sort(key=lambda i: i.created_at)
+            existing_max = max([i.number for i in self.items if i.number is not None], default=0)
+            for offset, item in enumerate(unnumbered, start=1):
+                item.number = existing_max + offset
+
+        stored_next = payload.get("next_number")
+        highest_seen = max([i.number for i in self.items if i.number is not None], default=0)
+        self.next_number = max(stored_next or 1, highest_seen + 1)
+
+        if unnumbered:
+            self.save()  # persist the migration so it only ever runs once

@@ -1,3 +1,4 @@
+import json
 import os
 import tempfile
 
@@ -20,8 +21,35 @@ def test_add_creates_an_open_item_with_defaults():
     assert item.priority == "Medium"
     assert item.description == ""
     assert item.id  # non-empty auto-generated id
+    assert item.number == 1
     assert [i.id for i in pl.open_items()] == [item.id]
     assert pl.closed_items() == []
+
+
+def test_add_assigns_sequential_numbers_starting_at_1():
+    pl = _fresh_list()
+    a = pl.add("First")
+    b = pl.add("Second")
+    c = pl.add("Third")
+    assert [a.number, b.number, c.number] == [1, 2, 3]
+
+
+def test_deleting_an_item_does_not_reuse_its_number():
+    pl = _fresh_list()
+    a = pl.add("First")
+    pl.add("Second")
+    pl.delete(a.id)
+    c = pl.add("Third")
+    assert c.number == 3  # not 2 -- #1 is gone for good, not recycled
+
+
+def test_get_by_number_finds_the_right_item_and_raises_for_unknown():
+    pl = _fresh_list()
+    pl.add("First")
+    second = pl.add("Second")
+    assert pl.get_by_number(2).id == second.id
+    with pytest.raises(KeyError):
+        pl.get_by_number(999)
 
 
 def test_add_strips_whitespace_and_rejects_a_blank_title():
@@ -110,7 +138,62 @@ def test_persistence_round_trip():
     assert len(pl2.items) == 2
     assert pl2.items[0].title == "Persisted item"
     assert pl2.items[0].priority == "High"
+    assert pl2.items[0].number == 1
+    assert pl2.items[1].number == 2
     assert pl2.items[1].status == "Closed"
+    os.unlink(tmp.name)
+
+
+def test_numbering_survives_a_reload_and_keeps_counting_up():
+    tmp = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+    tmp.close()
+    os.unlink(tmp.name)
+    pl1 = PunchList(state_file=tmp.name)
+    pl1.add("First")
+    pl1.add("Second")
+
+    pl2 = PunchList(state_file=tmp.name)  # simulates re-opening the page
+    third = pl2.add("Third")
+    assert third.number == 3
+    os.unlink(tmp.name)
+
+
+def test_loading_a_pre_numbering_file_migrates_items_to_sequential_numbers():
+    """Items saved before #-numbering existed have no "number" key at all
+    (simulates a real file written by an older version of this app)."""
+    tmp = tempfile.NamedTemporaryFile(suffix=".json", delete=False)
+    tmp.close()
+    legacy_payload = {
+        "items": [
+            {
+                "id": "aaaaaaaa", "title": "Older item", "description": "", "priority": "Medium",
+                "status": "Open", "created_at": "2026-08-01T00:00:00+00:00",
+                "updated_at": "2026-08-01T00:00:00+00:00", "closed_at": None,
+            },
+            {
+                "id": "bbbbbbbb", "title": "Newer item", "description": "", "priority": "Low",
+                "status": "Open", "created_at": "2026-08-02T00:00:00+00:00",
+                "updated_at": "2026-08-02T00:00:00+00:00", "closed_at": None,
+            },
+        ],
+    }
+    with open(tmp.name, "w") as f:
+        json.dump(legacy_payload, f)
+
+    pl = PunchList(state_file=tmp.name)
+    by_id = {i.id: i.number for i in pl.items}
+    assert by_id["aaaaaaaa"] == 1  # oldest created_at -> #1
+    assert by_id["bbbbbbbb"] == 2
+
+    # A newly-added item continues from there, not restarting at 1.
+    new_item = pl.add("Brand new")
+    assert new_item.number == 3
+
+    # The migration was persisted, so re-loading doesn't renumber again.
+    pl2 = PunchList(state_file=tmp.name)
+    by_id2 = {i.id: i.number for i in pl2.items}
+    assert by_id2["aaaaaaaa"] == 1
+    assert by_id2["bbbbbbbb"] == 2
     os.unlink(tmp.name)
 
 

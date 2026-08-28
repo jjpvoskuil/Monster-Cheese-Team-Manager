@@ -124,6 +124,27 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   `scripts/simulate_draft.py --help` documents CLI usage; `scipy` added
   to `requirements-dev.txt` (dev/sim-only dependency, not needed by the
   deployed Streamlit app itself).
+- **Development page: punch-list items now get permanent #numbers
+  (2026-08-28)**: league manager wants to say "work on #7" and have
+  that be unambiguous. `PunchListItem` gained a `number: int` field,
+  assigned by `PunchList.add()` from a persisted, monotonically
+  -increasing `next_number` counter (stored in `data/punch_list.json`
+  alongside the items) -- so numbers are stable across restarts and
+  NEVER reused, even after the item they belonged to is deleted. New
+  `PunchList.get_by_number(n)` looks an item up by its #, for scripted/
+  future use beyond the UI. Old files saved before this existed (item
+  dicts with no `"number"` key) migrate automatically on next load:
+  unnumbered items get sequential numbers in creation order (oldest
+  first), the migration is saved immediately so it only ever runs once,
+  and `next_number` picks up from the highest number seen either way.
+  `pages/5_Development.py` now shows `#N` in the open-items expander
+  title, the closed-items list, and the "Added" confirmation toast. 8
+  new tests (sequential assignment, no reuse after delete,
+  `get_by_number` hit/miss, numbering survives a reload, legacy-file
+  migration + it only runs once); 230/230 tests passing. Verified via
+  headless `AppTest` against both an empty list and a populated one (2
+  items, one closed) — no exceptions; numbers rendered correctly
+  (`#1`, `#2`) in both the expander labels and closed-list markdown.
 - **Live Draft Tracker: number-formatting bug fixed (2026-08-28, sixth
   pass)**: league manager: "fix the numbers. They should be in the
   format 'x.x'." Root cause: `pages/3_Draft_Tendencies.py` called
@@ -689,6 +710,48 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-28 — Development page: punch-list items now get a permanent #number
+League manager: "please add item #'s to the punch list items and
+automatically assign new ones when a new task is entered. I'll
+reference the # when asking you to work on an item."
+
+`src/punch_list.py`: `PunchListItem` gained `number: Optional[int] =
+None`. `PunchList` now tracks a `next_number` counter (starts at 1),
+persisted in `data/punch_list.json` as a top-level `"next_number"` key
+alongside `"items"`. `add()` stamps the new item with `self.next_number`
+then increments the counter -- so numbers are sequential, permanent,
+and (critically) NEVER reused: deleting item #1 doesn't free it up for
+the next add, which still gets whatever `next_number` is up to. New
+`get_by_number(n)` does the #-based lookup (`_find` stays id-based
+internally, used by the UI's widget keys).
+
+Backward compatibility: if `data/punch_list.json` already has items
+from before this feature (no `"number"` key on those dicts -- possible
+if the league manager had already been using the page), `_load_if_exists()`
+detects any item with `number is None`, assigns them sequential numbers
+in `created_at` order (oldest first), and immediately re-saves so the
+migration is permanent and doesn't re-run on the next load.
+`next_number` is set to `max(stored value, highest number actually
+seen) + 1` either way, so it's correct whether or not a migration just
+happened.
+
+`pages/5_Development.py`: open-item expanders now read `"#3 · 🔴 High —
+<title>"`, the closed-items list shows `**#3**` before the
+strikethrough title, and the "Added" toast after submitting the form
+now says `Added #3 — "<title>"` so the number is visible the moment an
+item is created (no need to scroll down and find it).
+
+8 new tests in `test_punch_list.py`: sequential numbering from 1, a
+deleted item's number is never reused, `get_by_number` hit + KeyError
+miss, numbering survives closing and reopening a `PunchList` instance
+against the same file, and a legacy-file migration test (hand-built
+JSON with no `"number"` keys) confirming both the migration itself and
+that it's idempotent (doesn't renumber again on a second load).
+230/230 tests passing overall. Verified via headless `AppTest`: empty
+list (no exceptions), and a 2-item populated list (one open, one
+closed) confirming `#1`/`#2` actually render in the expander label and
+the closed-list markdown, not just present on the underlying objects.
 
 ### 2026-08-28 — Live Draft Tracker: fixed a number-formatting bug (chained .format() calls clobber each other)
 League manager: "looks good but fix the numbers. They should be in the
