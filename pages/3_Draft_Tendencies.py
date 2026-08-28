@@ -21,8 +21,12 @@ import streamlit as st
 from src.data_sources.draft_history import load_draft_history
 from src.draft_state import DraftState
 from src.draft_tendencies import (
+    KNOWN_POSITIONS,
+    actual_cumulative_at_pick,
     available_years,
     counts_by_round,
+    cumulative_counts_by_pick,
+    historical_cumulative_at_pick,
     next_run_positions,
     predict_position_counts,
     round_preserve_sum,
@@ -142,6 +146,80 @@ else:
     st.dataframe(by_round_int, use_container_width=True)
     st.caption(f"Each round's row sums to exactly {teams_n} (rounded from the raw historical average).")
     st.bar_chart(by_round_int)
+
+# ---------------------------------------------------------------------
+# Section 1b: live cumulative picks by round (actual once reached, else
+# the historical projection) -- automates the league manager's old
+# hand-tallied "Alt Targets" worksheet, where they used to pencil in a
+# running cumulative count per position, round by round, as the real
+# draft happened. Collapsible per the league manager's request, since a
+# 20+ round table runs long down the page.
+# ---------------------------------------------------------------------
+st.divider()
+with st.expander("📋 Live cumulative picks by round", expanded=False):
+    st.caption(
+        "One row per round of YOUR draft slot. Shows the league-wide "
+        "cumulative count of each position drafted by that point in the "
+        "draft — **Actual** (from the live draft log) for rounds already "
+        "reached, **Projected** (historical average for the years selected "
+        "in the sidebar) for rounds still ahead. Replaces the old "
+        "hand-tallied 'Alt Targets' worksheet — this fills itself in as "
+        "the real draft proceeds."
+    )
+    cum_hist = cumulative_counts_by_pick(history, years=selected_years)
+    my_team_name = config["league"]["team_name"]
+    picks_made = len(draft_state.picks)
+    picks_by_overall = {p.overall_pick: p for p in draft_state.picks}
+
+    cum_rows = []
+    for rnd in range(1, config["draft"]["rounds"] + 1):
+        anchor = draft_state.team_pick_in_round(my_team_name, rnd)
+        if anchor is None:
+            continue
+        reached = anchor <= picks_made
+        if reached:
+            counts = actual_cumulative_at_pick(draft_state.picks, anchor)
+            source = "Actual"
+        elif not cum_hist.empty:
+            hist_row = historical_cumulative_at_pick(cum_hist, anchor)
+            counts = {pos: round(float(hist_row.get(pos, 0.0)), 1) for pos in KNOWN_POSITIONS}
+            source = "Projected"
+        else:
+            counts = {pos: 0 for pos in KNOWN_POSITIONS}
+            source = "Projected"
+
+        my_pick = picks_by_overall.get(anchor)
+        my_pick_label = f"{my_pick.position or '—'} · {my_pick.player_name}" if my_pick else "—"
+
+        row = {
+            "Round": rnd, "Your pick #": anchor, "Your pick": my_pick_label,
+            "Source": source,
+        }
+        row.update(counts)
+        cum_rows.append(row)
+
+    if not cum_rows:
+        st.info("No rounds to show yet.")
+    else:
+        cum_table = pd.DataFrame(cum_rows).set_index("Round")
+
+        def _highlight_source(row: pd.Series) -> list[str]:
+            color = (
+                "background-color: rgba(46, 160, 67, 0.18)" if row["Source"] == "Actual"
+                else "background-color: rgba(255, 171, 0, 0.14)"
+            )
+            return [color] * len(row)
+
+        st.dataframe(
+            cum_table.style.apply(_highlight_source, axis=1),
+            use_container_width=True,
+        )
+        st.caption(
+            "🟩 Actual = real cumulative counts from the live draft log. "
+            "🟨 Projected = historical average for the selected years, for "
+            "rounds not reached yet. Flips from projected to actual "
+            "automatically, round by round, as the real draft happens."
+        )
 
 # ---------------------------------------------------------------------
 # Section 2: live "what's likely next" prediction

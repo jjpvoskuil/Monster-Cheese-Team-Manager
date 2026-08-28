@@ -89,6 +89,23 @@ class DraftState:
         pick_in_round = (overall_pick - 1) % n + 1
         return rnd, pick_in_round
 
+    def team_pick_in_round(self, team: str, round_num: int) -> Optional[int]:
+        """`team`'s overall pick number within `round_num` -- exactly one
+        per round in a snake draft with no keepers/trades, this model's
+        assumption throughout. Returns None if `round_num` is out of range
+        (< 1 or > self.rounds) or `team` isn't in self.teams. Used by the
+        Draft Tendencies page's live cumulative-by-round tracker to know
+        which overall pick number to snapshot league-wide position counts
+        at for each of my_team's own rounds."""
+        if team not in self.teams or round_num < 1 or round_num > self.rounds:
+            return None
+        n = len(self.teams)
+        first_pick_of_round = (round_num - 1) * n + 1
+        for overall in range(first_pick_of_round, first_pick_of_round + n):
+            if self.team_for_pick(overall) == team:
+                return overall
+        return None  # unreachable given every team picks exactly once per round
+
     @property
     def total_picks(self) -> int:
         return len(self.teams) * self.rounds

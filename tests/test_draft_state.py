@@ -90,6 +90,26 @@ def test_reverse_last_n_rounds_of_zero_is_a_no_op():
         assert ds.team_for_pick(overall) == plain.team_for_pick(overall)
 
 
+def test_team_pick_in_round_matches_snake_order():
+    ds = _fresh_state()
+    # Monster Cheese is TEAMS[3] (0-indexed) -> pick 4 in round 1 (forward).
+    assert ds.team_pick_in_round("Monster Cheese", 1) == 4
+    # Round 2 reverses: pos_in_round = 9 - 3 = 6 -> overall = 10 + 6 + 1 = 17.
+    assert ds.team_pick_in_round("Monster Cheese", 2) == 17
+    # Sanity check against team_for_pick itself for every round.
+    for rnd in range(1, ds.rounds + 1):
+        overall = ds.team_pick_in_round("Monster Cheese", rnd)
+        assert ds.team_for_pick(overall) == "Monster Cheese"
+        assert ds.round_and_slot_for_pick(overall)[0] == rnd
+
+
+def test_team_pick_in_round_out_of_range_or_unknown_team_returns_none():
+    ds = _fresh_state()
+    assert ds.team_pick_in_round("Monster Cheese", 0) is None
+    assert ds.team_pick_in_round("Monster Cheese", ds.rounds + 1) is None
+    assert ds.team_pick_in_round("Not A Real Team", 1) is None
+
+
 def test_upcoming_picks_returns_next_n_with_correct_teams():
     ds = _fresh_state()
     upcoming = ds.upcoming_picks(3)

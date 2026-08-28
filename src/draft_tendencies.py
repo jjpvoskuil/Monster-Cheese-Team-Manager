@@ -218,3 +218,41 @@ def next_run_positions(
     predicted = predict_position_counts(df, years, current_overall_pick, picks_ahead)
     predicted = predicted[predicted >= min_expected]
     return predicted.head(top_n).index.tolist()
+
+
+def actual_cumulative_at_pick(
+    picks: list, through_overall_pick: int, positions: tuple[str, ...] = KNOWN_POSITIONS
+) -> dict[str, int]:
+    """Real cumulative count of each position drafted by ANYONE, from the
+    live/in-progress draft's own actual pick log (a list of
+    src.draft_state.Pick), through and including `through_overall_pick`.
+
+    This is the live, exact counterpart to cumulative_counts_by_pick()'s
+    historical AVERAGE -- the league manager used to hand-tally this same
+    number on the old "Alt Targets" worksheet round by round as the real
+    draft happened; this computes it directly from the already-tracked
+    live draft state instead, so it needs no manual entry and is never
+    off. Picks with no recognized position (blank, e.g. a name-only
+    manual log) are ignored, same spirit as _valid_picks() above for
+    historical data."""
+    counts = {p: 0 for p in positions}
+    for pick in picks:
+        if pick.overall_pick > through_overall_pick:
+            continue
+        if pick.position in counts:
+            counts[pick.position] += 1
+    return counts
+
+
+def historical_cumulative_at_pick(cumulative_df: pd.DataFrame, overall_pick: int) -> pd.Series:
+    """Look up cumulative_counts_by_pick()'s output at a single overall
+    pick number, clipped to the historical data's own pick range (the
+    same clipping predict_position_counts() applies) -- a pick number
+    beyond what history covers returns the last available row instead of
+    raising a KeyError. Returns an empty Series if `cumulative_df` is
+    empty (e.g. no draft history loaded)."""
+    if cumulative_df.empty:
+        return pd.Series(dtype=float)
+    max_pick = cumulative_df.index.max()
+    clipped = min(max(overall_pick, 1), max_pick)
+    return cumulative_df.loc[clipped]

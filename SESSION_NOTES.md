@@ -124,6 +124,26 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   `scripts/simulate_draft.py --help` documents CLI usage; `scipy` added
   to `requirements-dev.txt` (dev/sim-only dependency, not needed by the
   deployed Streamlit app itself).
+- **Live cumulative picks-by-round tracker (2026-08-27/28)**: Draft
+  Tendencies now has a collapsible "📋 Live cumulative picks by round"
+  section (`st.expander`, collapsed by default per league-manager
+  request) that automates the old hand-tallied "Alt Targets" worksheet
+  the league manager showed via screenshot — one row per round of
+  Monster Cheese's own draft slot, with the league-wide cumulative count
+  of each position drafted by that point: **Actual** (from the live
+  draft log, green-highlighted) for rounds already reached, **Projected**
+  (historical average for the sidebar's selected years, amber-highlighted)
+  for rounds still ahead — flips automatically from projected to actual,
+  round by round, as the real draft happens, no manual entry needed.
+  New `DraftState.team_pick_in_round(team, round_num)` finds each round's
+  anchor overall-pick number (that team's one pick in a snake round);
+  new `src/draft_tendencies.py` functions `actual_cumulative_at_pick()`
+  (tallies the live pick log) and `historical_cumulative_at_pick()`
+  (looks up `cumulative_counts_by_pick()`'s table at one pick number,
+  clipped to the historical data's range) supply the two data sources.
+  9 new tests across `test_draft_state.py`/`test_draft_tendencies.py`;
+  206/206 tests passing; verified with a headless `AppTest` smoke run of
+  the page (no exceptions).
 - **Sidebar nav switched to `st.navigation()` (2026-08-27, cosmetic)**:
   `app.py` used to BE the landing page (league-settings summary + draft
   countdown), which under Streamlit's classic `pages/`-directory
@@ -531,6 +551,63 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-27/28 — Live cumulative picks-by-round tracker on Draft Tendencies
+League manager: "on the draft tendencies page we typically track the
+actual counts as we go through the draft. It is good to have it
+cumulative history pick by pick, and also have that fill in as the
+actual draft proceeds," with a screenshot of the old hand-tallied
+worksheet (title "8th Pick / 2025") for reference. Clarified via
+AskUserQuestion that this should be a new, collapsible section (not
+folded into an existing one) since a 20+ round table runs long down the
+page.
+
+Read the screenshot carefully before building: it's organized by ROUND,
+with an "OA PICK" column showing Monster Cheese's own overall pick
+number that round (verified the pattern against `team_for_pick()` math —
+an 8th-overall-pick team's snake sequence is 8, 13, 28, 33, 48...,
+matching the sheet exactly), then one column per position (QB/RB/WR/TE/
+D/K) each holding a single running cumulative league-wide count for that
+round, with a "Next Run" hint column at the far right. The
+diagonal-hatched columns between each position turned out to just be
+visual dividers, not a second data column — an early read of the
+screenshot (before the image itself came through) assumed they were a
+manual "this round" tally input separate from the cumulative row; they
+aren't.
+
+Built: `DraftState.team_pick_in_round(team, round_num)` (new method in
+`src/draft_state.py`, right after `round_and_slot_for_pick`) walks a
+round's `n` overall-pick numbers and returns whichever one belongs to
+`team` — exactly one match always exists per round in this model's
+no-keepers/no-trades snake draft. Two new functions in
+`src/draft_tendencies.py`: `actual_cumulative_at_pick(picks,
+through_overall_pick)` tallies real position counts from the live
+`DraftState.picks` log through a given pick (mirrors `_valid_picks()`'s
+"ignore unrecognized/blank position" spirit); `historical_cumulative_at_
+pick(cumulative_df, overall_pick)` looks up a single row of the existing
+`cumulative_counts_by_pick()` table, clipped to the historical data's own
+pick range same as `predict_position_counts()` already does.
+
+New UI section in `pages/3_Draft_Tendencies.py`: an `st.expander("📋 Live
+cumulative picks by round")`, collapsed by default, with one row per
+round 1..`config["draft"]["rounds"]`. For each round, looks up Monster
+Cheese's anchor overall-pick via `team_pick_in_round()`; if the live
+draft has already reached that pick, shows the ACTUAL cumulative counts
+(green row highlight) plus what Monster Cheese drafted that round; if
+not, shows the HISTORICAL projection for the sidebar's selected years
+(amber row highlight) instead. No manual entry at all — it's derived
+entirely from state the app already tracks, and rounds flip from
+projected to actual automatically as the real draft happens.
+
+9 new tests: `test_team_pick_in_round_matches_snake_order` and
+`test_team_pick_in_round_out_of_range_or_unknown_team_returns_none` in
+`test_draft_state.py`; 7 covering both new `draft_tendencies.py`
+functions (normal counting, blank/unrecognized positions ignored, empty
+pick list, custom positions tuple, matching the underlying table, and
+clipping above/below the historical pick range) in
+`test_draft_tendencies.py`. 206/206 tests passing overall. Verified the
+actual page renders with no exception via a headless `AppTest` run
+(`app.py` -> `switch_page("pages/3_Draft_Tendencies.py")`).
 
 ### 2026-08-27 — Added a full-pick-log export to the Monte Carlo harness, delivered a sample draft as an Excel workbook
 League manager asked to see the actual pick-by-pick results of a

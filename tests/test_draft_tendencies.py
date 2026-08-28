@@ -1,10 +1,13 @@
 import pandas as pd
 import pytest
 
+from src.draft_state import Pick
 from src.draft_tendencies import (
+    actual_cumulative_at_pick,
     available_years,
     counts_by_round,
     cumulative_counts_by_pick,
+    historical_cumulative_at_pick,
     next_run_positions,
     predict_position_counts,
     round_preserve_sum,
@@ -92,6 +95,79 @@ def test_next_run_positions_ranks_and_filters_negligible_positions():
     df = _synthetic_history()
     top = next_run_positions(df, years=None, current_overall_pick=3, picks_ahead=2, top_n=2)
     assert top == ["RB"]  # QB/WR are ~0 in this window, filtered by min_expected
+
+
+def _pick(overall, rnd, pick_in_round, team, position):
+    return Pick(
+        overall_pick=overall, round=rnd, pick_in_round=pick_in_round,
+        team=team, player_name=f"Player{overall}", position=position,
+    )
+
+
+def test_actual_cumulative_at_pick_counts_by_position_through_the_given_pick():
+    picks = [
+        _pick(1, 1, 1, "Team1", "QB"),
+        _pick(2, 1, 2, "Team2", "RB"),
+        _pick(3, 2, 1, "Team1", "RB"),
+    ]
+    assert actual_cumulative_at_pick(picks, 2) == {
+        "QB": 1, "RB": 1, "WR": 0, "TE": 0, "K": 0, "DST": 0,
+    }
+    through_3 = actual_cumulative_at_pick(picks, 3)
+    assert through_3["RB"] == 2
+    assert through_3["QB"] == 1
+
+
+def test_actual_cumulative_at_pick_ignores_blank_or_unrecognized_positions():
+    picks = [
+        _pick(1, 1, 1, "Team1", ""),  # blank -- e.g. a name-only manual log entry
+        _pick(2, 1, 2, "Team2", "FLEX"),  # not one of the tracked positions
+        _pick(3, 2, 1, "Team1", "QB"),
+    ]
+    counts = actual_cumulative_at_pick(picks, 3)
+    assert counts["QB"] == 1
+    assert sum(counts.values()) == 1
+
+
+def test_actual_cumulative_at_pick_empty_pick_list_returns_all_zeros():
+    assert actual_cumulative_at_pick([], 10) == {
+        "QB": 0, "RB": 0, "WR": 0, "TE": 0, "K": 0, "DST": 0,
+    }
+
+
+def test_actual_cumulative_at_pick_respects_a_custom_positions_tuple():
+    picks = [_pick(1, 1, 1, "Team1", "QB"), _pick(2, 1, 2, "Team2", "RB")]
+    assert actual_cumulative_at_pick(picks, 2, positions=("QB",)) == {"QB": 1}
+
+
+def test_historical_cumulative_at_pick_matches_the_underlying_table():
+    df = _synthetic_history()
+    cum = cumulative_counts_by_pick(df)
+    row = historical_cumulative_at_pick(cum, 2)
+    assert row["QB"] == pytest.approx(cum.loc[2, "QB"])
+    assert row["RB"] == pytest.approx(cum.loc[2, "RB"])
+
+
+def test_historical_cumulative_at_pick_clips_above_the_max_pick():
+    df = _synthetic_history()
+    cum = cumulative_counts_by_pick(df)
+    max_pick = cum.index.max()
+    row = historical_cumulative_at_pick(cum, max_pick + 50)
+    expected = cum.loc[max_pick]
+    assert row["QB"] == pytest.approx(expected["QB"])
+    assert row["WR"] == pytest.approx(expected["WR"])
+
+
+def test_historical_cumulative_at_pick_clips_below_pick_one():
+    df = _synthetic_history()
+    cum = cumulative_counts_by_pick(df)
+    row = historical_cumulative_at_pick(cum, 0)
+    expected = cum.loc[1]
+    assert row["QB"] == pytest.approx(expected["QB"])
+
+
+def test_historical_cumulative_at_pick_empty_dataframe_returns_empty_series():
+    assert historical_cumulative_at_pick(pd.DataFrame(), 5).empty
 
 
 def test_empty_dataframe_returns_empty_results_without_raising():
