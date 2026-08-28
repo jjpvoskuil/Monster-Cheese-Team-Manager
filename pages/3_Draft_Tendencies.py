@@ -1,13 +1,17 @@
 """
-Draft Tendencies — historical league positional patterns (from 2022-2025
-CBS draft results) plus a live "what's likely to happen next" predictor
-that cross-references the current live draft state and each upcoming
-opponent's roster needs.
+Draft Tendencies — a live, on-the-clock draft tracker (projected
+cumulative counts from 2022-2025 CBS draft history, the actual draft's
+live counts as a delta off that projection, and a same-row consider
+-now/can-wait read) up top, with the supporting historical/predictive
+detail collapsed below it.
 
-Answers the two questions the league manager asked for:
-  1. "The number of players per position per round is pretty consistent
+Answers the questions the league manager asked for:
+  1. "We track actual counts as we go through the draft, cumulative
+     pick by pick, filling in as the actual draft proceeds" -- the old
+     hand-tallied 'Alt Targets' worksheet, automated.
+  2. "The number of players per position per round is pretty consistent
      -- if I'm seeing a run on a position, is it predictable?"
-  2. "Will the teams picking before my next turn likely take a position
+  3. "Will the teams picking before my next turn likely take a position
      I want, based on what's still open on their rosters?"
 """
 
@@ -129,176 +133,196 @@ else:
     c3.metric("Picks until your turn", until if until is not None else "—")
 
 # ---------------------------------------------------------------------
-# Section 1: historical per-round positional tendencies
+# LIVE DRAFT TRACKER -- the primary view of this page, kept uncollapsed
+# and at the top so it's immediately visible during the draft. One row
+# per round of YOUR draft slot: the historical PROJECTED cumulative
+# count per position, how the ACTUAL draft is running vs. that
+# projection (as a delta, once a round is reached), and a same-row read
+# on which positions are worth grabbing before your next pick vs. which
+# can wait. Replaces the earlier (2026-08-27) "Live cumulative picks by
+# round" section -- that one showed actual OR projected per round; this
+# shows projected always, with actual expressed as the delta, which is
+# the more useful "am I ahead of or behind the historical pace" read.
 # ---------------------------------------------------------------------
-st.divider()
-st.subheader("Historical positions drafted per round")
+st.subheader("🎯 Live Draft Tracker")
 st.caption(
-    "Average number of each position taken in each round, across the "
-    "selected years. This is the base pattern the live predictions below "
-    "are built from."
+    "One row per round of YOUR draft slot. **Proj** = historical average "
+    "cumulative count of that position drafted league-wide by this pick "
+    "(years selected in the sidebar). **Δ** = the ACTUAL draft vs. that "
+    "projection, once a round is reached (actual − projected: 🔴 positive "
+    "= running hotter than history, that position is disappearing faster "
+    "than usual; 🟢 negative = running cooler, safer than usual); shows "
+    "– for rounds not reached yet. **Consider now** / **Can wait** "
+    "look at the projected run of picks between this round and your NEXT "
+    "pick to flag what's worth grabbing now vs. what should still be "
+    "there next round."
 )
-by_round = counts_by_round(history, years=selected_years)
-if by_round.empty:
-    st.info("No data for the selected years.")
-else:
-    by_round_int = round_table_preserve_row_sums(by_round, teams_n)
-    st.dataframe(by_round_int, use_container_width=True)
-    st.caption(f"Each round's row sums to exactly {teams_n} (rounded from the raw historical average).")
-    st.bar_chart(by_round_int)
 
-# ---------------------------------------------------------------------
-# Section 1b: live cumulative picks by round (actual once reached, else
-# the historical projection) -- automates the league manager's old
-# hand-tallied "Alt Targets" worksheet, where they used to pencil in a
-# running cumulative count per position, round by round, as the real
-# draft happened. Collapsible per the league manager's request, since a
-# 20+ round table runs long down the page.
-# ---------------------------------------------------------------------
-st.divider()
-with st.expander("📋 Live cumulative picks by round", expanded=False):
-    st.caption(
-        "One row per round of YOUR draft slot. Shows the league-wide "
-        "cumulative count of each position drafted by that point in the "
-        "draft — **Actual** (from the live draft log) for rounds already "
-        "reached, **Projected** (historical average for the years selected "
-        "in the sidebar) for rounds still ahead. Replaces the old "
-        "hand-tallied 'Alt Targets' worksheet — this fills itself in as "
-        "the real draft proceeds."
+cum_hist = cumulative_counts_by_pick(history, years=selected_years)
+my_team_name = config["league"]["team_name"]
+picks_made = len(draft_state.picks)
+picks_by_overall = {p.overall_pick: p for p in draft_state.picks}
+total_rounds = config["draft"]["rounds"]
+
+tracker_rows = []
+for rnd in range(1, total_rounds + 1):
+    anchor = draft_state.team_pick_in_round(my_team_name, rnd)
+    if anchor is None:
+        continue
+    next_anchor = (
+        draft_state.team_pick_in_round(my_team_name, rnd + 1) if rnd < total_rounds else None
     )
-    cum_hist = cumulative_counts_by_pick(history, years=selected_years)
-    my_team_name = config["league"]["team_name"]
-    picks_made = len(draft_state.picks)
-    picks_by_overall = {p.overall_pick: p for p in draft_state.picks}
+    reached = anchor <= picks_made
 
-    cum_rows = []
-    for rnd in range(1, config["draft"]["rounds"] + 1):
-        anchor = draft_state.team_pick_in_round(my_team_name, rnd)
-        if anchor is None:
-            continue
-        reached = anchor <= picks_made
+    proj_row = (
+        historical_cumulative_at_pick(cum_hist, anchor) if not cum_hist.empty
+        else pd.Series(0.0, index=list(KNOWN_POSITIONS))
+    )
+    actual_counts = actual_cumulative_at_pick(draft_state.picks, anchor) if reached else None
+
+    my_pick = picks_by_overall.get(anchor)
+    my_pick_label = f"{my_pick.position or '—'} · {my_pick.player_name}" if my_pick else "—"
+
+    # Windowed on THIS round's actual gap to your next pick (not the
+    # sidebar's fixed look-ahead) -- same prediction engine as "What's
+    # likely to happen next" below, just scoped per-row.
+    if next_anchor is not None and next_anchor > anchor and not cum_hist.empty:
+        window = next_anchor - anchor
+        consider = next_run_positions(history, selected_years, anchor, window, top_n=3, min_expected=0.5)
+    else:
+        consider = []
+    can_wait = [p for p in KNOWN_POSITIONS if p not in consider]
+
+    row = {"Round": rnd, "Pick #": anchor, "Your pick": my_pick_label}
+    for pos in KNOWN_POSITIONS:
+        proj_val = float(proj_row.get(pos, 0.0))
+        row[f"{pos} Proj"] = round(proj_val, 1)
         if reached:
-            counts = actual_cumulative_at_pick(draft_state.picks, anchor)
-            source = "Actual"
-        elif not cum_hist.empty:
-            hist_row = historical_cumulative_at_pick(cum_hist, anchor)
-            counts = {pos: round(float(hist_row.get(pos, 0.0)), 1) for pos in KNOWN_POSITIONS}
-            source = "Projected"
+            row[f"{pos} Δ"] = round(actual_counts.get(pos, 0) - proj_val, 1)
         else:
-            counts = {pos: 0 for pos in KNOWN_POSITIONS}
-            source = "Projected"
+            row[f"{pos} Δ"] = float("nan")
+    row["Consider now"] = ", ".join(consider) if consider else "—"
+    row["Can wait"] = ", ".join(can_wait) if can_wait else "—"
+    tracker_rows.append(row)
 
-        my_pick = picks_by_overall.get(anchor)
-        my_pick_label = f"{my_pick.position or '—'} · {my_pick.player_name}" if my_pick else "—"
-
-        row = {
-            "Round": rnd, "Your pick #": anchor, "Your pick": my_pick_label,
-            "Source": source,
-        }
-        row.update(counts)
-        cum_rows.append(row)
-
-    if not cum_rows:
-        st.info("No rounds to show yet.")
-    else:
-        cum_table = pd.DataFrame(cum_rows).set_index("Round")
-
-        def _highlight_source(row: pd.Series) -> list[str]:
-            color = (
-                "background-color: rgba(46, 160, 67, 0.18)" if row["Source"] == "Actual"
-                else "background-color: rgba(255, 171, 0, 0.14)"
-            )
-            return [color] * len(row)
-
-        st.dataframe(
-            cum_table.style.apply(_highlight_source, axis=1),
-            use_container_width=True,
-        )
-        st.caption(
-            "🟩 Actual = real cumulative counts from the live draft log. "
-            "🟨 Projected = historical average for the selected years, for "
-            "rounds not reached yet. Flips from projected to actual "
-            "automatically, round by round, as the real draft happens."
-        )
-
-# ---------------------------------------------------------------------
-# Section 2: live "what's likely next" prediction
-# ---------------------------------------------------------------------
-st.divider()
-st.subheader("What's likely to happen next")
-
-picks_ahead = rounds_ahead * teams_n if teams_n else rounds_ahead * config["league"]["teams"]
-predict_from = current_pick if current_pick is not None else 1
-
-predicted = predict_position_counts(history, selected_years, predict_from, picks_ahead)
-if predicted.empty:
-    st.info("No prediction available (no historical data for the selected years).")
+if not tracker_rows:
+    st.info("No rounds to show yet.")
 else:
-    predicted_int = round_preserve_sum(predicted, picks_ahead)
-    hot = next_run_positions(history, selected_years, predict_from, picks_ahead, top_n=2)
-    if hot:
-        st.info(
-            f"**Likely run in the next {rounds_ahead} round(s):** "
-            f"{' / '.join(hot)} — historically {predicted_int[hot].to_dict()} "
-            f"players taken in this pick window. Positions NOT in this list have "
-            f"historically been safe to wait on for a round or two."
-        )
-    pred_df = predicted_int.rename("Expected # drafted").to_frame()
-    st.dataframe(pred_df, use_container_width=True)
-    st.caption(f"Sums to exactly {picks_ahead} — the number of picks in the next {rounds_ahead} round(s).")
-    st.bar_chart(predicted_int)
+    tracker_df = pd.DataFrame(tracker_rows).set_index("Round")
+    delta_cols = [f"{pos} Δ" for pos in KNOWN_POSITIONS]
+    proj_cols = [f"{pos} Proj" for pos in KNOWN_POSITIONS]
 
-# ---------------------------------------------------------------------
-# Section 3: opponent roster needs before your next pick
-# ---------------------------------------------------------------------
-st.divider()
-st.subheader("Opponent roster needs before your next pick")
+    def _delta_color(val) -> str:
+        if pd.isna(val):
+            return ""
+        if val > 0:
+            return "background-color: rgba(220, 38, 38, 0.20);"
+        if val < 0:
+            return "background-color: rgba(34, 197, 94, 0.20);"
+        return ""
 
-if draft_state.is_draft_complete:
-    st.caption("Draft complete — no upcoming opponents.")
-elif draft_state.is_my_pick:
-    st.success("🎯 It's your pick right now — no opponents ahead of you.")
-else:
-    needs = opponent_needs_before_next_pick(draft_state, config)
-    if not needs:
-        st.caption("No opponents picking before your next turn.")
-    else:
-        rows = []
-        for team, demand in needs.items():
-            if demand:
-                top_positions = ", ".join(
-                    f"{pos} ({wt:.1f})" for pos, wt in demand.most_common(3)
-                )
-            else:
-                top_positions = "— (starters look filled)"
-            rows.append({"Team": team, "Likely needs": top_positions})
-        st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
-
-        total_demand = aggregate_opponent_demand(needs)
-        if total_demand:
-            st.markdown("**Combined demand from teams picking ahead of you:**")
-            demand_df = pd.Series(dict(total_demand)).sort_values(ascending=False).rename(
-                "Unfilled-slot demand"
-            ).round(2).to_frame()
-            st.dataframe(demand_df, use_container_width=True)
-
-            if not predicted.empty:
-                overlap = [
-                    p for p in demand_df.index
-                    if p in predicted.index and predicted[p] >= 0.5 and p in demand_df.index[:3]
-                ]
-                if overlap:
-                    st.warning(
-                        f"⚠️ **{' / '.join(overlap)}** shows up both in opponents' "
-                        f"unfilled roster needs AND the historical next-run "
-                        f"prediction above — the strongest signal that this "
-                        f"position may not last until your pick."
-                    )
-
-    st.caption(
-        "\"Likely needs\" = starter slots this team can't yet fill from "
-        "players it has already drafted (dedicated slots like QB/RB/TE/K/DST "
-        "are filled first, then the flex slots), spread across each slot's "
-        "eligible positions. This is a heuristic about what's still OPEN on "
-        "their roster, not a guess at their draft strategy."
+    styled_tracker = (
+        tracker_df.style
+        .map(_delta_color, subset=delta_cols)
+        .format({c: "{:.1f}" for c in proj_cols})
+        .format({c: "{:+.1f}" for c in delta_cols}, na_rep="–")
     )
+    st.dataframe(styled_tracker, use_container_width=True)
+    st.caption(
+        "🔴 running hotter than history (scarcer than usual right now) · "
+        "🟢 running cooler than history (safer than usual right now) · "
+        "rows update live as picks are logged on the Draft Board."
+    )
+
+# ---------------------------------------------------------------------
+# Everything below is supporting detail for the tracker above --
+# collapsed by default so the tracker is what's immediately visible.
+# ---------------------------------------------------------------------
+st.divider()
+
+with st.expander("Historical positions drafted per round"):
+    st.caption(
+        "Average number of each position taken in each round, across the "
+        "selected years. This is the base pattern the tracker above and "
+        "the predictions below are built from."
+    )
+    by_round = counts_by_round(history, years=selected_years)
+    if by_round.empty:
+        st.info("No data for the selected years.")
+    else:
+        by_round_int = round_table_preserve_row_sums(by_round, teams_n)
+        st.dataframe(by_round_int, use_container_width=True)
+        st.caption(f"Each round's row sums to exactly {teams_n} (rounded from the raw historical average).")
+        st.bar_chart(by_round_int)
+
+with st.expander("What's likely to happen next"):
+    picks_ahead = rounds_ahead * teams_n if teams_n else rounds_ahead * config["league"]["teams"]
+    predict_from = current_pick if current_pick is not None else 1
+
+    predicted = predict_position_counts(history, selected_years, predict_from, picks_ahead)
+    if predicted.empty:
+        st.info("No prediction available (no historical data for the selected years).")
+    else:
+        predicted_int = round_preserve_sum(predicted, picks_ahead)
+        hot = next_run_positions(history, selected_years, predict_from, picks_ahead, top_n=2)
+        if hot:
+            st.info(
+                f"**Likely run in the next {rounds_ahead} round(s):** "
+                f"{' / '.join(hot)} — historically {predicted_int[hot].to_dict()} "
+                f"players taken in this pick window. Positions NOT in this list have "
+                f"historically been safe to wait on for a round or two."
+            )
+        pred_df = predicted_int.rename("Expected # drafted").to_frame()
+        st.dataframe(pred_df, use_container_width=True)
+        st.caption(f"Sums to exactly {picks_ahead} — the number of picks in the next {rounds_ahead} round(s).")
+        st.bar_chart(predicted_int)
+
+with st.expander("Opponent roster needs before your next pick"):
+    if draft_state.is_draft_complete:
+        st.caption("Draft complete — no upcoming opponents.")
+    elif draft_state.is_my_pick:
+        st.success("🎯 It's your pick right now — no opponents ahead of you.")
+    else:
+        needs = opponent_needs_before_next_pick(draft_state, config)
+        if not needs:
+            st.caption("No opponents picking before your next turn.")
+        else:
+            rows = []
+            for team, demand in needs.items():
+                if demand:
+                    top_positions = ", ".join(
+                        f"{pos} ({wt:.1f})" for pos, wt in demand.most_common(3)
+                    )
+                else:
+                    top_positions = "— (starters look filled)"
+                rows.append({"Team": team, "Likely needs": top_positions})
+            st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+
+            total_demand = aggregate_opponent_demand(needs)
+            if total_demand:
+                st.markdown("**Combined demand from teams picking ahead of you:**")
+                demand_df = pd.Series(dict(total_demand)).sort_values(ascending=False).rename(
+                    "Unfilled-slot demand"
+                ).round(2).to_frame()
+                st.dataframe(demand_df, use_container_width=True)
+
+                if not predicted.empty:
+                    overlap = [
+                        p for p in demand_df.index
+                        if p in predicted.index and predicted[p] >= 0.5 and p in demand_df.index[:3]
+                    ]
+                    if overlap:
+                        st.warning(
+                            f"⚠️ **{' / '.join(overlap)}** shows up both in opponents' "
+                            f"unfilled roster needs AND the historical next-run "
+                            f"prediction above — the strongest signal that this "
+                            f"position may not last until your pick."
+                        )
+
+        st.caption(
+            "\"Likely needs\" = starter slots this team can't yet fill from "
+            "players it has already drafted (dedicated slots like QB/RB/TE/K/DST "
+            "are filled first, then the flex slots), spread across each slot's "
+            "eligible positions. This is a heuristic about what's still OPEN on "
+            "their roster, not a guess at their draft strategy."
+        )

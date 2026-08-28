@@ -124,26 +124,54 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   `scripts/simulate_draft.py --help` documents CLI usage; `scipy` added
   to `requirements-dev.txt` (dev/sim-only dependency, not needed by the
   deployed Streamlit app itself).
-- **Live cumulative picks-by-round tracker (2026-08-27/28)**: Draft
-  Tendencies now has a collapsible "📋 Live cumulative picks by round"
-  section (`st.expander`, collapsed by default per league-manager
-  request) that automates the old hand-tallied "Alt Targets" worksheet
-  the league manager showed via screenshot — one row per round of
-  Monster Cheese's own draft slot, with the league-wide cumulative count
-  of each position drafted by that point: **Actual** (from the live
-  draft log, green-highlighted) for rounds already reached, **Projected**
-  (historical average for the sidebar's selected years, amber-highlighted)
-  for rounds still ahead — flips automatically from projected to actual,
-  round by round, as the real draft happens, no manual entry needed.
-  New `DraftState.team_pick_in_round(team, round_num)` finds each round's
-  anchor overall-pick number (that team's one pick in a snake round);
-  new `src/draft_tendencies.py` functions `actual_cumulative_at_pick()`
-  (tallies the live pick log) and `historical_cumulative_at_pick()`
-  (looks up `cumulative_counts_by_pick()`'s table at one pick number,
-  clipped to the historical data's range) supply the two data sources.
-  9 new tests across `test_draft_state.py`/`test_draft_tendencies.py`;
-  206/206 tests passing; verified with a headless `AppTest` smoke run of
-  the page (no exceptions).
+- **Live Draft Tracker, redesigned + moved to the top (2026-08-28,
+  supersedes the 2026-08-27 version below)**: the league manager asked
+  for a second pass — wanted the tracker at the VERY top of Draft
+  Tendencies (immediately visible during the draft, not tucked in a
+  collapsed section), projected cumulative counts shown alongside the
+  actual counts EXPRESSED AS A DELTA off projection (not actual-or
+  -projected as separate rows), and two new columns reading which
+  positions to consider drafting now (a run is projected before your
+  next pick) vs. which can wait. `pages/3_Draft_Tendencies.py` now opens
+  with an uncollapsed "🎯 Live Draft Tracker": one row per round of
+  Monster Cheese's draft slot, `{POS} Proj` = historical cumulative
+  average at that pick (`historical_cumulative_at_pick()`), `{POS} Δ` =
+  actual − projected once that round is reached (🔴 red background if
+  running hotter than history / scarcer than usual, 🟢 green if cooler /
+  safer, blank "–" for rounds not yet reached), plus **Consider now** /
+  **Can wait** columns computed per-row from `next_run_positions()`
+  windowed on THIS round's actual gap to the team's own next pick (not
+  the sidebar's fixed look-ahead slider) — positions in the predicted
+  run go in "Consider now", everything else in "Can wait". Styled via a
+  pandas `Styler` (`.map()`, not the pandas-3-removed `.applymap()`).
+  Everything else on the page (historical-per-round table, the
+  slider-driven "what's likely next", opponent roster needs) got pushed
+  below a divider and wrapped in individually collapsed `st.expander`s,
+  per instruction to push supporting detail down and keep only the
+  tracker immediately visible. No new `src/` functions needed — reused
+  `team_pick_in_round()`, `actual_cumulative_at_pick()`,
+  `historical_cumulative_at_pick()`, and `next_run_positions()`, all
+  already built and tested for the prior version of this feature (same
+  day before this redesign). Verified via a headless `AppTest` run of
+  the full page against both an empty and a 15-pick-logged draft state
+  (no exceptions either way) and the full test suite. 206/206 tests
+  passing (no test changes needed — only UI code changed).
+
+- **Live cumulative picks-by-round tracker, v1 — superseded same day
+  (2026-08-27/28)**: first pass at this feature: a collapsible "📋 Live
+  cumulative picks by round" section (`st.expander`, collapsed by
+  default) automating the league manager's old hand-tallied "Alt
+  Targets" worksheet — one row per round, showing **either** the actual
+  cumulative count (rounds already reached, green-highlighted) **or**
+  the historical projection (rounds still ahead, amber-highlighted) per
+  position. Replaced by the redesign above per league-manager feedback:
+  wanted the tracker uncollapsed at the top of the page, and wanted
+  actual shown as a DELTA against projection rather than swapping one
+  for the other. `DraftState.team_pick_in_round(team, round_num)` (finds
+  a team's one overall pick within a snake-draft round) and
+  `src/draft_tendencies.py`'s `actual_cumulative_at_pick()` /
+  `historical_cumulative_at_pick()` were built for this version and are
+  still in use by the redesign above.
 - **Sidebar nav switched to `st.navigation()` (2026-08-27, cosmetic)**:
   `app.py` used to BE the landing page (league-settings summary + draft
   countdown), which under Streamlit's classic `pages/`-directory
@@ -551,6 +579,64 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-28 — Live Draft Tracker redesign: moved to top, actual-as-delta, consider-now/can-wait
+Second pass on yesterday's feature, per league-manager feedback: "I
+really want the live tracker at the top. I'd like to see projected
+cumulative #'s based [on] history, actual cumulative as the draft
+continues as a delta. I'd also like to have 2 columns at the end. One
+would indicate position to consider drafting considering a projected
+[up]coming run and conversely, positions that can wait... This would
+also replace w[ha]t you built last. For now, we can push everything
+else below that and also make everything below collapsed."
+
+Rewrote `pages/3_Draft_Tendencies.py`'s top section. It now opens
+(right after the sidebar year-selector and the small live-draft-state
+metrics row) with an uncollapsed "🎯 Live Draft Tracker" table, one row
+per round of Monster Cheese's own draft slot:
+- `{POS} Proj`: historical average cumulative count at that pick,
+  unchanged from yesterday (`historical_cumulative_at_pick()`).
+- `{POS} Δ`: NEW -- actual minus projected, once that round is reached
+  (`actual_cumulative_at_pick()` minus the projection), rendered with a
+  sign (`+1.0`/`-2.0`) and a red/green cell background (red =
+  running hotter than history at that position = scarcer than usual
+  right now; green = running cooler = safer than usual); shows "–" for
+  rounds not reached yet. Replaces yesterday's version, which showed
+  actual OR projected as alternate ROWS (a "Source" column) rather than
+  actual as a delta against projection in the same row -- the delta is
+  the more useful read during a live draft ("am I ahead of or behind
+  pace"), which is exactly what the league manager asked for.
+- `Consider now` / `Can wait`: NEW -- two columns at the end of each
+  row. Reuses the existing `next_run_positions()` predictor, but
+  windowed per-row on THAT round's actual gap to Monster Cheese's own
+  NEXT pick (`team_pick_in_round(rnd)` to `team_pick_in_round(rnd+1)`),
+  not the sidebar's fixed 1-3 round look-ahead slider used elsewhere on
+  the page -- so each row's suggestion is specific to how many picks
+  actually stand between this round and the next one, which varies
+  round to round near the snake's turn. Positions in the predicted run
+  land in "Consider now"; every other tracked position lands in "Can
+  wait".
+
+Everything else that used to be directly on the page -- "Historical
+positions drafted per round", "What's likely to happen next" (the
+slider-driven version), "Opponent roster needs before your next pick"
+-- moved below a `st.divider()` and each got wrapped in its own
+collapsed `st.expander(...)`, per the explicit instruction to push
+supporting detail down and keep only the tracker immediately visible
+on load. No `src/` logic changed; this was entirely a page-layout
+rewrite reusing already-tested functions. One implementation note:
+pandas 3.0 (installed in this repo) removed `Styler.applymap()` --
+used the newer `Styler.map()` instead for the delta-column cell
+coloring.
+
+Verified with a headless `AppTest` run of the full page (`app.py` ->
+`switch_page("pages/3_Draft_Tendencies.py")`) both against an empty
+draft state and against a temporary 15-pick logged state (built and
+torn down in this session only -- `data/draft_state.json` was never
+touched for real and isn't tracked by git anyway) — no exceptions in
+either case. Full test suite: 206/206 passing (no test changes needed,
+only UI code changed; the underlying `src/` functions this reuses were
+already covered by yesterday's 9 new tests).
 
 ### 2026-08-27/28 — Live cumulative picks-by-round tracker on Draft Tendencies
 League manager: "on the draft tendencies page we typically track the
