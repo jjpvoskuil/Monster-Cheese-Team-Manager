@@ -124,6 +124,26 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   `scripts/simulate_draft.py --help` documents CLI usage; `scipy` added
   to `requirements-dev.txt` (dev/sim-only dependency, not needed by the
   deployed Streamlit app itself).
+- **Live Draft Tracker: content-fit column widths (2026-08-28, fourth
+  pass)**: league manager: "make the 'your pick', 'Consider now' and
+  'can wait' columns smaller to match the max characters the field will
+  actually need. The grid is still off screen on the right." Replaced
+  the fixed `width="small"/"medium"` column_config values with pixel
+  widths computed FROM the actual data each rerun: `_col_px(header,
+  values)` measures the widest header/value in "display units" (emoji
+  like 🔒 and separators like `·` count double, since a plain
+  character-count undercounts how wide they render) and returns
+  `pad + per_char * widest` pixels, floored at a small minimum. Applied
+  to every column, not just the 3 named -- Round/Pick #/each position
+  column shrink too whenever their real content is short. Recomputed on
+  every rerun, so e.g. "Your pick" grows automatically the one time a
+  long-named DST actually gets drafted, without needing a hardcoded
+  worst case. Verified with a scripted worst-case scenario (every pick
+  logged as "DST · San Francisco 49ers" or a long RB name) — no
+  exceptions, and the estimated total grid width dropped from a fixed
+  ~1200px+ to as low as ~960px in that same worst case (typically much
+  less with real, shorter position codes/names). 225/225 tests passing
+  (no test changes — this is pure display/layout, same underlying data).
 - **Live Draft Tracker: roster-cap-aware consider-now/can-wait, compact
   columns (2026-08-28, third pass)**: league manager: "if the teams
   ahead of us prior to our next pick are all filled on RB's, they are
@@ -629,6 +649,45 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-28 — Live Draft Tracker: column widths now fit their actual content
+League manager: "make the 'your pick', 'Consider now' and 'can wait'
+columns smaller to match the max characters the field will actually
+need. The grid is still off screen on the right."
+
+The prior pass (same day, below) used `column_config` with the
+categorical `width="small"`/`"medium"` presets (75px / 200px, fixed
+regardless of what's actually in the column) -- fine for the 6 short
+position cells, way oversized for "Your pick"/"Consider now"/"Can wait"
+most of the time, since a typical cell there is much shorter than
+"medium"'s 200px budget.
+
+Replaced with content-driven pixel widths in
+`pages/3_Draft_Tendencies.py`: `_col_px(header, values)` scans every
+actual value that will appear in that column this rerun (plus the
+header, in case it's the longest thing), estimates a rendered width via
+`_display_width()` (counts each character as 1 "unit" except emoji/
+wide glyphs like 🔒 and the `·` separator, counted as 2, since raw
+`len()` undercounts how wide those actually render), and returns
+`pad + per_char * widest_unit_count` pixels, floored at a small
+minimum. Applied to every column (not just the 3 named) via
+`st.column_config`, so the 6 position columns tighten too when their
+content is short. Recomputes every rerun from the CURRENT tracker data
+(not a hardcoded worst case), so e.g. "Your pick" only grows wide on
+the actual round a long-named DST gets logged, and shrinks back for
+every other row.
+
+Sanity-checked the arithmetic against a deliberately pessimistic
+scenario (every "Your pick" a long DST name, every "Can wait" the full
+6-position list with a 🔒 lock) — total estimated grid width dropped
+from a previously-fixed ~1200px+ floor to about 960px in that SAME
+worst case, and noticeably less in ordinary rows. Verified via headless
+`AppTest`, twice: the normal empty-draft state, and a scripted 60-pick
+state where every pick is logged as either "Christian McCaffrey" (RB,
+Monster Cheese's picks) or "San Francisco 49ers" (DST, everyone else's)
+to specifically exercise the long-name case — no exceptions either way.
+225/225 tests passing (pure layout change, no new `src/` logic, so no
+new tests needed).
 
 ### 2026-08-28 — Live Draft Tracker: roster-cap-aware consider/wait, compact columns, 1-decimal everywhere
 League manager, third pass on the tracker: "During the draft the

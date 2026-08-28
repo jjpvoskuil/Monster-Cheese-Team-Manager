@@ -249,15 +249,45 @@ else:
 
     styled_tracker = tracker_df.style.map(_pos_cell_color, subset=pos_cols)
 
+    def _display_width(s: str) -> int:
+        """Rough rendered-width estimate in "character units" -- wide glyphs
+        (emoji like the 🔒 lock, or the Δ/· separators) count for more than
+        a plain ASCII letter, since len() alone undercounts how wide they
+        actually render."""
+        return sum(2 if ord(ch) > 0x2000 else 1 for ch in s)
+
+    def _col_px(header: str, values, per_char: int = 6, pad: int = 14, min_px: int = 36) -> int:
+        """Pixel width just wide enough for this column's own longest
+        actual value (or its header, if that's longer) -- so "Your pick",
+        "Consider now", and "Can wait" size to what they actually contain
+        instead of a fixed "medium" (200px) that's overkill once most
+        entries are short. Recomputed every rerun, so it tracks the real
+        draft as picks get logged (e.g. "Your pick" grows once a
+        long-named DST gets drafted)."""
+        widest = max([_display_width(header)] + [_display_width(str(v)) for v in values])
+        return max(min_px, pad + per_char * widest)
+
     tracker_column_config = {
-        "_index": st.column_config.NumberColumn("Rnd", width="small"),
-        "Pick #": st.column_config.NumberColumn("Pick #", width="small"),
-        "Your pick": st.column_config.TextColumn("Your pick", width="medium"),
-        "Consider now": st.column_config.TextColumn("Consider now", width="medium"),
-        "Can wait": st.column_config.TextColumn("Can wait", width="medium"),
+        "_index": st.column_config.NumberColumn(
+            "Rnd", width=_col_px("Rnd", tracker_df.index.astype(str).tolist())
+        ),
+        "Pick #": st.column_config.NumberColumn(
+            "Pick #", width=_col_px("Pick #", tracker_df["Pick #"].astype(str).tolist())
+        ),
+        "Your pick": st.column_config.TextColumn(
+            "Your pick", width=_col_px("Your pick", tracker_df["Your pick"].tolist())
+        ),
+        "Consider now": st.column_config.TextColumn(
+            "Consider now", width=_col_px("Consider now", tracker_df["Consider now"].tolist())
+        ),
+        "Can wait": st.column_config.TextColumn(
+            "Can wait", width=_col_px("Can wait", tracker_df["Can wait"].tolist())
+        ),
     }
     for pos in pos_cols:
-        tracker_column_config[pos] = st.column_config.TextColumn(pos, width="small")
+        tracker_column_config[pos] = st.column_config.TextColumn(
+            pos, width=_col_px(pos, tracker_df[pos].tolist())
+        )
 
     st.dataframe(styled_tracker, use_container_width=True, column_config=tracker_column_config)
     st.caption(
