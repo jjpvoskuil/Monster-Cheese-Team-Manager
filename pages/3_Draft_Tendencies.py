@@ -248,11 +248,18 @@ else:
             return "background-color: rgba(34, 197, 94, 0.20);"
         return ""
 
+    # A single merged .format() call, not two chained ones -- pandas'
+    # Styler.format() resets any earlier call's per-column formatters for
+    # columns it doesn't explicitly re-list, so calling it twice (once for
+    # proj_cols, once for delta_cols) silently dropped the FIRST call's
+    # "{:.1f}" and left proj columns rendering with pandas' raw default
+    # float precision (6 decimals, e.g. "2.200000") instead of "2.2".
+    number_format = {c: "{:.1f}" for c in proj_cols}
+    number_format.update({c: "{:+.1f}" for c in delta_cols})
     styled_tracker = (
         tracker_df.style
         .map(_delta_color, subset=delta_cols)
-        .format({c: "{:.1f}" for c in proj_cols})
-        .format({c: "{:+.1f}" for c in delta_cols}, na_rep="–")
+        .format(number_format, na_rep="–")
     )
 
     def _display_width(s: str) -> int:

@@ -124,6 +124,24 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   `scripts/simulate_draft.py --help` documents CLI usage; `scipy` added
   to `requirements-dev.txt` (dev/sim-only dependency, not needed by the
   deployed Streamlit app itself).
+- **Live Draft Tracker: number-formatting bug fixed (2026-08-28, sixth
+  pass)**: league manager: "fix the numbers. They should be in the
+  format 'x.x'." Root cause: `pages/3_Draft_Tendencies.py` called
+  `.style.format(...)` TWICE on the tracker's Styler -- once for the
+  proj columns' `"{:.1f}"`, once for the delta columns' `"{:+.1f}"`.
+  pandas' `Styler.format()` resets any earlier call's per-column
+  formatters for columns the new call doesn't re-list, so the SECOND
+  call silently wiped out the first's formatting and every proj column
+  fell back to pandas' raw default float precision -- rendering like
+  `"2.200000"` instead of `"2.2"`. Fixed by merging both format specs
+  into ONE dict and calling `.format()` once. Confirmed via a byte
+  -level inspection of the rendered Arrow table (decoded the Styler's
+  `display_values` buffer through `pyarrow`) that cells now render
+  exactly `"4.5"`, `"-3.5"`, `"+3.8"`, etc. -- true 1-decimal formatting,
+  not just visually plausible. 225/225 tests passing (no `src/` logic
+  touched). General lesson for this codebase: chaining multiple
+  `Styler.format()` calls on different column subsets is a trap --
+  merge into one dict-based call instead.
 - **Live Draft Tracker: Δ columns restored as their own narrow columns
   (2026-08-28, fifth pass)**: the previous pass's merge of each
   position's Proj+Δ into one cell ("18.0 (+1.0)") lost the ability to
@@ -671,6 +689,49 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-28 — Live Draft Tracker: fixed a number-formatting bug (chained .format() calls clobber each other)
+League manager: "looks good but fix the numbers. They should be in the
+format 'x.x'."
+
+`pages/3_Draft_Tendencies.py`'s tracker Styler was built as:
+```python
+tracker_df.style
+    .map(_delta_color, subset=delta_cols)
+    .format({c: "{:.1f}" for c in proj_cols})
+    .format({c: "{:+.1f}" for c in delta_cols}, na_rep="–")
+```
+Two separate `.format()` calls, each scoped to a different set of
+columns. Confirmed by inspecting the actual rendered Arrow buffer
+(`AppTest`'s `Dataframe.proto.arrow_data.styler.display_values`,
+decoded with `pyarrow.ipc.open_stream(...).read_all().to_pandas()`)
+that this silently broke: pandas' `Styler.format()` doesn't ADD to
+whatever formatting a previous call set up for columns outside its own
+subset -- it resets them back to pandas' internal default float
+formatter. So the SECOND `.format()` call (delta_cols) wiped out the
+FIRST call's `"{:.1f}"` for proj_cols, and those columns rendered with
+raw default precision instead -- e.g. `"2.200000"` (6 decimals) rather
+than `"2.2"`. This wasn't caught by the 225 passing tests because none
+of them inspect a rendered Styler's actual display strings -- the
+underlying numeric VALUES were always correct (proven by
+`test_draft_tendencies.py`'s coverage of the functions that produce
+them), only the presentation layer was silently wrong.
+
+Fixed by merging both format specs into a single dict and calling
+`.format()` once:
+```python
+number_format = {c: "{:.1f}" for c in proj_cols}
+number_format.update({c: "{:+.1f}" for c in delta_cols})
+tracker_df.style.map(_delta_color, subset=delta_cols).format(number_format, na_rep="–")
+```
+Re-ran the same byte-level Arrow inspection against a populated draft
+state (30 picks logged) and confirmed real cells now read exactly
+`"4.5"`, `"-3.5"`, `"+3.8"`, `"–"` for not-yet-reached rounds, etc. --
+true 1-decimal formatting, not just a plausible-looking screenshot.
+225/225 tests still passing (no `src/` logic changed, pure Styler
+-construction fix). **Lesson recorded for next time this page's Styler
+gets touched: never chain multiple `.style.format()` calls across
+different column subsets on the same Styler -- merge into one dict.**
 
 ### 2026-08-28 — Live Draft Tracker: brought the Δ columns back, split from proj, compacted to the position code
 League manager: "we lost the delta columns. Can you add those back and
