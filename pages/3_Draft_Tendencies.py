@@ -37,7 +37,13 @@ from src.draft_tendencies import (
     round_table_preserve_row_sums,
     teams_per_round,
 )
-from src.roster_needs import aggregate_opponent_demand, opponent_needs_before_next_pick
+from src.roster_needs import (
+    aggregate_opponent_demand,
+    opponent_needs_before_next_pick,
+    positions_at_cap,
+    positions_blocked_for_all,
+    team_position_counts,
+)
 from src.scoring import load_config
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -134,28 +140,29 @@ else:
 
 # ---------------------------------------------------------------------
 # LIVE DRAFT TRACKER -- the primary view of this page, kept uncollapsed
-# and at the top so it's immediately visible during the draft. One row
-# per round of YOUR draft slot: the historical PROJECTED cumulative
-# count per position, how the ACTUAL draft is running vs. that
-# projection (as a delta, once a round is reached), and a same-row read
-# on which positions are worth grabbing before your next pick vs. which
-# can wait. Replaces the earlier (2026-08-27) "Live cumulative picks by
-# round" section -- that one showed actual OR projected per round; this
-# shows projected always, with actual expressed as the delta, which is
-# the more useful "am I ahead of or behind the historical pace" read.
+# and at the top so it's immediately visible during the draft. One
+# compact column per position, one row per round of YOUR draft slot:
+# "proj" = historical cumulative average at that pick, "(Δ)" = the
+# ACTUAL draft vs. that projection once a round is reached, and a
+# same-row read on which positions are worth grabbing before your next
+# pick vs. which can wait -- downgraded to "can wait" whenever every
+# opponent in that window is already roster-capped on a position, since
+# a real cap makes them structurally unable to draft more of it no
+# matter what history says usually happens.
 # ---------------------------------------------------------------------
 st.subheader("🎯 Live Draft Tracker")
 st.caption(
-    "One row per round of YOUR draft slot. **Proj** = historical average "
-    "cumulative count of that position drafted league-wide by this pick "
-    "(years selected in the sidebar). **Δ** = the ACTUAL draft vs. that "
-    "projection, once a round is reached (actual − projected: 🔴 positive "
-    "= running hotter than history, that position is disappearing faster "
-    "than usual; 🟢 negative = running cooler, safer than usual); shows "
-    "– for rounds not reached yet. **Consider now** / **Can wait** "
+    "One row per round of YOUR draft slot. Each position column shows "
+    "**proj** = historical average cumulative count drafted league-wide "
+    "by this pick (years selected in the sidebar), plus **(Δ)** once a "
+    "round is reached -- the ACTUAL draft vs. that projection (🔴 "
+    "running hotter than history = scarcer than usual right now, 🟢 "
+    "running cooler = safer than usual). **Consider now** / **Can wait** "
     "look at the projected run of picks between this round and your NEXT "
-    "pick to flag what's worth grabbing now vs. what should still be "
-    "there next round."
+    "pick -- 🔒 marks a position moved to \"can wait\" because every "
+    "opponent picking in that window has already hit this league's real "
+    "roster cap for it (can't legally draft more), overriding what "
+    "history alone would suggest."
 )
 
 cum_hist = cumulative_counts_by_pick(history, years=selected_years)
@@ -163,6 +170,18 @@ my_team_name = config["league"]["team_name"]
 picks_made = len(draft_state.picks)
 picks_by_overall = {p.overall_pick: p for p in draft_state.picks}
 total_rounds = config["draft"]["rounds"]
+
+# Current position counts per team, as of RIGHT NOW -- used only for the
+# "already capped" check below. That check is valid forever once true (a
+# real roster max can only be reached, never un-reached), so it's a safe
+# floor to apply even to rounds well ahead of where the draft currently
+# stands -- though a team not yet capped today could still become capped
+# by a future round, which this can't foresee; it only ever gets MORE
+# accurate as the real draft catches up to each row.
+capped_positions_now = {
+    team: positions_at_cap(team_position_counts(picks), config)
+    for team, picks in draft_state.roster_by_team().items()
+}
 
 tracker_rows = []
 for rnd in range(1, total_rounds + 1):
@@ -185,53 +204,67 @@ for rnd in range(1, total_rounds + 1):
 
     # Windowed on THIS round's actual gap to your next pick (not the
     # sidebar's fixed look-ahead) -- same prediction engine as "What's
-    # likely to happen next" below, just scoped per-row.
+    # likely to happen next" below, just scoped per-row. window_teams is
+    # who's picking in that gap -- fully determined by the snake order,
+    # regardless of what they've actually drafted.
     if next_anchor is not None and next_anchor > anchor and not cum_hist.empty:
         window = next_anchor - anchor
         consider = next_run_positions(history, selected_years, anchor, window, top_n=3, min_expected=0.5)
+        window_teams = [draft_state.team_for_pick(o) for o in range(anchor + 1, next_anchor)]
     else:
         consider = []
-    can_wait = [p for p in KNOWN_POSITIONS if p not in consider]
+        window_teams = []
+
+    blocked = positions_blocked_for_all(window_teams, capped_positions_now)
+    demoted = {pos for pos in consider if pos in blocked}
+    consider_final = [p for p in consider if p not in demoted]
+    can_wait_final = [p for p in KNOWN_POSITIONS if p not in consider_final]
 
     row = {"Round": rnd, "Pick #": anchor, "Your pick": my_pick_label}
     for pos in KNOWN_POSITIONS:
         proj_val = float(proj_row.get(pos, 0.0))
-        row[f"{pos} Proj"] = round(proj_val, 1)
         if reached:
-            row[f"{pos} Δ"] = round(actual_counts.get(pos, 0) - proj_val, 1)
+            delta = round(actual_counts.get(pos, 0) - proj_val, 1)
+            row[pos] = f"{proj_val:.1f} ({delta:+.1f})" if delta != 0 else f"{proj_val:.1f} (0.0)"
         else:
-            row[f"{pos} Δ"] = float("nan")
-    row["Consider now"] = ", ".join(consider) if consider else "—"
-    row["Can wait"] = ", ".join(can_wait) if can_wait else "—"
+            row[pos] = f"{proj_val:.1f}"
+    row["Consider now"] = ", ".join(consider_final) if consider_final else "—"
+    row["Can wait"] = (
+        ", ".join(f"{p}🔒" if p in demoted else p for p in can_wait_final) if can_wait_final else "—"
+    )
     tracker_rows.append(row)
 
 if not tracker_rows:
     st.info("No rounds to show yet.")
 else:
     tracker_df = pd.DataFrame(tracker_rows).set_index("Round")
-    delta_cols = [f"{pos} Δ" for pos in KNOWN_POSITIONS]
-    proj_cols = [f"{pos} Proj" for pos in KNOWN_POSITIONS]
+    pos_cols = list(KNOWN_POSITIONS)
 
-    def _delta_color(val) -> str:
-        if pd.isna(val):
-            return ""
-        if val > 0:
+    def _pos_cell_color(val: str) -> str:
+        if "(+" in val:
             return "background-color: rgba(220, 38, 38, 0.20);"
-        if val < 0:
+        if "(-" in val:
             return "background-color: rgba(34, 197, 94, 0.20);"
         return ""
 
-    styled_tracker = (
-        tracker_df.style
-        .map(_delta_color, subset=delta_cols)
-        .format({c: "{:.1f}" for c in proj_cols})
-        .format({c: "{:+.1f}" for c in delta_cols}, na_rep="–")
-    )
-    st.dataframe(styled_tracker, use_container_width=True)
+    styled_tracker = tracker_df.style.map(_pos_cell_color, subset=pos_cols)
+
+    tracker_column_config = {
+        "_index": st.column_config.NumberColumn("Rnd", width="small"),
+        "Pick #": st.column_config.NumberColumn("Pick #", width="small"),
+        "Your pick": st.column_config.TextColumn("Your pick", width="medium"),
+        "Consider now": st.column_config.TextColumn("Consider now", width="medium"),
+        "Can wait": st.column_config.TextColumn("Can wait", width="medium"),
+    }
+    for pos in pos_cols:
+        tracker_column_config[pos] = st.column_config.TextColumn(pos, width="small")
+
+    st.dataframe(styled_tracker, use_container_width=True, column_config=tracker_column_config)
     st.caption(
-        "🔴 running hotter than history (scarcer than usual right now) · "
-        "🟢 running cooler than history (safer than usual right now) · "
-        "rows update live as picks are logged on the Draft Board."
+        "🔴 running hotter than history · 🟢 running cooler than history · "
+        "🔒 downgraded to \"can wait\" because every opponent in that "
+        "window is already capped out · rows update live as picks are "
+        "logged on the Draft Board."
     )
 
 # ---------------------------------------------------------------------
@@ -303,7 +336,7 @@ with st.expander("Opponent roster needs before your next pick"):
                 st.markdown("**Combined demand from teams picking ahead of you:**")
                 demand_df = pd.Series(dict(total_demand)).sort_values(ascending=False).rename(
                     "Unfilled-slot demand"
-                ).round(2).to_frame()
+                ).round(1).to_frame()
                 st.dataframe(demand_df, use_container_width=True)
 
                 if not predicted.empty:

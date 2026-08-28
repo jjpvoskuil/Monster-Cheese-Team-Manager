@@ -174,6 +174,69 @@ def opponent_needs_before_next_pick(draft_state: DraftState, config: dict) -> di
     return result
 
 
+def positions_at_cap(position_counts: dict[str, int], config: dict) -> set[str]:
+    """Which positions this team is now structurally BLOCKED from
+    drafting any more of, per config's roster.position_active_limits --
+    a real roster-construction ceiling (confirmed against CBS's actual
+    platform behavior for DST/TE at least -- see that config block's
+    comments), not a strategy guess. Once a team hits one of these caps
+    it can never draft that position again for the rest of the draft, so
+    (unlike a starter-need read) this stays TRUE for every future round,
+    not just right now -- it only ever grows, never shrinks.
+
+    WR has no standalone cap in this league's rules -- only a combined
+    WR_TE max that both WR and TE draw from, alongside TE's own separate
+    (tighter) max. A team is capped on WR once that combined bucket is
+    full; capped on TE once EITHER TE's own max or the combined bucket
+    is reached.
+
+    Used by the Draft Tendencies page's Live Draft Tracker to downgrade
+    a historically-predicted "run" on a position to "can wait" when every
+    opponent picking before your next turn is already unable to take
+    any more of it, regardless of what history says usually happens."""
+    limits = config.get("roster", {}).get("position_active_limits", {})
+    capped: set[str] = set()
+
+    for pos in ("QB", "RB", "K", "DST"):
+        max_n = (limits.get(pos) or {}).get("max")
+        if max_n is not None and position_counts.get(pos, 0) >= max_n:
+            capped.add(pos)
+
+    te_max = (limits.get("TE") or {}).get("max")
+    if te_max is not None and position_counts.get("TE", 0) >= te_max:
+        capped.add("TE")
+
+    combined_max = (limits.get("WR_TE") or {}).get("max")
+    if combined_max is not None:
+        combined_count = position_counts.get("WR", 0) + position_counts.get("TE", 0)
+        if combined_count >= combined_max:
+            capped.add("WR")
+            capped.add("TE")
+
+    return capped
+
+
+def positions_blocked_for_all(window_teams: list[str], capped_positions: dict[str, set[str]]) -> set[str]:
+    """Positions that NONE of `window_teams` can legally draft any more
+    of -- the intersection of each team's already-capped positions (see
+    positions_at_cap()). Empty if `window_teams` is empty (nothing to
+    check against) or if the teams don't share any capped position.
+
+    Used by the Draft Tendencies page's Live Draft Tracker to downgrade
+    a historically-predicted "run" on a position to "can wait" when it's
+    genuinely impossible for any upcoming opponent to extend it,
+    overriding what history alone would suggest."""
+    if not window_teams:
+        return set()
+    common: Optional[set[str]] = None
+    for team in window_teams:
+        team_capped = capped_positions.get(team, set())
+        common = team_capped if common is None else common & team_capped
+        if not common:
+            return set()
+    return common or set()
+
+
 def aggregate_opponent_demand(opponent_needs: dict[str, Counter]) -> Counter:
     """Sum position demand across all upcoming opponents into one ranked
     Counter, for a simple "these are the positions the teams ahead of you

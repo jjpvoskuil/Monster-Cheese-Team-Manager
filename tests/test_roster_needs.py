@@ -9,6 +9,8 @@ from src.roster_needs import (
     aggregate_opponent_demand,
     assign_roster_slots,
     opponent_needs_before_next_pick,
+    positions_at_cap,
+    positions_blocked_for_all,
     positions_that_would_fill,
     team_position_counts,
     unfilled_starter_slots,
@@ -138,6 +140,82 @@ def test_opponent_needs_before_next_pick_flags_teams_with_no_picks_yet():
     total = aggregate_opponent_demand(needs)
     assert total["RB"] > 0
     assert total["QB"] > 0
+
+
+# ---------------------------------------------------------------------
+# positions_at_cap
+# ---------------------------------------------------------------------
+
+def test_positions_at_cap_flags_a_dedicated_position_at_its_configured_max():
+    config, _ = _real_starters()
+    limits = config["roster"]["position_active_limits"]
+    at_cap_count = limits["RB"]["max"]
+    capped = positions_at_cap({"RB": at_cap_count}, config)
+    assert "RB" in capped
+
+
+def test_positions_at_cap_leaves_a_position_below_its_max_uncapped():
+    config, _ = _real_starters()
+    limits = config["roster"]["position_active_limits"]
+    below_cap = limits["RB"]["max"] - 1
+    capped = positions_at_cap({"RB": below_cap}, config)
+    assert "RB" not in capped
+
+
+def test_positions_at_cap_wr_uses_the_combined_wr_te_bucket():
+    config, _ = _real_starters()
+    limits = config["roster"]["position_active_limits"]
+    combined_max = limits["WR_TE"]["max"]
+    # All WR, no TE -- still fills the combined bucket, so WR (and TE,
+    # since they draw from the same bucket) both read as capped even
+    # though this team has never drafted a TE.
+    capped = positions_at_cap({"WR": combined_max, "TE": 0}, config)
+    assert "WR" in capped
+    assert "TE" in capped
+
+
+def test_positions_at_cap_te_capped_by_its_own_max_even_below_the_combined_bucket():
+    config, _ = _real_starters()
+    limits = config["roster"]["position_active_limits"]
+    te_max = limits["TE"]["max"]
+    combined_max = limits["WR_TE"]["max"]
+    assert te_max < combined_max  # sanity check on the real config's assumption this test relies on
+    capped = positions_at_cap({"TE": te_max, "WR": 0}, config)
+    assert "TE" in capped
+    assert "WR" not in capped  # combined bucket still has room
+
+
+def test_positions_at_cap_empty_roster_is_never_capped():
+    config, _ = _real_starters()
+    assert positions_at_cap({}, config) == set()
+
+
+# ---------------------------------------------------------------------
+# positions_blocked_for_all
+# ---------------------------------------------------------------------
+
+def test_positions_blocked_for_all_requires_every_window_team_capped():
+    capped = {"Team A": {"RB", "TE"}, "Team B": {"RB"}}
+    # RB: both teams capped -> blocked. TE: only Team A -> not blocked.
+    assert positions_blocked_for_all(["Team A", "Team B"], capped) == {"RB"}
+
+
+def test_positions_blocked_for_all_empty_window_is_never_blocked():
+    capped = {"Team A": {"RB", "TE", "QB", "WR", "K", "DST"}}
+    assert positions_blocked_for_all([], capped) == set()
+
+
+def test_positions_blocked_for_all_a_team_missing_from_the_capped_map_blocks_nothing():
+    # A team with no drafted picks yet (or simply absent from the map)
+    # has no capped positions -- its presence in the window means
+    # nothing can be "blocked for all" unless it's independently capped.
+    capped = {"Team A": {"RB"}}
+    assert positions_blocked_for_all(["Team A", "Team B"], capped) == set()
+
+
+def test_positions_blocked_for_all_repeated_team_in_window_still_works():
+    capped = {"Team A": {"RB"}}
+    assert positions_blocked_for_all(["Team A", "Team A", "Team A"], capped) == {"RB"}
 
 
 # ---------------------------------------------------------------------

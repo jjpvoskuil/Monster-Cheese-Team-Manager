@@ -124,6 +124,40 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   `scripts/simulate_draft.py --help` documents CLI usage; `scipy` added
   to `requirements-dev.txt` (dev/sim-only dependency, not needed by the
   deployed Streamlit app itself).
+- **Live Draft Tracker: roster-cap-aware consider-now/can-wait, compact
+  columns (2026-08-28, third pass)**: league manager: "if the teams
+  ahead of us prior to our next pick are all filled on RB's, they are
+  far less likely to take any and we potentially can wait" -- pure
+  historical prediction couldn't see that. New `src/roster_needs.py`
+  functions: `positions_at_cap(position_counts, config)` (which
+  positions a team is now structurally blocked from drafting more of,
+  per config's real `roster.position_active_limits` -- WR has no
+  standalone cap, only a combined WR_TE bucket both WR and TE draw
+  from, handled explicitly) and `positions_blocked_for_all(window_teams,
+  capped_positions)` (intersection of capped positions across a set of
+  teams). The Live Draft Tracker now computes, per round row, which
+  teams pick in that row's window (deterministic from snake order, not
+  from what's actually been drafted) and downgrades a
+  historically-predicted "run" position to **Can wait** (marked 🔒)
+  whenever EVERY one of those teams is already capped on it — a real
+  constraint, not a strategy guess, and one that (unlike a starter
+  -need read) only ever gets MORE true over time, so it's safe to apply
+  even to rounds well ahead of where the draft currently stands.
+  Verified the exact scenario end-to-end with a scripted repro (window
+  teams forced to cap 1 RB each, only RB demoted, WR left alone).
+  Also crunched the grid to fit without horizontal scrolling per
+  request: merged each position's separate Proj/Δ columns into ONE
+  compact cell (`"2.2"` before a round is reached, `"2.2 (+1.0)"` once
+  it is, red/green background parsed from the `(+`/`(-` in the cell
+  text itself rather than a parallel data structure), all numbers at 1
+  decimal place throughout the page (including the opponent-demand
+  table, previously 2), and explicit `column_config` widths (`small`
+  for Round/Pick#/position columns, `medium` for the text columns) on
+  top of `use_container_width`. 8 new tests (4 `positions_at_cap`, 4
+  `positions_blocked_for_all`); 225/225 tests passing. Verified via
+  headless `AppTest` against both an empty draft state and a 60-pick
+  scripted state that pushes several opponents past the real RB cap
+  (5) — no exceptions either way.
 - **New "Development" page — in-app punch list (2026-08-28)**: league
   manager wants to input, edit, and close punch-list items directly in
   the app as it keeps getting refined, rather than tracking them
@@ -595,6 +629,76 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-28 — Live Draft Tracker: roster-cap-aware consider/wait, compact columns, 1-decimal everywhere
+League manager, third pass on the tracker: "During the draft the
+tendencies will be influenced by the roster slots each team has filled.
+So while the average rb's taken at any point might be xxx, practically,
+if the teams ahead of us prior to our next pick are all filled on RB's,
+they are far less likely to take any and we potentially can wait...
+also, lets only show 1 decimal place on the numbers and see if we can
+crunch the column widths a bit to get the whole grid visible without
+scrolling right."
+
+**Roster-cap-aware consider-now/can-wait.** The historical run
+predictor (`next_run_positions`) has no idea what any team has actually
+drafted -- it's a pure average over past seasons. Added two functions to
+`src/roster_needs.py`:
+- `positions_at_cap(position_counts, config) -> set[str]`: which
+  positions a team can never draft again, per this league's REAL roster
+  ceiling (`config.roster.position_active_limits` -- confirmed against
+  actual CBS platform behavior for at least DST/TE, see that config
+  block's own comments; not a heuristic guess). QB/RB/K/DST each have
+  their own max; WR has no standalone max in this league's rules, only
+  a combined WR_TE bucket that both WR and TE draw from alongside TE's
+  own separate (tighter) max -- handled explicitly: capped on WR once
+  the combined bucket is full, capped on TE once EITHER its own max or
+  the combined bucket is reached.
+- `positions_blocked_for_all(window_teams, capped_positions) -> set[str]`:
+  intersection of capped positions across a list of teams -- empty if
+  the window is empty or the teams don't share a capped position.
+
+On the Live Draft Tracker, for each round row's window (the opponents
+picking between that round's pick and Monster Cheese's own next pick --
+fully known in advance from the snake order, regardless of what's
+actually been drafted), look up which of those teams are ALREADY
+capped (from real, current roster counts) and demote any
+historically-predicted "run" position to **Can wait** (🔒) if literally
+every window opponent is capped on it. Key property that makes this
+valid even for rounds well ahead of where the draft stands right now:
+a real roster cap, once hit, can never become un-hit -- so "capped
+today" stays true for every later round too, even though a team not
+yet capped today COULD become capped by then (which this can't see in
+advance; the read only gets more accurate as the real draft catches up
+to each row). Verified the exact user-described scenario with a
+scripted repro: forced every window-team to draft exactly 1 RB against
+a synthetic RB cap=1, confirmed RB (and only RB) gets blocked while WR
+does not.
+
+**Compact columns + 1 decimal everywhere.** Merged each position's
+separate `Proj`/`Δ` columns into one cell per position: `"2.2"` for a
+round not yet reached, `"2.2 (+1.0)"` / `"2.2 (-0.5)"` once reached --
+halves the position-column count (6 instead of 12). Cell background
+color (🔴/🟢) is now parsed straight from the `(+`/`(-` in the
+formatted string rather than kept in a parallel numeric structure,
+since the column itself is text now. Added explicit
+`st.column_config` widths (`small` for the Round index, Pick #, and
+each position column; `medium` for Your pick / Consider now / Can
+wait) alongside the existing `use_container_width=True`, confirmed
+`column_config` and a pandas `Styler` (for the cell coloring) can be
+passed to `st.dataframe` together without error. Also dropped the
+opponent-demand table (in the collapsed "Opponent roster needs"
+section) from 2 decimal places to 1, for consistency with the rest of
+the page.
+
+8 new tests (`test_positions_at_cap_*` x4, `test_positions_blocked_for_all_*`
+x4) in `test_roster_needs.py`; 225/225 tests passing overall. Verified
+via headless `AppTest` runs of the full page: once against an empty
+draft state, once against a scripted 60-pick state (every non-Monster
+-Cheese pick through round 6 logged as RB) that pushes several real
+opponents past this league's actual RB cap of 5 -- no exceptions either
+time. Test state files were removed afterward; nothing left in
+`data/draft_state.json` for real.
 
 ### 2026-08-28 — New Development page: in-app punch list (add/edit/close)
 League manager: "lets also create a development page so that I can
