@@ -152,17 +152,18 @@ else:
 # ---------------------------------------------------------------------
 st.subheader("🎯 Live Draft Tracker")
 st.caption(
-    "One row per round of YOUR draft slot. Each position column shows "
-    "**proj** = historical average cumulative count drafted league-wide "
-    "by this pick (years selected in the sidebar), plus **(Δ)** once a "
-    "round is reached -- the ACTUAL draft vs. that projection (🔴 "
-    "running hotter than history = scarcer than usual right now, 🟢 "
-    "running cooler = safer than usual). **Consider now** / **Can wait** "
-    "look at the projected run of picks between this round and your NEXT "
-    "pick -- 🔒 marks a position moved to \"can wait\" because every "
-    "opponent picking in that window has already hit this league's real "
-    "roster cap for it (can't legally draft more), overriding what "
-    "history alone would suggest."
+    "One row per round of YOUR draft slot. Each position has TWO narrow "
+    "columns: the position code alone (e.g. **QB**) = historical average "
+    "cumulative count drafted league-wide by this pick (years selected "
+    "in the sidebar); **Δ** + the code (e.g. **ΔQB**) = the ACTUAL draft "
+    "vs. that projection once a round is reached (🔴 running hotter than "
+    "history = scarcer than usual right now, 🟢 running cooler = safer "
+    "than usual; blank for rounds not reached yet). **Consider now** / "
+    "**Can wait** look at the projected run of picks between this round "
+    "and your NEXT pick -- 🔒 marks a position moved to \"can wait\" "
+    "because every opponent picking in that window has already hit this "
+    "league's real roster cap for it (can't legally draft more), "
+    "overriding what history alone would suggest."
 )
 
 cum_hist = cumulative_counts_by_pick(history, years=selected_years)
@@ -223,11 +224,8 @@ for rnd in range(1, total_rounds + 1):
     row = {"Round": rnd, "Pick #": anchor, "Your pick": my_pick_label}
     for pos in KNOWN_POSITIONS:
         proj_val = float(proj_row.get(pos, 0.0))
-        if reached:
-            delta = round(actual_counts.get(pos, 0) - proj_val, 1)
-            row[pos] = f"{proj_val:.1f} ({delta:+.1f})" if delta != 0 else f"{proj_val:.1f} (0.0)"
-        else:
-            row[pos] = f"{proj_val:.1f}"
+        row[pos] = round(proj_val, 1)
+        row[f"Δ{pos}"] = round(actual_counts.get(pos, 0) - proj_val, 1) if reached else float("nan")
     row["Consider now"] = ", ".join(consider_final) if consider_final else "—"
     row["Can wait"] = (
         ", ".join(f"{p}🔒" if p in demoted else p for p in can_wait_final) if can_wait_final else "—"
@@ -238,32 +236,41 @@ if not tracker_rows:
     st.info("No rounds to show yet.")
 else:
     tracker_df = pd.DataFrame(tracker_rows).set_index("Round")
-    pos_cols = list(KNOWN_POSITIONS)
+    proj_cols = list(KNOWN_POSITIONS)
+    delta_cols = [f"Δ{pos}" for pos in KNOWN_POSITIONS]
 
-    def _pos_cell_color(val: str) -> str:
-        if "(+" in val:
+    def _delta_color(val: float) -> str:
+        if pd.isna(val):
+            return ""
+        if val > 0:
             return "background-color: rgba(220, 38, 38, 0.20);"
-        if "(-" in val:
+        if val < 0:
             return "background-color: rgba(34, 197, 94, 0.20);"
         return ""
 
-    styled_tracker = tracker_df.style.map(_pos_cell_color, subset=pos_cols)
+    styled_tracker = (
+        tracker_df.style
+        .map(_delta_color, subset=delta_cols)
+        .format({c: "{:.1f}" for c in proj_cols})
+        .format({c: "{:+.1f}" for c in delta_cols}, na_rep="–")
+    )
 
     def _display_width(s: str) -> int:
         """Rough rendered-width estimate in "character units" -- wide glyphs
-        (emoji like the 🔒 lock, or the Δ/· separators) count for more than
-        a plain ASCII letter, since len() alone undercounts how wide they
-        actually render."""
+        (emoji like the 🔒 lock, the Δ prefix, or the · separator) count for
+        more than a plain ASCII letter, since len() alone undercounts how
+        wide they actually render."""
         return sum(2 if ord(ch) > 0x2000 else 1 for ch in s)
 
-    def _col_px(header: str, values, per_char: int = 6, pad: int = 14, min_px: int = 36) -> int:
+    def _col_px(header: str, values, per_char: int = 6, pad: int = 10, min_px: int = 32) -> int:
         """Pixel width just wide enough for this column's own longest
-        actual value (or its header, if that's longer) -- so "Your pick",
-        "Consider now", and "Can wait" size to what they actually contain
-        instead of a fixed "medium" (200px) that's overkill once most
-        entries are short. Recomputed every rerun, so it tracks the real
-        draft as picks get logged (e.g. "Your pick" grows once a
-        long-named DST gets drafted)."""
+        actual DISPLAYED value (or its header, if that's longer) -- so
+        every column sizes to what it actually shows instead of a fixed
+        preset. `values` should already be the same strings the Styler
+        will render (e.g. "18.0", "+1.0", "–"), not raw numbers, so a
+        narrow numeric column (like a position code's Δ) comes out just
+        as tight as the position abbreviation itself. Recomputed every
+        rerun, so it tracks the real draft as picks get logged."""
         widest = max([_display_width(header)] + [_display_width(str(v)) for v in values])
         return max(min_px, pad + per_char * widest)
 
@@ -284,9 +291,15 @@ else:
             "Can wait", width=_col_px("Can wait", tracker_df["Can wait"].tolist())
         ),
     }
-    for pos in pos_cols:
-        tracker_column_config[pos] = st.column_config.TextColumn(
-            pos, width=_col_px(pos, tracker_df[pos].tolist())
+    for pos in proj_cols:
+        proj_display = [f"{v:.1f}" for v in tracker_df[pos]]
+        tracker_column_config[pos] = st.column_config.NumberColumn(
+            pos, width=_col_px(pos, proj_display)
+        )
+    for dcol in delta_cols:
+        delta_display = ["–" if pd.isna(v) else f"{v:+.1f}" for v in tracker_df[dcol]]
+        tracker_column_config[dcol] = st.column_config.NumberColumn(
+            dcol, width=_col_px(dcol, delta_display)
         )
 
     st.dataframe(styled_tracker, use_container_width=True, column_config=tracker_column_config)

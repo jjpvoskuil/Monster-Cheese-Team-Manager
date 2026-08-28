@@ -124,6 +124,28 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   `scripts/simulate_draft.py --help` documents CLI usage; `scipy` added
   to `requirements-dev.txt` (dev/sim-only dependency, not needed by the
   deployed Streamlit app itself).
+- **Live Draft Tracker: Δ columns restored as their own narrow columns
+  (2026-08-28, fifth pass)**: the previous pass's merge of each
+  position's Proj+Δ into one cell ("18.0 (+1.0)") lost the ability to
+  compact them independently and read as "we lost the delta columns."
+  Split back into two columns per position -- `QB` (proj) and `ΔQB`
+  (delta) -- but unlike the ORIGINAL (pre-merge) version, both are now
+  sized via the same content-fit `_col_px()` from the previous pass,
+  using short position-code headers instead of "QB Proj"/"QB Δ". Since
+  the displayed values are short (`"18.0"`, `"+1.0"`, `"–"`) and the
+  headers are just the position code, each pair comes out ~34px wide --
+  narrower in total (12 columns @ ~34px = ~408px) than the single
+  merged column had been (6 columns @ ~80-100px = ~480-600px), so
+  splitting them back apart actually shrank the grid further, not just
+  restored it. `_col_px()`'s pad/per_char tightened slightly (14→10)
+  since numeric columns carry less UI chrome than text ones. Delta cell
+  coloring reverted to a numeric sign check (`Styler.map` on the real
+  float column, NaN-safe) instead of the previous pass's string
+  -parsing hack, since the column is numeric again. 225/225 tests
+  passing (layout-only change). Verified via headless `AppTest` against
+  both an empty draft state and the same populated worst-case scenario
+  as the prior pass — no exceptions; worst-case total grid width
+  estimate came in around ~870px, down from ~960px.
 - **Live Draft Tracker: content-fit column widths (2026-08-28, fourth
   pass)**: league manager: "make the 'your pick', 'Consider now' and
   'can wait' columns smaller to match the max characters the field will
@@ -649,6 +671,44 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-08-28 — Live Draft Tracker: brought the Δ columns back, split from proj, compacted to the position code
+League manager: "we lost the delta columns. Can you add those back and
+you can compact all the position columns to the max size of the
+position abbreviation so it hopefully fits on my screen."
+
+The prior same-day pass had merged each position's Proj and Δ into one
+cell ("18.0 (+1.0)") specifically to cut column count in half for
+width. That traded away being able to see/scan the delta as its own
+column. Un-merged them in `pages/3_Draft_Tendencies.py`: `row[pos]` is
+the projection again (numeric, e.g. `18.0`), `row[f"Δ{pos}"]` is the
+delta again (numeric, NaN until the round is reached) -- built in the
+same loop iteration so the two land as adjacent columns per position,
+same visual grouping as the very first version of this feature.
+
+Headers are now just the position code (`QB`) and a Δ-prefixed code
+(`ΔQB`) instead of "QB Proj"/"QB Δ", and both columns run through the
+`_col_px()` content-fit sizer from the previous pass (pad/per_char
+tightened from 14/6 to 10/6, since a numeric column carries less
+padding overhead than a text one). Because the actual displayed values
+are short (`"18.0"`, `"+1.0"`, `"–"`) and the header is just 2-4
+characters, each proj/Δ pair lands around 34px -- 12 narrow columns at
+~34px (~408px total) beats the single merged column's 6 columns at
+~80-100px each (~480-600px) from the prior pass, so this split-and
+-compact approach is actually TIGHTER than the merge it replaces, not
+just a restoration of it. Delta cell coloring (🔴 hotter than history /
+🟢 cooler) reverted to a plain numeric sign check via `Styler.map` on
+the real float column (NaN-safe, no color for a not-yet-reached round)
+now that the column holds numbers again, replacing the previous pass's
+string-parsing workaround that merging had forced.
+
+225/225 tests passing (pure layout/column-split change, no `src/`
+logic touched). Verified via headless `AppTest`: empty draft state, and
+the same populated worst-case scenario as the prior pass (every
+Monster Cheese pick "Christian McCaffrey" RB, every opponent pick "San
+Francisco 49ers" DST, through round 6) -- no exceptions either way.
+Recomputed the worst-case total-grid-width estimate the same way as
+before: ~870px, down from the merged version's ~960px.
 
 ### 2026-08-28 — Live Draft Tracker: column widths now fit their actual content
 League manager: "make the 'your pick', 'Consider now' and 'can wait'
