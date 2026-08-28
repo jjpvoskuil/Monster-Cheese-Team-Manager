@@ -45,6 +45,7 @@ from src.roster_needs import (
     team_position_counts,
 )
 from src.scoring import load_config
+from src.ui_text import team_text_column
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
@@ -379,7 +380,10 @@ with st.expander("Opponent roster needs before your next pick"):
                 else:
                     top_positions = "— (starters look filled)"
                 rows.append({"Team": team, "Likely needs": top_positions})
-            st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+            st.dataframe(
+                pd.DataFrame(rows), hide_index=True, use_container_width=True,
+                column_config={"Team": team_text_column("Team", live_teams)},
+            )
 
             total_demand = aggregate_opponent_demand(needs)
             if total_demand:

@@ -711,6 +711,67 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-08-28 — Punch list #6 (team-name truncation) and #7 (Reports/Excel download page)
+
+**#6 — team names getting cut off with "...".** Two distinct Streamlit
+truncation mechanisms, both hit by this league's longer team names (up
+to "Mississippi Swamp Ass", 22 chars): `st.metric`'s value text (the
+Draft Board sidebar's "On the clock" metric, in a ~300px sidebar) has
+default CSS `overflow:hidden; text-overflow:ellipsis; white-space:nowrap`;
+`st.dataframe`'s auto column-sizing clips long cell text with an
+ellipsis when a column isn't given an explicit width. Fixed the first
+with one small global CSS injection in `app.py` (shrinks
+`[data-testid="stMetricValue"]`'s font a bit and lets it wrap instead of
+clip -- applies to every `st.metric` in the app, harmless on League
+Settings' short values too). Fixed the second with a new
+`src/ui_text.py` (`team_column_width()`/`team_text_column()`, sized to
+the longest name in whatever team list is passed in, +2 chars for a
+possible "🎯 " own-team prefix) applied via `column_config={"Team": ...}`
+on every dataframe with a "Team" column: Draft Board's sidebar "Picks by
+round" and "Next 10 picks" tables, its "Full pick log", and Draft
+Tendencies' "Opponent roster needs" table. Went with widening/shrinking
+over the punch-list item's own suggested fallback (abbreviating team
+names) since the primary ask ("compact the font so the whole team name
+fits") was achievable without it. 4 new tests in `tests/test_ui_text.py`.
+
+**#7 — Reports page, download grids/reports as Excel.** New
+`pages/7_Reports.py` ("📥 Reports", registered in `app.py`): a
+multiselect of available reports (everything on by default) plus one
+"⬇️ Download selected reports as Excel" button that bundles all of them
+into a single `.xlsx` workbook, one sheet per report. New
+`src/report_catalog.py` holds the actual report builders (pure
+functions of a `ReportContext`, no Streamlit -- unit-tested in
+`tests/test_report_catalog.py`, 12 tests) so the page itself is just a
+thin picker + `pd.ExcelWriter(engine="openpyxl")` wrapper. Six reports
+for this first pass, chosen because each is a pure function of
+`draft_state`/`config`/the blended projections board and doesn't depend
+on another page's own widget state (a slider position, a search filter,
+etc. -- e.g. Draft Tendencies' Position Tracker table was left out for
+this reason, not forgotten): Draft Board's Available Players and Full
+Pick Log, My Roster's Starting Lineup and Bench, League Rosters (expands
+into ONE SHEET PER TEAM, same Roster Position/Player/Proj Pts layout as
+that page's grid -- a real Excel sheet can't merge a "Team Name" header
+across two sub-columns the way that page's HTML table does, so this
+splits it back out per-team like an actual draft-day roster binder), and
+Draft Tendencies' Opponent Roster Needs. Sheet names are sanitized once,
+workbook-wide (`safe_sheet_name()` in `src/report_catalog.py`, Excel's
+31-char limit and illegal `: \ / ? *[]` characters, with automatic
+"(2)"/"(3)" de-duplication) across ALL selected reports' sheets
+together, not per-report, so a report label and a team name can never
+collide. Manually verified end-to-end against real 2026 projection data
+with a partial mock draft: generated the actual workbook, round-tripped
+it back through `openpyxl.load_workbook()`, confirmed sheet names and
+cell values are correct (15 sheets from the default 6-report selection:
+4 single-sheet reports + 10 team sheets from League Rosters + 1 from
+Opponent Needs, since My Roster/Available Players/Pick Log don't expand).
+4 AppTest smoke tests in `tests/test_reports_page.py` (everything
+selected by default, the download button gets a real `.xlsx` behind it,
+deselecting a report changes the sheet count, an empty selection shows a
+prompt instead of erroring).
+
+Both closed on the live deployed site and in the git-mirrored
+`data/punch_list.json`. Full suite 281/281.
+
 ### 2026-08-28 — League Rosters rebuilt as one unified wide grid (2nd mockup revision)
 
 League manager clarified their spreadsheet mockup: they wanted ONE grid

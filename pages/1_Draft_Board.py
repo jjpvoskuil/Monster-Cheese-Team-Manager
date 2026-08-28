@@ -28,6 +28,7 @@ from src.pick_suggestion import suggest_position, top_available_players
 from src.projections import build_draft_board, compute_tiers
 from src.scoring import load_config
 from src.tier_display import add_tier_divider_rows
+from src.ui_text import team_text_column
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
@@ -218,7 +219,10 @@ with st.sidebar:
                 for p in sorted(draft_state.picks, key=lambda p: p.overall_pick, reverse=True)
             ]
         )
-        st.dataframe(by_round_df, hide_index=True, use_container_width=True, height=260)
+        st.dataframe(
+            by_round_df, hide_index=True, use_container_width=True, height=260,
+            column_config={"Team": team_text_column("Team", st.session_state.team_names)},
+        )
 
     st.subheader("Next 10 picks")
     upcoming = draft_state.upcoming_picks(10)
@@ -235,7 +239,10 @@ with st.sidebar:
                 for u in upcoming
             ]
         )
-        st.dataframe(upcoming_df, hide_index=True, use_container_width=True, height=260)
+        st.dataframe(
+            upcoming_df, hide_index=True, use_container_width=True, height=260,
+            column_config={"Team": team_text_column("Team", st.session_state.team_names)},
+        )
     st.page_link("pages/4_My_Roster.py", label="Full roster by position →", icon="📋")
 
     with st.expander("Rename opponent teams"):
@@ -506,6 +513,9 @@ with st.expander("Full pick log"):
                 for p in draft_state.picks
             ]
         )
-        st.dataframe(log_df, hide_index=True, use_container_width=True)
+        st.dataframe(
+            log_df, hide_index=True, use_container_width=True,
+            column_config={"Team": team_text_column("Team", st.session_state.team_names)},
+        )
     else:
         st.caption("No picks logged yet.")
