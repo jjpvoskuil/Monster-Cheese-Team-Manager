@@ -711,6 +711,25 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-08-28 — Fix: League Rosters page crashed on Streamlit Cloud with `ModuleNotFoundError: scipy`
+
+`pages/6_League_Rosters.py` (see the entry directly below) imports
+`src.lineup_value`, which imports `scipy.optimize.linear_sum_assignment`.
+`scipy` had only ever been listed in `requirements-dev.txt` — fine while
+`lineup_value` was only reached from `scripts/simulate_draft.py` (a
+local dev script), but this new page imports it at page-load time in
+the actual deployed app, which installs from `requirements.txt` only.
+User hit this immediately after the previous push, as a
+`ModuleNotFoundError` traceback on the live site. Moved `scipy>=1.11`
+into `requirements.txt` (with a comment explaining why it has to be a
+real, non-dev dependency now) and dropped the now-redundant line from
+`requirements-dev.txt` (already pulls in `requirements.txt` via `-r`).
+No code changes; local venv already had scipy installed so this session
+never reproduced the failure directly, only via Streamlit Cloud's build
+log/traceback the user shared. Full suite still 254/254 — this was a
+deploy-environment gap, not a test gap the suite could have caught (the
+local install had scipy from `requirements-dev.txt` all along).
+
 ### 2026-08-28 — Punch list #2: new "League Rosters" page (every team's roster + projected points + starting-lineup totals)
 
 New page `pages/6_League_Rosters.py` (registered in `app.py` as "League

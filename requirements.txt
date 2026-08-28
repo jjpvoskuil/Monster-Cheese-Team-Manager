@@ -5,3 +5,5 @@ openpyxl>=3.1
 requests>=2.31
 beautifulsoup4>=4.12
 lxml>=5.0
+scipy>=1.11  # src/lineup_value.py (optimal-lineup assignment solver) -- imported at page-load
+             # time by pages/6_League_Rosters.py, so this must be a real (non-dev) dependency
