@@ -6,9 +6,10 @@ Board's rankings actually come from (src/projections.py's blend_projections
 only showing the final ranked output.
 
 Sources currently wired in (data/projections/*.csv):
-  - cbs           — all rostered players, no live refresh (CBS requires a
-                    logged-in session; re-pull manually via a browser
-                    capture + scripts/fetch_draft_order.py's pattern).
+  - cbs           — all rostered players. LOGIN-GATED (see below) —
+                    requires a logged-in CBS session, so there's no plain
+                    "Refresh" button; there's a "Log in & refresh" one
+                    instead (see LOGIN_GATED below).
   - fftoday       — ~50 players/skill-position, all 32 DSTs. Live refresh
                     supported below (server-rendered page, plain HTTP works).
   - fantasypros   — top 10 players per position only (free-tier cap — see
@@ -16,11 +17,23 @@ Sources currently wired in (data/projections/*.csv):
                     Live refresh attempted below but UNVERIFIED outside a
                     real deployment (this repo's dev sandbox has no general
                     internet egress to test against fantasypros.com).
+  - fantasypoints — league manager's paid subscription (added 2026-08-28).
+                    All 6 positions, ~630 players. LOGIN-GATED like CBS —
+                    see src/data_sources/fantasypoints.py's module
+                    docstring for the capture procedure and this source's
+                    known gaps (no fumbles-lost; no DST points/yards
+                    -allowed).
 
 Sites keep updating their season projections up until the first regular-
-season game, so each live source has its own "Refresh from web" button
-that re-fetches right now rather than relying only on the CSV snapshots
-committed to the repo.
+season game, so each live source has its own refresh control below.
+fftoday/fantasypros are plain HTTP and get a "Refresh" button that
+re-fetches right now, server-side. cbs/fantasypoints are LOGIN-GATED —
+Streamlit Cloud has no browser session to authenticate with, so their
+button ("Log in & refresh") just opens the site in a new tab for you to
+sign in; getting the actual updated data into this app still needs a
+live Claude session to capture it (ask Claude "refresh cbs" or "refresh
+fantasypoints" once you're logged in — see each source's module
+docstring for exactly what that capture does).
 """
 
 from __future__ import annotations
@@ -43,11 +56,29 @@ CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
 DATA_DIR = os.path.join(ROOT, "data", "projections")
 DATA_EXTENSIONS = (".csv", ".tsv", ".xlsx", ".xlsm", ".xltx", ".xls")
 
-# Sources with a working live-refresh path. CBS is deliberately absent —
-# it requires a logged-in browser session the deployed app doesn't have.
+# Sources with a working live-refresh path: plain HTTP, so a click here
+# re-fetches synchronously, server-side, right now.
 LIVE_REFRESH = {
     "fftoday": {"fetch": fetch_fftoday_all, "csv": os.path.join(DATA_DIR, "fftoday_2026.csv")},
     "fantasypros": {"fetch": fetch_fantasypros_all, "csv": os.path.join(DATA_DIR, "fantasypros_2026.csv")},
+}
+
+# Sources that require a logged-in session (the league manager's own paid
+# subscription, for fantasypoints) -- Streamlit Cloud has no browser to
+# authenticate with, so there's no plain-HTTP "Refresh" path (see cbs.py's
+# and fantasypoints.py's module docstrings). The button below just opens
+# the site so the league manager can log in; getting fresh data into this
+# app from there is a live-Claude-session capture, not something this
+# deployed app can trigger on its own.
+LOGIN_GATED = {
+    "cbs": {
+        "url": "https://www.cbssports.com/fantasy/football/stats/QB/2026/season/projections/nonppr/",
+        "csv": os.path.join(DATA_DIR, "cbs_2026.csv"),
+    },
+    "fantasypoints": {
+        "url": "https://www.fantasypoints.com/nfl/projections/season",
+        "csv": os.path.join(DATA_DIR, "fantasypoints_2026.csv"),
+    },
 }
 
 
@@ -120,7 +151,7 @@ st.caption(
     "pull the latest numbers right now instead of relying only on the snapshots below."
 )
 
-refresh_cols = st.columns(len(LIVE_REFRESH) + 1)
+refresh_cols = st.columns(len(LIVE_REFRESH) + len(LOGIN_GATED))
 for i, source in enumerate(LIVE_REFRESH):
     with refresh_cols[i]:
         csv_path = LIVE_REFRESH[source]["csv"]
@@ -131,9 +162,19 @@ for i, source in enumerate(LIVE_REFRESH):
         if st.button(f"🔄 Refresh {source}", key=f"refresh_{source}", use_container_width=True):
             _refresh_source(source)
             st.rerun()
-with refresh_cols[-1]:
-    st.caption("**cbs** — no live refresh (requires a logged-in CBS session)")
-    st.caption("Re-pull manually via a browser capture; see `SESSION_NOTES.md`.")
+for j, source in enumerate(LOGIN_GATED):
+    with refresh_cols[len(LIVE_REFRESH) + j]:
+        csv_path = LOGIN_GATED[source]["csv"]
+        if os.path.exists(csv_path):
+            st.caption(f"**{source}** — last updated {pd.Timestamp(os.path.getmtime(csv_path), unit='s').strftime('%Y-%m-%d %H:%M')}")
+        else:
+            st.caption(f"**{source}** — no data yet")
+        st.link_button(f"🔗 Log in & refresh {source}", LOGIN_GATED[source]["url"], use_container_width=True)
+        st.caption(
+            "Opens the site to sign in — once you're logged in, ask Claude "
+            f'"refresh {source}" and a live session will capture the latest '
+            "data and update this file for you."
+        )
 
 if "_refresh_ok" in st.session_state:
     source, n = st.session_state.pop("_refresh_ok")

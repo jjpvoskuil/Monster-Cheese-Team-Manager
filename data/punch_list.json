@@ -1,0 +1,82 @@
+{
+  "next_number": 8,
+  "items": [
+    {
+      "id": "7d9bb554",
+      "title": "Run 100 simulations to generate an ADP and other stats",
+      "number": 1,
+      "description": "Run many simulations to use that date to calculate average draft position of each player specific to our league.  Use this output on the draft board sheet as a colum.  Also calculate points per team to see the average simulated points for each teama nd out rank.",
+      "priority": "Medium",
+      "status": "Open",
+      "created_at": "2026-08-28T20:08:44.525315+00:00",
+      "updated_at": "2026-08-28T20:08:44.525373+00:00",
+      "closed_at": null
+    },
+    {
+      "id": "28ccb33d",
+      "title": "Create a page with all team roster grids",
+      "number": 2,
+      "description": "Create a page that shows the entire roster of each team in the league that fills as we are drafting.  This will allow us to look at each team to help id their needs and adjust ours.  Also add a column to each roster to who the project points for all the players and the total for each team.  Have a breakdown of total points for the roster and a second for the projected starting line up for each team.",
+      "priority": "Medium",
+      "status": "Open",
+      "created_at": "2026-08-28T20:08:44.525745+00:00",
+      "updated_at": "2026-08-28T20:08:44.525755+00:00",
+      "closed_at": null
+    },
+    {
+      "id": "733d9d16",
+      "title": "Refresh button for CBS on the Projections page",
+      "number": 3,
+      "description": "Add a refresh button that launches claude in chrome to allow refresh of the CBS stats",
+      "priority": "Medium",
+      "status": "Closed",
+      "created_at": "2026-08-28T20:08:44.526141+00:00",
+      "updated_at": "2026-08-28T20:08:44.526455+00:00",
+      "closed_at": "2026-08-28T20:08:44.526455+00:00"
+    },
+    {
+      "id": "4c8a16a6",
+      "title": "Add projections from Fantasy Points",
+      "number": 4,
+      "description": "Add another paid projections site to the the mix of sites.  The website is: FantasyPoints.com. (Login ID given directly in chat -- not stored here.)",
+      "priority": "Medium",
+      "status": "Closed",
+      "created_at": "2026-08-28T20:08:44.526756+00:00",
+      "updated_at": "2026-08-28T20:08:44.527023+00:00",
+      "closed_at": "2026-08-28T20:08:44.527023+00:00"
+    },
+    {
+      "id": "ea2f9d64",
+      "title": "Mock Draft Dry run",
+      "number": 5,
+      "description": "For the actual draft we will have 2 users logged into CBS.  My co-owner Sam and me.  Sam will do the actually picking on the cbs site during the draft and I'll be watching the app primarily.  What I would like to have claude do is watch my logged in CBS view with Claude in Chrome and make the picks on the app as they occur on the CBS site.  Claude does not have to pick anything live from the CBS draft, just watch and update the app.  To simulate this, we'll run a mock draft in CBS and I'll set it to autodraft and let the draft run.  Claude will watch this mock draft and make the associated picks on the app.  I'll be watch the app like I would during the real draft to see how it goes.",
+      "priority": "Medium",
+      "status": "Open",
+      "created_at": "2026-08-28T20:08:44.527350+00:00",
+      "updated_at": "2026-08-28T20:08:44.527359+00:00",
+      "closed_at": null
+    },
+    {
+      "id": "92b8f2b4",
+      "title": "Resize the team name txt to fit",
+      "number": 6,
+      "description": "On any page that shows the team names, compact the font so that the whole team name fits without the \"...\".  If that doesn't work, abbreviations for the team names is fine as well.",
+      "priority": "Medium",
+      "status": "Open",
+      "created_at": "2026-08-28T20:08:44.527705+00:00",
+      "updated_at": "2026-08-28T20:08:44.527711+00:00",
+      "closed_at": null
+    },
+    {
+      "id": "e649e1e9",
+      "title": "Download button for reports",
+      "number": 7,
+      "description": "Lets create a selectable download button and option.  We should be able to select multiple grids and reports from various pages and be able to extract each selected grid/report as a Excel file.",
+      "priority": "Medium",
+      "status": "Open",
+      "created_at": "2026-08-28T20:08:44.528115+00:00",
+      "updated_at": "2026-08-28T20:08:44.528124+00:00",
+      "closed_at": null
+    }
+  ]
+}

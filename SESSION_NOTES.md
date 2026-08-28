@@ -711,6 +711,76 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-08-28 — Punch list #4: added FantasyPoints.com as a 4th projections source; #3: login-gated "Log in & refresh" buttons for CBS + FantasyPoints; punch list now git-mirrored
+Three related pieces of work from one session, punch-list items #3 and #4
+(closed both — see below).
+
+**#4 — new source, `src/data_sources/fantasypoints.py`.** FantasyPoints.com
+is the league manager's own paid subscription, login-gated (like CBS) —
+no plain-HTTP path exists. Used Claude in Chrome on the league manager's
+own logged-in browser to reach NFL → Projections & Rankings → Season,
+which renders an ag-Grid table with its own "Download CSV" button; that
+export is per-position (dropdown), so clicked it once for each of
+QB/RB/WR/TE/K/DST and staged all 6 files via the device bridge into
+`data/projections/raw/fantasypoints_capture/`. (First tried reading the
+grid's row data directly via `javascript_tool` — found the full ~630-row
+dataset sitting in the page's Pinia store (`useNuxtApp().payload.pinia
+.grid`, an ag-Grid `gridApi`) with EVERY position already loaded
+regardless of the visible dropdown filter, which would have been a much
+cleaner one-shot extraction — but `javascript_tool`'s return value
+truncates hard at roughly 1,500-2,000 characters, well below what even
+one position's rows need, so that path doesn't work for bulk data and
+the CSV-download approach was used instead.)
+
+`src/data_sources/fantasypoints.py` parses those 6 CSVs into the
+canonical schema via fixed COLUMN INDEXES per position (not header
+names — the export has two header rows, and generic names like YDS/TD
+repeat once per stat group, e.g. RB's sheet has YDS/TD for rushing AND
+receiving, so name-based aliasing collides). `scripts/fetch_fantasypoints
+.py --from-capture-dir` builds `data/projections/fantasypoints_2026.csv`
+from a capture dir (633 rows total: 72/146/213/138/32/32 for QB/RB/WR/
+TE/K/DST) — confirmed loading and blending cleanly alongside the other 3
+sources (Josh Allen and Houston's DST each show all 4 sources joined).
+8 new tests in `tests/test_fantasypoints.py`, full suite 249/249.
+
+Two real, documented gaps in this source (see the module's docstring):
+no fumbles-lost column anywhere in the export, and DST rows have no
+points/yards-allowed at all (only sacks/int/fumble-rec/TD/return-TD) —
+both still come from CBS/FFToday in the blend, just not from this
+source's own vote.
+
+**#3 — "Log in & refresh" buttons, `pages/2_Projections.py`.** Per the
+punch-list item: "Add a refresh button that launches claude in chrome to
+allow refresh of the CBS stats." A deployed Streamlit Cloud app has no
+browser session of its own to authenticate with, so this can't be a
+plain "Refresh" button the way fftoday/fantasypros' plain-HTTP ones are
+— added a new `LOGIN_GATED` section instead: `st.link_button("🔗 Log in
+& refresh <source>", url)` opens the site (CBS's stats page or
+FantasyPoints' season-projections page) in a new tab for the league
+manager to sign into; the caption is explicit that getting the actual
+refreshed data into the app from there still needs a live Claude
+session to capture it (ask "refresh cbs" / "refresh fantasypoints") —
+this button is a convenience for step 1 (log in), not a magic pipe from
+a deployed static app to an agent session, which doesn't exist. Applied
+to both cbs and fantasypoints since both are login-gated the same way.
+
+**Punch list git-mirrored.** Per the league manager's earlier explicit
+choice (AskUserQuestion: "Sync with the deployed Streamlit Cloud app"),
+removed `data/punch_list.json` from `.gitignore` (kept
+`data/draft_state.json` ignored — that one's still live draft data, not
+this) and committed the 7 real items currently on the deployed site
+(read via Claude in Chrome — the `Claude_Browser__*` device-bridge pane
+still won't scroll/render Streamlit content reliably, but the
+`claude-in-chrome` extension tools, driving the league manager's actual
+logged-in Chrome, work fine: click-then-`key:End` gets an initial
+scroll, then plain mouse-wheel `scroll` works after that). This is a
+ONE-DIRECTIONAL mirror as of today, not live sync — future edits made
+directly on the deployed site won't flow back to git automatically;
+whoever picks this up next should re-pull it the same way before trusting
+this file as current. Also closed #3 and #4 both here and on the live
+site (both now actually done), so `data/punch_list.json` already
+reflects 5 open / 2 closed.
+
 ### 2026-08-28 — Pick-suggestion algorithm: 2nd DST and both Kickers now can't come before round 17 (Monster Cheese only)
 League manager: "The algorithm for pick recommendations look pretty good.
 One tweak before we run the simulations. For our team only, add a rule
