@@ -4,7 +4,10 @@ AppTest smoke tests for the League Rosters page (punch-list item #2):
 that fills as we are drafting ... add a column to each roster to who the
 project points for all the players and the total for each team. Have a
 breakdown of total points for the roster and a second for the projected
-starting line up for each team."
+starting line up for each team." Layout (2026-08-28) matches the league
+manager's own spreadsheet mockup: one Roster Position / Player / Proj
+Pts table per team, capped with Starting Lineup Pts / Bench Points /
+Total Team Points summary rows.
 
 Same AppTest-via-app.py pattern as tests/test_draft_board_page.py (see
 that file's module docstring for why: st.page_link needs the real
@@ -53,7 +56,11 @@ def _log_picks(rounds_to_log: int) -> tuple[DraftState, dict]:
     against the real config/team order, same helper style as
     test_draft_board_page.py's _write_draft_state_directly. Every pick is
     an RB filler -- fine here since these tests only care about pick
-    counts and points plumbing, not realistic roster construction."""
+    counts and points plumbing, not realistic roster construction. RB is
+    eligible for the dedicated RB slot (fewest eligible positions, so
+    src.roster_needs.assign_roster_slots fills it before any flex slot),
+    so up to `starters`'s RB count worth of fillers land in the Starting
+    Lineup section, not the bench."""
     config = _load_config()
     teams = config["draft"]["team_order"]
     ds = DraftState(
@@ -86,8 +93,18 @@ def test_league_rosters_page_renders_with_no_picks_logged():
     summary_df = at.dataframe[0].value
     assert len(summary_df) == len(teams)
     assert set(summary_df["Picks"]) == {0}
-    assert set(summary_df["Roster Pts"]) == {0.0}
     assert set(summary_df["Starting Lineup Pts"]) == {0.0}
+    assert set(summary_df["Bench Points"]) == {0.0}
+    assert set(summary_df["Total Team Points"]) == {0.0}
+
+    # Every starter slot still gets a row even with nothing drafted --
+    # matches the spreadsheet mockup's per-slot layout, empty or not.
+    first_team_table = at.dataframe[1].value
+    assert "Roster Position" in first_team_table.columns
+    assert "— empty —" in first_team_table["Player"].values
+    assert "Starting Lineup Pts" in first_team_table["Roster Position"].values
+    assert "Bench Points" in first_team_table["Roster Position"].values
+    assert "Total Team Points" in first_team_table["Roster Position"].values
 
 
 def test_league_rosters_page_fills_in_as_picks_are_logged():
@@ -102,6 +119,9 @@ def test_league_rosters_page_fills_in_as_picks_are_logged():
     # Strip the "🎯 " prefix used to mark my own team in the summary table.
     row = summary_df[summary_df["Team"].str.endswith(my_team)].iloc[0]
     assert row["Picks"] == 2
+    # Total Team Points must always equal Starting Lineup + Bench, since
+    # every drafted pick lands in exactly one of those two buckets.
+    assert row["Total Team Points"] == round(row["Starting Lineup Pts"] + row["Bench Points"], 1)
 
     # "Filler" isn't a real player in any projections source, so points
     # for it come back as 0 and it should show up in the missing-
@@ -123,9 +143,10 @@ def test_league_rosters_page_flags_players_missing_from_projections():
 
 def test_league_rosters_page_totals_are_zero_for_an_all_filler_roster():
     """Every logged pick is "Filler" (position RB, not in any real
-    projections source) -- both Roster Pts and Starting Lineup Pts for
-    every team should come back exactly 0, confirming the page doesn't
-    silently substitute some other player's points for an unmatched name."""
+    projections source) -- Starting Lineup Pts, Bench Points, and Total
+    Team Points should all come back exactly 0 for every team, confirming
+    the page doesn't silently substitute some other player's points for
+    an unmatched name."""
     _log_picks(rounds_to_log=3)
 
     at = AppTest.from_file(os.path.join(ROOT, "app.py"))
@@ -133,22 +154,28 @@ def test_league_rosters_page_totals_are_zero_for_an_all_filler_roster():
     at = _open_page(at)
 
     summary_df = at.dataframe[0].value
-    assert (summary_df["Roster Pts"] == 0.0).all()
     assert (summary_df["Starting Lineup Pts"] == 0.0).all()
+    assert (summary_df["Bench Points"] == 0.0).all()
+    assert (summary_df["Total Team Points"] == 0.0).all()
     assert (summary_df["Picks"] == 3).all()
 
 
-def test_league_rosters_page_per_team_expander_shows_proj_pts_column():
+def test_league_rosters_page_per_team_table_has_roster_position_and_player_columns():
     _log_picks(rounds_to_log=1)
 
     at = AppTest.from_file(os.path.join(ROOT, "app.py"))
     at.run(timeout=60)
     at = _open_page(at)
 
-    # Summary table is dataframe[0]; per-team roster grids follow it, one
-    # per team with at least one pick.
-    per_team_grids = at.dataframe[1:]
-    assert len(per_team_grids) >= 1
-    for grid in per_team_grids:
-        assert "Proj Pts" in grid.value.columns
-        assert "Player" in grid.value.columns
+    # Summary table is dataframe[0]; one per-team roster table follows
+    # for every team (even those with zero picks, since starter slots
+    # always render).
+    config = _load_config()
+    teams = config["draft"]["team_order"]
+    per_team_tables = at.dataframe[1:]
+    assert len(per_team_tables) == len(teams)
+    for table in per_team_tables:
+        cols = table.value.columns
+        assert "Roster Position" in cols
+        assert "Player" in cols
+        assert "Proj Pts" in cols

@@ -711,6 +711,38 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-08-28 — League Rosters page redesigned to match the league manager's spreadsheet mockup
+
+Reworked `pages/6_League_Rosters.py` (added earlier this session) after
+the league manager shared a screenshot of the layout they actually
+wanted: one Roster Position / Player / Proj Pts table per team, ending
+in a blank spacer row then three summary rows -- Starting Lineup Pts,
+Bench Points, Total Team Points -- each a literal sum of the rows above
+it.
+
+This required switching methodologies for the "starting lineup" figure:
+previously used `src.lineup_value.optimal_lineup_points()` (the
+mathematically best-possible legal lineup, a proper assignment-problem
+optimization not tied to any single set of slot rows); now uses
+`src.roster_needs.assign_roster_slots()` instead -- the SAME draft-order
+heuristic `pages/4_My_Roster.py`'s own "Starting lineup" section already
+uses. Necessary because the mockup's summary rows have to visibly sum
+the specific Player/Proj-Pts rows printed above them, which only works
+if "starting lineup" corresponds to an actual, displayable slot
+assignment. `src.lineup_value` is no longer imported by any page --
+still used by `scripts/simulate_draft.py`'s Monte Carlo harness, so left
+alone (and left `scipy` in `requirements.txt` from the fix below rather
+than moving it back to dev-only, since it's harmless there and another
+page may want it again).
+
+League summary table's columns renamed to match: Starting Lineup Pts /
+Bench Points / Total Team Points (dropped the old ambiguous "Roster
+Pts"). Rewrote all 5 tests in `tests/test_league_rosters_page.py` for
+the new table shape and column names; full suite 254/254. Manually
+verified the math end-to-end with a real (non-filler) mock draft against
+actual 2026 projection data -- Starting Lineup Pts summed correctly from
+the printed player rows.
+
 ### 2026-08-28 — Fix: League Rosters page crashed on Streamlit Cloud with `ModuleNotFoundError: scipy`
 
 `pages/6_League_Rosters.py` (see the entry directly below) imports

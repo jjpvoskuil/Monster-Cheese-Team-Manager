@@ -1,31 +1,36 @@
 """
-League Rosters — every team's drafted roster in one place, filling in
-live as picks are logged. Punch-list item #2: "Create a page that shows
-the entire roster of each team in the league that fills as we are
-drafting. This will allow us to look at each team to help id their needs
-and adjust ours. Also add a column to each roster to who the project
-points for all the players and the total for each team. Have a breakdown
-of total points for the roster and a second for the projected starting
-line up for each team."
+League Rosters — every team's drafted roster in one place, organized by
+starting-lineup slot exactly like My Roster's own layout
+(pages/4_My_Roster.py's src.roster_needs.assign_roster_slots() draft
+-order heuristic: dedicated slots filled first, then flex slots,
+earliest-drafted player first among each slot's eligible positions) --
+so "Starting Lineup Pts" below is a literal sum of the rows shown above
+it, not a separate harder-to-verify figure. Layout matches the league
+manager's own spreadsheet mockup (2026-08-28): one Roster Position /
+Player / Proj Pts table per team, capped with Starting Lineup Pts /
+Bench Points / Total Team Points rows.
+
+Punch-list item #2: "Create a page that shows the entire roster of each
+team in the league that fills as we are drafting. This will allow us to
+look at each team to help id their needs and adjust ours. Also add a
+column to each roster to who the project points for all the players and
+the total for each team. Have a breakdown of total points for the
+roster and a second for the projected starting line up for each team."
 
 Reads the same data/draft_state.json every other page does (a pick
 logged anywhere shows up here on the next rerun), and the same blended
 projections board the Draft Board itself uses (src.projections
-.build_draft_board), so the point totals here always match what's shown
+.build_draft_board), so point totals here always match what's shown
 there.
 
-Two point totals per team, deliberately different methodologies:
-  - "Roster pts" = sum of every drafted player's projected points,
-    regardless of position or slot. A simple "how much value have they
-    accumulated" number.
-  - "Starting lineup pts" = src.lineup_value.optimal_lineup_points() --
-    the best-possible total from a LEGAL starting lineup assembled from
-    that team's drafted players (a proper assignment-problem
-    optimization, not the draft-order heuristic src.roster_needs uses on
-    the My Roster page). This is what actually decides weekly scoring,
-    so it's the more useful number for sizing up an opponent's team
-    strength -- a team that's hoarded 4 late-round QBs will have a much
-    lower starting-lineup total than its raw roster total suggests.
+NOTE: this deliberately uses the SAME draft-order heuristic as My
+Roster (src.roster_needs.assign_roster_slots), not
+src.lineup_value.optimal_lineup_points()'s "best mathematically
+possible legal lineup" figure -- the mockup's rows need to be an actual,
+literal slot assignment for the summary sums to visibly match what's
+printed above them. If a "best possible" number is ever wanted again
+alongside this, it'd have to be a separate column/metric, since it
+doesn't correspond to any single set of slot rows.
 """
 
 from __future__ import annotations
@@ -37,8 +42,8 @@ import streamlit as st
 
 from src.data_sources.manual_import import load_many
 from src.draft_state import DraftState
-from src.lineup_value import LineupPlayer, optimal_lineup_points
 from src.projections import build_draft_board
+from src.roster_needs import assign_roster_slots
 from src.scoring import load_config
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -49,6 +54,11 @@ DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
 DATA_EXTENSIONS = (".csv", ".tsv", ".xlsx", ".xlsm", ".xltx", ".xls")
 REAL_DATA_DIR = os.path.join(ROOT, "data", "projections")
 SAMPLE_DATA_DIR = os.path.join(ROOT, "data", "sample")
+
+# Display-only relabeling, same as My Roster -- doesn't touch
+# eligibility/assignment logic (src.roster_needs still sees "SUPERFLEX"
+# and its real QB/RB/WR/TE eligible list).
+SLOT_DISPLAY_NAMES = {"SUPERFLEX": "QB (Flex)"}
 
 
 @st.cache_resource
@@ -143,57 +153,79 @@ if not using_real_team_order:
 points_by_name = players_df.set_index("name")["score_total"]
 rosters = draft_state.roster_by_team()
 
+
+def _points_for(pick, missing: list[str]) -> float:
+    pts = points_by_name.get(pick.player_name)
+    if pts is None or pd.isna(pts):
+        missing.append(pick.player_name)
+        return 0.0
+    return float(pts)
+
+
 # ---------------------------------------------------------------------
-# Per-team totals -- "Roster pts" (sum of everything drafted) and
-# "Starting lineup pts" (optimal_lineup_points -- best legal lineup from
-# what's been drafted so far, not a draft-order heuristic).
+# Per-team table: one row per starting-lineup slot instance (draft-order
+# heuristic, same as My Roster), then one row per bench player, then a
+# blank spacer row, then Starting Lineup Pts / Bench Points / Total Team
+# Points summary rows -- literal sums of the rows above them.
 # ---------------------------------------------------------------------
 
 team_summaries = []
-per_team_rows: dict[str, list[dict]] = {}
+per_team_tables: dict[str, pd.DataFrame] = {}
 missing_projection_players: dict[str, list[str]] = {}
 
 for team in teams:
-    picks = sorted(rosters.get(team, []), key=lambda p: p.overall_pick)
-    lineup_players = []
+    picks = rosters.get(team, [])
+    slots, bench = assign_roster_slots(picks, starters)
+    bench_sorted = sorted(bench, key=lambda p: p.overall_pick)
+
     rows = []
-    missing = []
-    roster_pts = 0.0
-    for pick in picks:
-        pts = points_by_name.get(pick.player_name)
-        if pts is None or pd.isna(pts):
-            pts = 0.0
-            missing.append(pick.player_name)
-        else:
-            pts = float(pts)
-        roster_pts += pts
-        lineup_players.append(LineupPlayer(name=pick.player_name, position=pick.position, points=pts))
-        rows.append({
-            "Player": pick.player_name,
-            "Pos": pick.position,
-            "NFL Team": pick.nfl_team,
-            "Rd": pick.round,
-            "Pick": pick.overall_pick,
-            "Proj Pts": round(pts, 1),
-        })
-    lineup_pts = optimal_lineup_points(lineup_players, starters)
-    per_team_rows[team] = rows
+    missing: list[str] = []
+    starting_pts = 0.0
+    for slot in starters:
+        filled = slots.get(slot["slot"], [None] * slot["count"])
+        label_base = SLOT_DISPLAY_NAMES.get(slot["slot"], slot["slot"].replace("_", " "))
+        for i, pick in enumerate(filled, start=1):
+            label = label_base if slot["count"] == 1 else f"{label_base} {i}"
+            if pick is not None:
+                pts = _points_for(pick, missing)
+                starting_pts += pts
+                rows.append({"Roster Position": label, "Player": pick.player_name, "Proj Pts": round(pts, 1)})
+            else:
+                rows.append({"Roster Position": label, "Player": "— empty —", "Proj Pts": ""})
+
+    bench_pts = 0.0
+    for i, pick in enumerate(bench_sorted, start=1):
+        pts = _points_for(pick, missing)
+        bench_pts += pts
+        label = "Bench" if len(bench_sorted) == 1 else f"Bench {i}"
+        rows.append({"Roster Position": label, "Player": pick.player_name, "Proj Pts": round(pts, 1)})
+
+    total_pts = starting_pts + bench_pts
+
+    rows.append({"Roster Position": "", "Player": "", "Proj Pts": ""})
+    rows.append({"Roster Position": "Starting Lineup Pts", "Player": "", "Proj Pts": round(starting_pts, 1)})
+    rows.append({"Roster Position": "Bench Points", "Player": "", "Proj Pts": round(bench_pts, 1)})
+    rows.append({"Roster Position": "Total Team Points", "Player": "", "Proj Pts": round(total_pts, 1)})
+
+    per_team_tables[team] = pd.DataFrame(rows)
     missing_projection_players[team] = missing
     team_summaries.append({
         "Team": f"🎯 {team}" if team == my_team else team,
         "_team_raw": team,
         "Picks": len(picks),
-        "Roster Pts": round(roster_pts, 1),
-        "Starting Lineup Pts": round(lineup_pts, 1),
+        "Starting Lineup Pts": round(starting_pts, 1),
+        "Bench Points": round(bench_pts, 1),
+        "Total Team Points": round(total_pts, 1),
     })
 
 st.divider()
 st.subheader("League summary")
 st.caption(
-    "**Roster Pts** = sum of every drafted player's projected points. "
-    "**Starting Lineup Pts** = best-possible total from a *legal* starting "
-    "lineup assembled from that team's drafted players (roster.starters "
-    "slots) — the number that actually predicts weekly scoring strength."
+    "**Starting Lineup Pts** = sum of the Starting Lineup rows in each team's "
+    "table below — same slot-filling logic as the My Roster page's own "
+    "\"Starting lineup\" section (earliest-drafted player first among each "
+    "slot's eligible positions). **Bench Points** = everyone else drafted. "
+    "**Total Team Points** = both combined."
 )
 summary_df = pd.DataFrame(team_summaries).sort_values("Starting Lineup Pts", ascending=False)
 st.dataframe(
@@ -208,18 +240,13 @@ st.subheader("Team-by-team rosters")
 # My own team's expander opens by default; others start collapsed so the
 # page doesn't overwhelm on load with 10 teams x 22 rounds.
 for team in teams:
-    rows = per_team_rows[team]
     label = f"🎯 {team}" if team == my_team else team
     summary_row = next(s for s in team_summaries if s["_team_raw"] == team)
     with st.expander(
-        f"{label} — {summary_row['Picks']} picks · {summary_row['Roster Pts']} roster pts · "
-        f"{summary_row['Starting Lineup Pts']} starting-lineup pts",
+        f"{label} — {summary_row['Picks']} picks · {summary_row['Total Team Points']} total pts",
         expanded=(team == my_team),
     ):
-        if not rows:
-            st.caption("No picks logged yet.")
-        else:
-            st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+        st.dataframe(per_team_tables[team], hide_index=True, use_container_width=True)
         missing = missing_projection_players[team]
         if missing:
             st.caption(
