@@ -711,6 +711,49 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-08-28 — League Rosters rebuilt as one unified wide grid (2nd mockup revision)
+
+League manager clarified their spreadsheet mockup: they wanted ONE grid
+for the whole league (every team as a side-by-side Player/Proj Pts
+column pair, sharing one set of Roster Position row labels down the
+left edge, "Starters"/"Bench" section rows, Starting Lineup Pts/Bench
+Points/Total Team Points summary rows at the bottom) -- not the
+first revision's separate league-wide summary table plus a per-team
+expander each. That summary table is gone; the same totals now live as
+rows at the bottom of the single grid.
+
+Split the work: `src/league_grid.py` (new) builds the actual row/column
+data (`build_league_grid()` -> a `LeagueGrid` of per-team `TeamColumn`s,
+each with starter_players/starter_pts aligned to a shared
+`starter_labels` list, plus bench lists and the three point totals) --
+pure logic, no Streamlit, fully unit-tested in `tests/test_league_grid
+.py` (7 tests: label expansion, dedicated-before-flex fill order,
+overflow onto the bench, a missing-projection player scoring 0 and
+getting flagged, bench-depth padding across teams of different sizes,
+an all-empty team, column ordering). `pages/6_League_Rosters.py` just
+turns that into a hand-built HTML `<table>` via
+`st.markdown(unsafe_allow_html=True)` -- Streamlit's native
+`st.dataframe` can't merge a "Team Name" header across each team's two
+sub-columns the way the mockup wants, and `pd.DataFrame` MultiIndex
+columns don't render that way through `st.dataframe` either. Sticky
+first column (Roster Position stays pinned while scrolling right
+through 10 teams × 2 columns = 20 data columns), horizontal
+scroll container, "Starters"/"Bench" section-divider rows, my own team
+highlighted, every player/team name run through `html.escape()` (caught
+for real by "De'Von Achane" correctly escaping to `De&#x27;Von Achane`
+during manual verification below).
+
+Manually verified end-to-end against real 2026 projection data (not
+just the filler-player unit/AppTest fixtures): drafted the top 60
+players round-robin across 4 rounds, rendered the actual HTML, confirmed
+Total Team Points == Starting Lineup Pts + Bench Points for every one of
+the 10 teams and that dedicated slots fill before flex slots exactly as
+`src.roster_needs.assign_roster_slots` documents. 5 AppTest smoke tests
+rewritten in `tests/test_league_rosters_page.py` for the new HTML-based
+rendering (no more `st.dataframe` to introspect -- assertions check the
+raw HTML/caption text instead) plus one confirming the old summary
+dataframe is gone. Full suite 261/261.
+
 ### 2026-08-28 — League Rosters page redesigned to match the league manager's spreadsheet mockup
 
 Reworked `pages/6_League_Rosters.py` (added earlier this session) after

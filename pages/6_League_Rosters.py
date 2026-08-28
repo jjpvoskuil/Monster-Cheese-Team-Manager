@@ -1,14 +1,18 @@
 """
-League Rosters — every team's drafted roster in one place, organized by
-starting-lineup slot exactly like My Roster's own layout
+League Rosters — one single wide grid with every team side by side,
+organized by starting-lineup slot exactly like My Roster's own layout
 (pages/4_My_Roster.py's src.roster_needs.assign_roster_slots() draft
 -order heuristic: dedicated slots filled first, then flex slots,
-earliest-drafted player first among each slot's eligible positions) --
-so "Starting Lineup Pts" below is a literal sum of the rows shown above
-it, not a separate harder-to-verify figure. Layout matches the league
-manager's own spreadsheet mockup (2026-08-28): one Roster Position /
-Player / Proj Pts table per team, capped with Starting Lineup Pts /
-Bench Points / Total Team Points rows.
+earliest-drafted player first among each slot's eligible positions).
+Layout matches the league manager's own spreadsheet mockup (2026-08-28,
+second revision): ONE table for the whole league, not a table per team
+-- each team gets its own Player/Proj Pts column pair, all sharing the
+same Roster Position row labels down the left edge, ending in Starting
+Lineup Pts / Bench Points / Total Team Points rows that literally sum
+the columns above them. (The first revision built a separate
+league-wide summary table plus a per-team expander each; the league
+manager asked for one unified grid instead, so that summary table is
+gone -- the totals now live as rows at the bottom of the single grid.)
 
 Punch-list item #2: "Create a page that shows the entire roster of each
 team in the league that fills as we are drafting. This will allow us to
@@ -21,20 +25,15 @@ Reads the same data/draft_state.json every other page does (a pick
 logged anywhere shows up here on the next rerun), and the same blended
 projections board the Draft Board itself uses (src.projections
 .build_draft_board), so point totals here always match what's shown
-there.
-
-NOTE: this deliberately uses the SAME draft-order heuristic as My
-Roster (src.roster_needs.assign_roster_slots), not
-src.lineup_value.optimal_lineup_points()'s "best mathematically
-possible legal lineup" figure -- the mockup's rows need to be an actual,
-literal slot assignment for the summary sums to visibly match what's
-printed above them. If a "best possible" number is ever wanted again
-alongside this, it'd have to be a separate column/metric, since it
-doesn't correspond to any single set of slot rows.
+there. All the row/point-building logic lives in src.league_grid (unit
+-tested there) -- this file only turns that into an HTML table, since
+Streamlit's native st.dataframe can't merge a "Team Name" header across
+each team's Player+Proj Pts column pair the way the mockup wants.
 """
 
 from __future__ import annotations
 
+import html
 import os
 
 import pandas as pd
@@ -42,8 +41,8 @@ import streamlit as st
 
 from src.data_sources.manual_import import load_many
 from src.draft_state import DraftState
+from src.league_grid import LeagueGrid, build_league_grid
 from src.projections import build_draft_board
-from src.roster_needs import assign_roster_slots
 from src.scoring import load_config
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -55,10 +54,24 @@ DATA_EXTENSIONS = (".csv", ".tsv", ".xlsx", ".xlsm", ".xltx", ".xls")
 REAL_DATA_DIR = os.path.join(ROOT, "data", "projections")
 SAMPLE_DATA_DIR = os.path.join(ROOT, "data", "sample")
 
-# Display-only relabeling, same as My Roster -- doesn't touch
-# eligibility/assignment logic (src.roster_needs still sees "SUPERFLEX"
-# and its real QB/RB/WR/TE eligible list).
-SLOT_DISPLAY_NAMES = {"SUPERFLEX": "QB (Flex)"}
+GRID_CSS = """
+<style>
+.league-grid-wrap { overflow-x: auto; margin-bottom: 1rem; border: 1px solid #d0d0d0; }
+.league-grid { border-collapse: collapse; font-size: 0.82rem; white-space: nowrap; width: 100%; }
+.league-grid th, .league-grid td { border: 1px solid #d8d8d8; padding: 3px 8px; text-align: left; }
+.league-grid th.team-header { background: #e3e3e3; text-align: center; font-size: 0.9rem; }
+.league-grid th.team-header.mine { background: #ffe08a; }
+.league-grid th.sub, .league-grid th.corner { background: #f0f0f0; font-weight: 600; }
+.league-grid td.rowlabel { font-weight: 600; background: #fafafa; position: sticky; left: 0; z-index: 1; }
+.league-grid th.corner { position: sticky; left: 0; z-index: 2; }
+.league-grid tr.section td { background: #d9d9d9; font-weight: 700; }
+.league-grid tr.spacer td { border: none; height: 6px; background: transparent; }
+.league-grid tr.summary td.rowlabel { background: #dbe7ff; }
+.league-grid tr.summary td { background: #eef3ff; font-weight: 700; }
+.league-grid td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.league-grid td.empty { color: #999; }
+</style>
+"""
 
 
 @st.cache_resource
@@ -101,6 +114,81 @@ def load_players() -> tuple[pd.DataFrame, bool]:
     return pd.DataFrame(), False
 
 
+def _fmt(pts) -> str:
+    return f"{pts:.1f}" if pts is not None else ""
+
+
+def _esc(text) -> str:
+    return html.escape(str(text))
+
+
+def render_grid_html(grid: LeagueGrid, my_team: str) -> str:
+    n_teams = len(grid.columns)
+    parts: list[str] = ['<div class="league-grid-wrap"><table class="league-grid">']
+
+    # Row 1: team-name headers, each spanning that team's Player + Proj Pts columns.
+    parts.append('<tr><th class="corner"></th>')
+    for col in grid.columns:
+        cls = "team-header mine" if col.team == my_team else "team-header"
+        display = f"🎯 {_esc(col.team)}" if col.team == my_team else _esc(col.team)
+        parts.append(f'<th class="{cls}" colspan="2">{display}</th>')
+    parts.append("</tr>")
+
+    # Row 2: sub-headers.
+    parts.append('<tr><th class="corner">Roster Position</th>')
+    for _ in grid.columns:
+        parts.append('<th class="sub">Player</th><th class="sub">Proj Pts</th>')
+    parts.append("</tr>")
+
+    def section_row(label: str) -> str:
+        return f'<tr class="section"><td class="rowlabel">{_esc(label)}</td><td colspan="{n_teams * 2}"></td></tr>'
+
+    def spacer_row() -> str:
+        return f'<tr class="spacer"><td colspan="{1 + n_teams * 2}"></td></tr>'
+
+    parts.append(section_row("Starters"))
+    for i, label in enumerate(grid.starter_labels):
+        row = [f'<td class="rowlabel">{_esc(label)}</td>']
+        for col in grid.columns:
+            player = col.starter_players[i]
+            pts = col.starter_pts[i]
+            if player:
+                row.append(f"<td>{_esc(player)}</td>")
+            else:
+                row.append('<td class="empty">—</td>')
+            row.append(f'<td class="num">{_fmt(pts)}</td>')
+        parts.append("<tr>" + "".join(row) + "</tr>")
+
+    if grid.max_bench:
+        parts.append(spacer_row())
+        parts.append(section_row("Bench"))
+        for i in range(grid.max_bench):
+            row = [f'<td class="rowlabel">Bench {i + 1}</td>']
+            for col in grid.columns:
+                if i < len(col.bench_players):
+                    row.append(f"<td>{_esc(col.bench_players[i])}</td>")
+                    row.append(f'<td class="num">{_fmt(col.bench_pts[i])}</td>')
+                else:
+                    row.append('<td class="empty">—</td><td></td>')
+            parts.append("<tr>" + "".join(row) + "</tr>")
+
+    parts.append(spacer_row())
+
+    def summary_row(label: str, value) -> str:
+        row = [f'<tr class="summary"><td class="rowlabel">{_esc(label)}</td>']
+        for col in grid.columns:
+            row.append(f'<td></td><td class="num">{_fmt(value(col))}</td>')
+        row.append("</tr>")
+        return "".join(row)
+
+    parts.append(summary_row("Starting Lineup Pts", lambda c: c.starting_pts))
+    parts.append(summary_row("Bench Points", lambda c: c.bench_pts_total))
+    parts.append(summary_row("Total Team Points", lambda c: c.total_pts))
+
+    parts.append("</table></div>")
+    return "".join(parts)
+
+
 config = get_config()
 real_team_order = config.get("draft", {}).get("team_order") or []
 using_real_team_order = bool(real_team_order) and config["league"]["team_name"] in real_team_order
@@ -123,9 +211,11 @@ my_team = config["league"]["team_name"]
 
 st.title("🏆 League Rosters")
 st.caption(
-    "Every team's drafted roster, updating live as picks are logged. Use "
-    "this to spot other teams' needs (and gaps you might be able to "
-    "exploit) and to see how your own roster stacks up on projected points."
+    "Every team's drafted roster, side by side, updating live as picks are "
+    "logged. Use this to spot other teams' needs (and gaps you might be able "
+    "to exploit) and to see how your own roster stacks up on projected "
+    "points. Scroll right for the rest of the league — Roster Position stays "
+    "pinned on the left."
 )
 
 if players_df.empty:
@@ -153,108 +243,22 @@ if not using_real_team_order:
 points_by_name = players_df.set_index("name")["score_total"]
 rosters = draft_state.roster_by_team()
 
+grid = build_league_grid(rosters, teams, starters, points_by_name)
 
-def _points_for(pick, missing: list[str]) -> float:
-    pts = points_by_name.get(pick.player_name)
-    if pts is None or pd.isna(pts):
-        missing.append(pick.player_name)
-        return 0.0
-    return float(pts)
+st.markdown(GRID_CSS, unsafe_allow_html=True)
+st.markdown(render_grid_html(grid, my_team), unsafe_allow_html=True)
 
-
-# ---------------------------------------------------------------------
-# Per-team table: one row per starting-lineup slot instance (draft-order
-# heuristic, same as My Roster), then one row per bench player, then a
-# blank spacer row, then Starting Lineup Pts / Bench Points / Total Team
-# Points summary rows -- literal sums of the rows above them.
-# ---------------------------------------------------------------------
-
-team_summaries = []
-per_team_tables: dict[str, pd.DataFrame] = {}
-missing_projection_players: dict[str, list[str]] = {}
-
-for team in teams:
-    picks = rosters.get(team, [])
-    slots, bench = assign_roster_slots(picks, starters)
-    bench_sorted = sorted(bench, key=lambda p: p.overall_pick)
-
-    rows = []
-    missing: list[str] = []
-    starting_pts = 0.0
-    for slot in starters:
-        filled = slots.get(slot["slot"], [None] * slot["count"])
-        label_base = SLOT_DISPLAY_NAMES.get(slot["slot"], slot["slot"].replace("_", " "))
-        for i, pick in enumerate(filled, start=1):
-            label = label_base if slot["count"] == 1 else f"{label_base} {i}"
-            if pick is not None:
-                pts = _points_for(pick, missing)
-                starting_pts += pts
-                rows.append({"Roster Position": label, "Player": pick.player_name, "Proj Pts": round(pts, 1)})
-            else:
-                rows.append({"Roster Position": label, "Player": "— empty —", "Proj Pts": ""})
-
-    bench_pts = 0.0
-    for i, pick in enumerate(bench_sorted, start=1):
-        pts = _points_for(pick, missing)
-        bench_pts += pts
-        label = "Bench" if len(bench_sorted) == 1 else f"Bench {i}"
-        rows.append({"Roster Position": label, "Player": pick.player_name, "Proj Pts": round(pts, 1)})
-
-    total_pts = starting_pts + bench_pts
-
-    rows.append({"Roster Position": "", "Player": "", "Proj Pts": ""})
-    rows.append({"Roster Position": "Starting Lineup Pts", "Player": "", "Proj Pts": round(starting_pts, 1)})
-    rows.append({"Roster Position": "Bench Points", "Player": "", "Proj Pts": round(bench_pts, 1)})
-    rows.append({"Roster Position": "Total Team Points", "Player": "", "Proj Pts": round(total_pts, 1)})
-
-    per_team_tables[team] = pd.DataFrame(rows)
-    missing_projection_players[team] = missing
-    team_summaries.append({
-        "Team": f"🎯 {team}" if team == my_team else team,
-        "_team_raw": team,
-        "Picks": len(picks),
-        "Starting Lineup Pts": round(starting_pts, 1),
-        "Bench Points": round(bench_pts, 1),
-        "Total Team Points": round(total_pts, 1),
-    })
-
-st.divider()
-st.subheader("League summary")
-st.caption(
-    "**Starting Lineup Pts** = sum of the Starting Lineup rows in each team's "
-    "table below — same slot-filling logic as the My Roster page's own "
-    "\"Starting lineup\" section (earliest-drafted player first among each "
-    "slot's eligible positions). **Bench Points** = everyone else drafted. "
-    "**Total Team Points** = both combined."
-)
-summary_df = pd.DataFrame(team_summaries).sort_values("Starting Lineup Pts", ascending=False)
-st.dataframe(
-    summary_df.drop(columns=["_team_raw"]),
-    hide_index=True,
-    use_container_width=True,
-)
-
-st.divider()
-st.subheader("Team-by-team rosters")
-
-# My own team's expander opens by default; others start collapsed so the
-# page doesn't overwhelm on load with 10 teams x 22 rounds.
-for team in teams:
-    label = f"🎯 {team}" if team == my_team else team
-    summary_row = next(s for s in team_summaries if s["_team_raw"] == team)
-    with st.expander(
-        f"{label} — {summary_row['Picks']} picks · {summary_row['Total Team Points']} total pts",
-        expanded=(team == my_team),
-    ):
-        st.dataframe(per_team_tables[team], hide_index=True, use_container_width=True)
-        missing = missing_projection_players[team]
-        if missing:
-            st.caption(
-                "⚠️ No projection found for: " + ", ".join(missing) +
-                " — scored as 0 pts above (name mismatch between the draft "
-                "log and projections data, or an undrafted-in-projections "
-                "player)."
-            )
+all_missing = sorted({
+    f"{name} ({col.team})"
+    for col in grid.columns
+    for name in col.missing_projection
+})
+if all_missing:
+    st.caption(
+        "⚠️ No projection found for: " + ", ".join(all_missing) +
+        " — scored as 0 pts above (name mismatch between the draft log and "
+        "projections data, or an undrafted-in-projections player)."
+    )
 
 st.divider()
 st.page_link("pages/1_Draft_Board.py", label="← Back to Draft Board", icon="🏈")
