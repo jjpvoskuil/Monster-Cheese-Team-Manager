@@ -24,6 +24,7 @@ from src.data_sources.draft_history import load_draft_history
 from src.data_sources.manual_import import load_many
 from src.data_sources.simulation_results import load_adp, load_team_points
 from src.draft_state import DraftState
+from src.live_refresh import inject_autorefresh
 from src.live_sync import read_sync_status
 from src.pick_suggestion import suggest_position, top_available_players
 from src.projections import build_draft_board, compute_tiers
@@ -163,6 +164,7 @@ draft_state = DraftState(
     state_file=DRAFT_STATE_FILE,
     reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
 )
+inject_autorefresh()
 
 players_df, is_sample = load_players()
 

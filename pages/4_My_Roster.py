@@ -24,6 +24,7 @@ import pandas as pd
 import streamlit as st
 
 from src.draft_state import DraftState
+from src.live_refresh import inject_autorefresh
 from src.roster_needs import assign_roster_slots
 from src.scoring import load_config
 
@@ -56,6 +57,7 @@ draft_state = DraftState(
     state_file=DRAFT_STATE_FILE,
     reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
 )
+inject_autorefresh()
 
 st.title(f"📋 My Roster — {config['league']['team_name']}")
 

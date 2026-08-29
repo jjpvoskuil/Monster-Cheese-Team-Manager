@@ -25,6 +25,7 @@ import streamlit as st
 
 from src.data_sources.manual_import import load_many
 from src.draft_state import DraftState
+from src.live_refresh import inject_autorefresh
 from src.projections import build_draft_board
 from src.report_catalog import REPORTS, ReportContext, build_workbook_sheets
 from src.scoring import load_config
@@ -102,6 +103,7 @@ draft_state = DraftState(
     state_file=DRAFT_STATE_FILE,
     reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
 )
+inject_autorefresh()
 
 players_df, is_sample = load_players()
 my_team = config["league"]["team_name"]

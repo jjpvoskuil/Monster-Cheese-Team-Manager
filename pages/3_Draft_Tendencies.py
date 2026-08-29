@@ -24,6 +24,7 @@ import streamlit as st
 
 from src.data_sources.draft_history import load_draft_history
 from src.draft_state import DraftState
+from src.live_refresh import inject_autorefresh
 from src.draft_tendencies import (
     KNOWN_POSITIONS,
     actual_cumulative_at_pick,
@@ -126,6 +127,7 @@ draft_state = DraftState(
     state_file=DRAFT_STATE_FILE,
     reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
 )
+inject_autorefresh()
 
 if draft_state.is_draft_complete:
     st.success("Live draft is complete — showing historical tendencies only.")
