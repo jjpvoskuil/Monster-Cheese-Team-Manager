@@ -7,10 +7,10 @@
       "number": 1,
       "description": "Run many simulations to use that date to calculate average draft position of each player specific to our league.  Use this output on the draft board sheet as a colum.  Also calculate points per team to see the average simulated points for each teama nd out rank.",
       "priority": "Medium",
-      "status": "Open",
+      "status": "Closed",
       "created_at": "2026-08-28T20:08:44.525315+00:00",
-      "updated_at": "2026-08-28T20:08:44.525373+00:00",
-      "closed_at": null
+      "updated_at": "2026-08-29T01:44:17.418510+00:00",
+      "closed_at": "2026-08-29T01:44:17.418510+00:00"
     },
     {
       "id": "28ccb33d",

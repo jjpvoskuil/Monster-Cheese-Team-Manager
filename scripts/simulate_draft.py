@@ -48,6 +48,27 @@ Same `--seed` across variants reproduces the exact same opponent-behavior
 random draws for every trial (Monster Cheese's own decisions are the only
 thing that can differ between two runs with the same seed), which is what
 makes an A/B comparison between two configs/weightings fair.
+
+Punch-list item #1 ("Run many simulations to ... calculate average draft
+position of each player specific to our league. Use this output on the
+draft board sheet as a column. Also calculate points per team to see the
+average simulated points for each team and [their] rank"): add
+--adp-csv/--team-points-csv to any run to also write those two
+aggregates (see aggregate_adp()/aggregate_team_points() below). The
+committed data/simulations/adp_2026.csv and
+data/simulations/team_points_2026.csv (read by pages/1_Draft_Board.py)
+were generated with:
+    python scripts/simulate_draft.py --trials 100 --seed 1000 \\
+        --adp-csv data/simulations/adp_2026.csv \\
+        --team-points-csv data/simulations/team_points_2026.csv
+Re-run the same command (bump --seed for a fresh random draw) and
+re-commit those two files whenever the projections data, league config,
+or pick-suggestion logic changes meaningfully enough that the old
+simulation no longer reflects them -- there's no automatic trigger for
+this, it's a manual "re-run before trusting these numbers again" step
+(100 trials takes on this hardware roughly 15 minutes; there's no faster
+path today, see SESSION_NOTES.md's 2026-08-29 entry for the measured
+per-trial cost and why it wasn't optimized further this round).
 """
 
 from __future__ import annotations
@@ -115,6 +136,7 @@ class TrialResult:
     unmet_round20_requirements: int = 0
     second_qb_round: "int | None" = None
     picks: "list[dict] | None" = None  # only populated when capture_picks=True
+    player_picks: dict[str, int] = field(default_factory=dict)  # player name -> overall_pick, EVERY trial (for ADP)
 
 
 def _opponent_pick(
@@ -246,6 +268,13 @@ def simulate_one_draft(
             for p in sorted(draft_state.picks, key=lambda p: p.overall_pick)
         ]
 
+    # name -> overall_pick for EVERY drafted player this trial -- cheap
+    # (draft_state.picks is already fully populated), always captured
+    # (not gated behind capture_picks like the formatted `picks` log
+    # above) since aggregate_adp() needs this from every single trial,
+    # not just one dumped draft.
+    player_picks = {p.player_name: p.overall_pick for p in draft_state.picks}
+
     return TrialResult(
         seed=seed,
         my_rank=my_rank,
@@ -255,7 +284,84 @@ def simulate_one_draft(
         unmet_round20_requirements=unmet_count,
         picks=picks_log,
         second_qb_round=second_qb_round,
+        player_picks=player_picks,
     )
+
+
+def aggregate_adp(board: pd.DataFrame, results: "list[TrialResult]") -> pd.DataFrame:
+    """Punch-list item #1: "Run many simulations to ... calculate average
+    draft position of each player specific to our league." One row per
+    player in `board` (whether or not they were ever actually drafted
+    across the trials): adp = mean overall_pick among the trials that DID
+    draft them (undrafted-in-every-trial players get adp=NaN, not some
+    penalty pick number -- the standard "ADP" convention treats "never
+    drafted" as a distinct, reportable fact rather than folding it into
+    the average). drafted_pct tells you how much to trust a given ADP --
+    a player drafted in only 3/100 trials has a real but noisy ADP.
+    Sorted by ADP ascending (earliest picks first), undrafted players
+    last, matching how ADP is conventionally read."""
+    trials = len(results)
+    pick_lists: dict[str, list[int]] = {}
+    for r in results:
+        for name, pick in r.player_picks.items():
+            pick_lists.setdefault(name, []).append(pick)
+
+    rows = []
+    for _, row in board.iterrows():
+        name = row["name"]
+        picks = pick_lists.get(name, [])
+        rows.append({
+            "name": name,
+            "position": row["position"],
+            "nfl_team": row["nfl_team"],
+            "adp": round(sum(picks) / len(picks), 1) if picks else None,
+            "times_drafted": len(picks),
+            "trials": trials,
+            "drafted_pct": round(100 * len(picks) / trials, 1) if trials else 0.0,
+        })
+    df = pd.DataFrame(rows)
+    return df.sort_values(by="adp", na_position="last", kind="stable").reset_index(drop=True)
+
+
+def aggregate_team_points(results: "list[TrialResult]") -> pd.DataFrame:
+    """Punch-list item #1: "Also calculate points per team to see the
+    average simulated points for each team[] and [their] rank." avg_pts
+    = mean of that team's OPTIMAL starting-lineup points
+    (src.lineup_value.optimal_lineup_points) across every trial.
+    avg_finish_rank = mean of the team's 1-10 finish rank WITHIN each
+    individual trial (a consistency signal -- a team that's usually 2nd
+    or 3rd but occasionally craters to 9th has a worse avg_finish_rank
+    than its avg_pts alone would suggest). rank = the team's simple
+    standing when every team is ranked by its own avg_pts -- the more
+    literal reading of "the average simulated points for each team and
+    [their] rank." Both are cheap to keep since they can legitimately
+    differ."""
+    trials = len(results)
+    if trials == 0:
+        return pd.DataFrame(columns=["team", "avg_points", "avg_finish_rank", "best_rank", "worst_rank", "trials", "rank"])
+    teams = list(results[0].all_points.keys())
+    points_by_team: dict[str, list[float]] = {t: [] for t in teams}
+    finish_rank_by_team: dict[str, list[int]] = {t: [] for t in teams}
+    for r in results:
+        ranked = sorted(r.all_points, key=lambda t: r.all_points[t], reverse=True)
+        for t in teams:
+            points_by_team[t].append(r.all_points[t])
+            finish_rank_by_team[t].append(ranked.index(t) + 1)
+
+    rows = [
+        {
+            "team": t,
+            "avg_points": round(sum(points_by_team[t]) / trials, 1),
+            "avg_finish_rank": round(sum(finish_rank_by_team[t]) / trials, 2),
+            "best_rank": min(finish_rank_by_team[t]),
+            "worst_rank": max(finish_rank_by_team[t]),
+            "trials": trials,
+        }
+        for t in teams
+    ]
+    df = pd.DataFrame(rows).sort_values("avg_points", ascending=False).reset_index(drop=True)
+    df["rank"] = df.index + 1
+    return df
 
 
 def run_trials(
@@ -269,7 +375,7 @@ def run_trials(
     need_weight: "float | None",
     scarcity_weight: "float | None",
     label: str,
-) -> dict:
+) -> "tuple[dict, list[TrialResult]]":
     results: list[TrialResult] = []
     t0 = time.time()
     for i in range(trials):
@@ -321,7 +427,7 @@ def run_trials(
             for r in results
         ],
     }
-    return summary
+    return summary, results
 
 
 def main() -> None:
@@ -338,6 +444,14 @@ def main() -> None:
         help="run ONE additional trial at this seed and write its full 220-pick draft log to --dump-picks-csv",
     )
     ap.add_argument("--dump-picks-csv", type=str, default=None, help="path for --dump-picks-seed's pick log CSV")
+    ap.add_argument(
+        "--adp-csv", type=str, default=None,
+        help="write per-player average draft position (punch-list item #1) across these trials here",
+    )
+    ap.add_argument(
+        "--team-points-csv", type=str, default=None,
+        help="write each team's average simulated optimal-lineup points + rank (punch-list item #1) here",
+    )
     args = ap.parse_args()
 
     config = load_config(CONFIG_PATH)
@@ -346,7 +460,7 @@ def main() -> None:
     hist_counts = counts_by_round(history_df) if not history_df.empty else pd.DataFrame()
 
     if args.trials > 0:
-        summary = run_trials(
+        summary, results = run_trials(
             board, config, history_df, hist_counts,
             trials=args.trials, base_seed=args.seed,
             value_weight=args.value_weight, need_weight=args.need_weight, scarcity_weight=args.scarcity_weight,
@@ -360,6 +474,16 @@ def main() -> None:
             with open(args.out, "w") as f:
                 json.dump(summary, f, indent=2)
             print(f"\nFull results written to {args.out}")
+
+        if args.adp_csv:
+            os.makedirs(os.path.dirname(args.adp_csv) or ".", exist_ok=True)
+            aggregate_adp(board, results).to_csv(args.adp_csv, index=False)
+            print(f"ADP for {len(board)} players (from {args.trials} trials) written to {args.adp_csv}")
+
+        if args.team_points_csv:
+            os.makedirs(os.path.dirname(args.team_points_csv) or ".", exist_ok=True)
+            aggregate_team_points(results).to_csv(args.team_points_csv, index=False)
+            print(f"Team points/rank (from {args.trials} trials) written to {args.team_points_csv}")
 
     if args.dump_picks_seed is not None:
         if not args.dump_picks_csv:

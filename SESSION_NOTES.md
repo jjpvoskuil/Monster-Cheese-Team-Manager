@@ -711,6 +711,58 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-08-29 — Punch list #1: 100-trial Monte Carlo simulation → ADP column + simulated league-strength table
+
+Extended the existing `scripts/simulate_draft.py` harness (already ran
+full 220-pick mock drafts with Monster Cheese picking via the real
+`suggest_position()`/`top_available_players()` and opponents sampling
+from real historical per-round position tendencies) to also aggregate
+two new outputs across all trials, via new `--adp-csv`/`--team-points
+-csv` flags:
+
+- **`aggregate_adp()`**: per-player Average Draft Position — mean overall
+  pick number across every trial that player was drafted in. A player
+  never drafted in any trial gets `adp = NaN` (not a penalty value) so it
+  doesn't quietly corrupt a downstream "average ADP by position" rollup.
+- **`aggregate_team_points()`**: per-team average optimal-lineup points
+  across all trials, plus `avg_finish_rank`/`best_rank`/`worst_rank` and a
+  1-indexed `rank` (highest avg points = #1).
+
+Ran the real 100-trial simulation in the background (a single trial costs
+~9s once the board/config are loaded once; 100 trials took **898s (~15
+min)** wall time — this comfortably exceeds the Bash tool's 10-minute
+timeout, so it has to be launched detached (`nohup ... & disown`) and
+polled, not run as one blocking call). Committed the output as
+`data/simulations/adp_2026.csv` (660 players) and
+`data/simulations/team_points_2026.csv` (10 teams) — see
+`scripts/simulate_draft.py`'s module docstring for the exact command to
+regenerate these; there's no automatic re-run trigger, it's a manual step
+whenever projections/config/pick-logic change enough to matter.
+
+Wired both into the Draft Board (`pages/1_Draft_Board.py`) via a new
+`src/data_sources/simulation_results.py` (`load_adp()`/`load_team_points()`,
+same "optional file, empty frame if missing" contract as
+`load_draft_history()` — the app doesn't break on a fresh checkout before
+anyone's run the simulation): an **"ADP"** column now sits on the main
+ranked-players grid (merged onto `players_df` by name before filtering/
+sorting/tier-computation, so it survives search/position-filter/sort
+exactly like every other column), and a new "📊 Simulated league
+strength (100 mock drafts)" expander (placed right above the "Suggested
+pick" section) shows every team's average points and rank. Per this
+100-trial run: **Monster Cheese ranks #1** (avg 6754.1 pts, best-case
+rank 1 / worst-case rank 6 across the 100 trials) — this is a real
+sanity check on the pick-suggestion logic itself, not just a nice-to
+-have display.
+
+14 new tests: `tests/test_simulate_draft.py` (6, the two aggregation
+functions against synthetic `TrialResult` fixtures — deliberately not the
+slow real simulation), `tests/test_simulation_results.py` (4, the two
+loaders' missing-file/round-trip contract), plus 1 new AppTest in
+`tests/test_draft_board_page.py` confirming the ADP column and the
+10-row, correctly-ranked league-strength table actually render. Full
+suite 292/292. Closed on the live deployed site and in the git-mirrored
+`data/punch_list.json`.
+
 ### 2026-08-28 — Punch list #6 (team-name truncation) and #7 (Reports/Excel download page)
 
 **#6 — team names getting cut off with "...".** Two distinct Streamlit

@@ -22,6 +22,7 @@ import streamlit as st
 
 from src.data_sources.draft_history import load_draft_history
 from src.data_sources.manual_import import load_many
+from src.data_sources.simulation_results import load_adp, load_team_points
 from src.draft_state import DraftState
 from src.live_sync import read_sync_status
 from src.pick_suggestion import suggest_position, top_available_players
@@ -42,6 +43,8 @@ SAMPLE_DATA_DIR = os.path.join(ROOT, "data", "sample")
 DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
 LIVE_SYNC_STATUS_FILE = os.path.join(ROOT, "data", "live_sync_status.json")
 DRAFT_HISTORY_CSV = os.path.join(ROOT, "data", "draft_history", "draft_history.csv")
+SIMULATED_ADP_CSV = os.path.join(ROOT, "data", "simulations", "adp_2026.csv")
+SIMULATED_TEAM_POINTS_CSV = os.path.join(ROOT, "data", "simulations", "team_points_2026.csv")
 
 
 def _set_position_override(key: str, position: str) -> None:
@@ -110,6 +113,35 @@ def load_draft_history_df() -> pd.DataFrame:
     return get_history(os.path.getmtime(DRAFT_HISTORY_CSV))
 
 
+@st.cache_data
+def get_simulated_adp(_mtime: float) -> pd.DataFrame:
+    return load_adp(SIMULATED_ADP_CSV)
+
+
+def load_simulated_adp_df() -> pd.DataFrame:
+    """Per-player ADP from scripts/simulate_draft.py's --adp-csv output
+    (punch-list item #1). Not an error if it's missing -- the "ADP"
+    column just doesn't show up on the board until someone runs the
+    simulation (see that script's module docstring for the command)."""
+    if not os.path.exists(SIMULATED_ADP_CSV):
+        return pd.DataFrame()
+    return get_simulated_adp(os.path.getmtime(SIMULATED_ADP_CSV))
+
+
+@st.cache_data
+def get_simulated_team_points(_mtime: float) -> pd.DataFrame:
+    return load_team_points(SIMULATED_TEAM_POINTS_CSV)
+
+
+def load_simulated_team_points_df() -> pd.DataFrame:
+    """Per-team average simulated optimal-lineup points + rank from
+    scripts/simulate_draft.py's --team-points-csv output (punch-list
+    item #1). Not an error if it's missing, same as load_simulated_adp_df()."""
+    if not os.path.exists(SIMULATED_TEAM_POINTS_CSV):
+        return pd.DataFrame()
+    return get_simulated_team_points(os.path.getmtime(SIMULATED_TEAM_POINTS_CSV))
+
+
 config = get_config()
 real_team_order = config.get("draft", {}).get("team_order") or []
 using_real_team_order = bool(real_team_order) and config["league"]["team_name"] in real_team_order
@@ -133,6 +165,14 @@ draft_state = DraftState(
 )
 
 players_df, is_sample = load_players()
+
+simulated_adp = load_simulated_adp_df()
+if not players_df.empty:
+    if not simulated_adp.empty:
+        players_df = players_df.merge(simulated_adp[["name", "adp"]], on="name", how="left")
+        players_df = players_df.rename(columns={"adp": "sim_adp"})
+    else:
+        players_df["sim_adp"] = pd.NA
 
 # ---------------------------------------------------------------------
 # Sidebar: draft status, picks-by-round history, upcoming picks, team
@@ -283,6 +323,27 @@ if not using_real_team_order:
         "script's docstring), or rename opponents manually in the sidebar.",
         icon="⚠️",
     )
+
+simulated_team_points = load_simulated_team_points_df()
+if not simulated_team_points.empty:
+    with st.expander(f"📊 Simulated league strength ({int(simulated_team_points['trials'].iloc[0])} mock drafts)"):
+        st.caption(
+            "Each team's average projected points from its OPTIMAL starting "
+            "lineup, across many full simulated drafts (scripts/simulate_draft.py, "
+            "punch-list item #1) — Monster Cheese always drafts using this app's "
+            "real pick-suggestion logic; opponents draft from real historical "
+            "per-round positional tendencies. Ranked #1 = highest average points."
+        )
+        points_display = simulated_team_points[
+            ["rank", "team", "avg_points", "avg_finish_rank", "best_rank", "worst_rank"]
+        ].rename(columns={
+            "rank": "Rank", "team": "Team", "avg_points": "Avg Pts",
+            "avg_finish_rank": "Avg Finish", "best_rank": "Best Finish", "worst_rank": "Worst Finish",
+        })
+        st.dataframe(
+            points_display, hide_index=True, use_container_width=True,
+            column_config={"Team": team_text_column("Team", st.session_state.team_names)},
+        )
 
 drafted = draft_state.drafted_player_names()
 available = players_df[~players_df["name"].isin(drafted)].copy()
@@ -449,12 +510,13 @@ view = view.sort_values(sort_by)
 
 display_cols = [
     "vor_rank", "overall_rank", "position_rank", "name", "position", "nfl_team",
-    "score_total", "vor", "tier", "num_sources",
+    "score_total", "vor", "tier", "num_sources", "sim_adp",
 ]
 display_view = view[display_cols].rename(columns={
     "vor_rank": "VOR Rk", "overall_rank": "Ovr Rk", "position_rank": "Pos Rk",
     "name": "Player", "position": "Pos", "nfl_team": "Team",
     "score_total": "Proj Pts", "vor": "VOR", "tier": "Tier", "num_sources": "# Sources",
+    "sim_adp": "ADP",
 })
 has_tier_dividers = len(pos_filter) == 1
 if has_tier_dividers:
