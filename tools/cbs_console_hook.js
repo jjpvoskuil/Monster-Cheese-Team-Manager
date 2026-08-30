@@ -256,9 +256,19 @@
         const nextOpickRaw = inner && inner.newstate && inner.newstate.opick;
         const nextOpick = nextOpickRaw != null ? parseInt(nextOpickRaw, 10) : null;
         if (picks.length && nextOpick) {
-          const startOverall = nextOpick - picks.length; // overall_pick of picks[0] - 1
+          // BUG FOUND LIVE 2026-08-30 (real mock draft, mid-morning run):
+          // the comment this replaced ("overall_pick of picks[0] - 1") was
+          // wrong -- `nextOpick` is the pick that becomes "on the clock"
+          // AFTER this batch, so picks[picks.length - 1]'s overall_pick is
+          // `nextOpick - 1`, and the batch counts backward from there.
+          // The old "+ 1" numbered every pick one too high, so overall
+          // pick #1 was never reported at all (mislabeled as #2) and the
+          // receiver's merge logic sat forever waiting for a #1 that would
+          // never arrive -- confirmed via the receiver's own pending_ahead
+          // list, whose team order matched the real snake order exactly
+          // once every number was shifted down by one.
           picks.forEach((pk, i) => {
-            const overall = startOverall + i + 1;
+            const overall = nextOpick - picks.length + i;
             const info = resolvePlayer(pk.playerid);
             enqueue({
               overall_pick: overall,
