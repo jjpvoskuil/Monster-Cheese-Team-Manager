@@ -26,7 +26,7 @@ from src.data_sources.simulation_results import format_adp_as_round_pick, load_a
 from src.draft_state import DraftState
 from src.live_sync import read_sync_status
 from src.pick_suggestion import suggest_position, top_available_players
-from src.projections import build_draft_board, compute_tiers
+from src.projections import build_draft_board, compute_tiers, load_source_weights
 from src.scoring import load_config
 from src.tier_display import add_tier_divider_rows
 from src.ui_text import team_text_column
@@ -40,6 +40,7 @@ CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
 DATA_EXTENSIONS = (".csv", ".tsv", ".xlsx", ".xlsm", ".xltx", ".xls")
 REAL_DATA_DIR = os.path.join(ROOT, "data", "projections")
 SAMPLE_DATA_DIR = os.path.join(ROOT, "data", "sample")
+SOURCE_WEIGHTS_FILE = os.path.join(ROOT, "data", "source_weights.json")
 DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
 LIVE_SYNC_STATUS_FILE = os.path.join(ROOT, "data", "live_sync_status.json")
 DRAFT_HISTORY_CSV = os.path.join(ROOT, "data", "draft_history", "draft_history.csv")
@@ -72,28 +73,37 @@ def get_config():
 
 
 @st.cache_data
-def get_ranked_players(data_dir: str, _mtimes: tuple) -> tuple[pd.DataFrame, bool]:
+def get_ranked_players(data_dir: str, _mtimes: tuple, _weights_mtime: float) -> tuple[pd.DataFrame, bool]:
     """Returns (ranked_df, is_sample_data). _mtimes busts the cache when
-    source files change on disk."""
+    source files change on disk; _weights_mtime does the same when the
+    per-source weights set on the Projections page change (data/
+    source_weights.json's own mtime) -- without it, this cache would never
+    know a weight changed (no source CSV touched) and would keep serving
+    the old (always-equal-weight) ranking. See src/projections.py's
+    load_source_weights()."""
     paths = _data_files(data_dir)
     if not paths:
         return pd.DataFrame(), False
     sources = [(p, os.path.splitext(os.path.basename(p))[0]) for p in paths]
     raw = load_many(sources)
-    ranked = build_draft_board(raw, get_config())
+    source_weights = load_source_weights(SOURCE_WEIGHTS_FILE)
+    ranked = build_draft_board(raw, get_config(), source_weights=source_weights)
     return ranked, False
 
 
 def load_players() -> tuple[pd.DataFrame, bool]:
+    weights_mtime = (
+        os.path.getmtime(SOURCE_WEIGHTS_FILE) if os.path.exists(SOURCE_WEIGHTS_FILE) else 0.0
+    )
     real_paths = _data_files(REAL_DATA_DIR)
     if real_paths:
         mtimes = tuple(os.path.getmtime(p) for p in real_paths)
-        df, _ = get_ranked_players(REAL_DATA_DIR, mtimes)
+        df, _ = get_ranked_players(REAL_DATA_DIR, mtimes, weights_mtime)
         return df, False
     sample_paths = _data_files(SAMPLE_DATA_DIR)
     if sample_paths:
         mtimes = tuple(os.path.getmtime(p) for p in sample_paths)
-        df, _ = get_ranked_players(SAMPLE_DATA_DIR, mtimes)
+        df, _ = get_ranked_players(SAMPLE_DATA_DIR, mtimes, weights_mtime)
         return df, True
     return pd.DataFrame(), False
 

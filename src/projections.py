@@ -16,6 +16,8 @@ tool gets wrong for superflex leagues.
 
 from __future__ import annotations
 
+import json
+import os
 from typing import Optional
 
 import numpy as np
@@ -58,6 +60,32 @@ def blend_projections(df: pd.DataFrame, source_weights: Optional[dict[str, float
     blended = df.groupby(["name_key", "position"], as_index=False).apply(_agg, include_groups=False)
     blended = blended.reset_index(drop=True)
     return blended
+
+
+def load_source_weights(path: str) -> dict[str, float]:
+    """Read the per-source weights last set on the Projections page's
+    sliders (persisted to data/source_weights.json by
+    save_source_weights() below) -- the fix for the Draft Board silently
+    always using equal (1.0) weights regardless of what was set there,
+    since each page previously only kept its own in-memory copy. Missing
+    or unreadable file -> {} -> every source defaults to 1.0, same as
+    before this existed."""
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path) as f:
+            return {str(k): float(v) for k, v in json.load(f).items()}
+    except (json.JSONDecodeError, ValueError, OSError):
+        return {}
+
+
+def save_source_weights(path: str, weights: dict[str, float]) -> None:
+    """Persist the Projections page's current slider weights so the Draft
+    Board (a separate page/rerun) can pick them up via
+    load_source_weights() -- see that function's docstring."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(weights, f, indent=2, sort_keys=True)
 
 
 def compute_position_demand(config: dict) -> dict[str, float]:

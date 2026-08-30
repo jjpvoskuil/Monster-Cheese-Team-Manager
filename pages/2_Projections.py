@@ -47,13 +47,14 @@ import streamlit as st
 from src.data_sources.fantasypros import fetch_all as fetch_fantasypros_all
 from src.data_sources.fftoday import fetch_all as fetch_fftoday_all
 from src.data_sources.manual_import import load_many
-from src.projections import blend_projections, compute_tiers, score_and_rank
+from src.projections import blend_projections, compute_tiers, load_source_weights, save_source_weights, score_and_rank
 from src.scoring import load_config
 from src.tier_display import add_tier_divider_rows
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
 DATA_DIR = os.path.join(ROOT, "data", "projections")
+SOURCE_WEIGHTS_FILE = os.path.join(ROOT, "data", "source_weights.json")
 DATA_EXTENSIONS = (".csv", ".tsv", ".xlsx", ".xlsm", ".xltx", ".xls")
 
 # Sources with a working live-refresh path: plain HTTP, so a click here
@@ -202,11 +203,23 @@ st.caption(
     "an absolute percentage."
 )
 
+_saved_weights = load_source_weights(SOURCE_WEIGHTS_FILE)
+
 weight_cols = st.columns(len(available_sources))
 weights: dict[str, float] = {}
 for col, source in zip(weight_cols, available_sources):
     with col:
-        weights[source] = st.slider(source, min_value=0.0, max_value=3.0, value=1.0, step=0.1, key=f"weight_{source}")
+        weights[source] = st.slider(
+            source, min_value=0.0, max_value=3.0, value=_saved_weights.get(source, 1.0),
+            step=0.1, key=f"weight_{source}",
+        )
+
+# Persisted to disk (not just this page's own in-memory `weights`) so the
+# Draft Board -- a separate page/rerun -- picks up whatever was set here,
+# instead of always silently defaulting every source back to 1.0. See
+# src/projections.py's load_source_weights()/save_source_weights().
+if weights != _saved_weights:
+    save_source_weights(SOURCE_WEIGHTS_FILE, weights)
 
 weight_items = tuple(sorted(weights.items()))
 board = blend_and_score(mtimes, weight_items, raw_df)
