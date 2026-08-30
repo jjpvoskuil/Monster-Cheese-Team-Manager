@@ -95,13 +95,29 @@ MY_TEAM = config["league"]["team_name"]
 ROUNDS = config["draft"]["rounds"]
 REVERSE_LAST_N_ROUNDS = config["draft"].get("reverse_last_n_rounds", 0)
 
-draft_state = DraftState(
-    teams=TEAM_ORDER,
-    rounds=ROUNDS,
-    my_team=MY_TEAM,
-    state_file=DRAFT_STATE_FILE,
-    reverse_last_n_rounds=REVERSE_LAST_N_ROUNDS,
-)
+def _fresh_draft_state() -> DraftState:
+    """A brand-new DraftState, re-read from disk, every time this is
+    called -- NOT a single long-lived instance held for the life of this
+    process. That matters because this file is also written by the
+    Streamlit app itself (its own "Undo last pick" / "Reset draft"
+    buttons, and manual click-to-log): if this script kept one DraftState
+    object in memory for the whole draft, an Undo click in the app would
+    correct the file on disk but this process would never notice --
+    its own in-memory `next_overall_pick` would stay wrong, so it would
+    reject or mismatch every correctly-numbered pick CBS reports after
+    that point, and there'd be no way to recover short of restarting this
+    whole script. Re-reading the file (a small JSON parse) on every
+    request is cheap enough that there's no real cost to paying it every
+    time -- same reasoning the Streamlit app's own fragments use for
+    rebuilding DraftState fresh on every tick."""
+    return DraftState(
+        teams=TEAM_ORDER,
+        rounds=ROUNDS,
+        my_team=MY_TEAM,
+        state_file=DRAFT_STATE_FILE,
+        reverse_last_n_rounds=REVERSE_LAST_N_ROUNDS,
+    )
+
 
 # Every LivePick ever received this run, keyed by overall_pick -- passed to
 # sync_new_picks() in full each time (see that function's docstring: it's a
@@ -136,6 +152,7 @@ def _apply_pick(payload: dict) -> dict:
             position=str(payload.get("position") or ""),
             nfl_team=str(payload.get("nfl_team") or ""),
         )
+        draft_state = _fresh_draft_state()
         result = sync_new_picks(draft_state, list(_live_picks.values()))
         write_sync_status(LIVE_SYNC_STATUS_FILE, draft_state, result)
 
@@ -192,6 +209,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/status":
+            draft_state = _fresh_draft_state()
             self._send_json(200, {
                 "next_overall_pick": draft_state.next_overall_pick,
                 "on_the_clock": draft_state.on_the_clock,
@@ -220,11 +238,12 @@ class Handler(BaseHTTPRequestHandler):
                     raise ValueError("expected {\"picks\": [...]}")
                 total_new = 0
                 all_mismatches: list[str] = []
+                _start_state = _fresh_draft_state()
                 result = {
                     "ok": True, "newly_logged": 0, "mismatches": [],
-                    "next_overall_pick": draft_state.next_overall_pick,
-                    "on_the_clock": draft_state.on_the_clock,
-                    "is_draft_complete": draft_state.is_draft_complete,
+                    "next_overall_pick": _start_state.next_overall_pick,
+                    "on_the_clock": _start_state.on_the_clock,
+                    "is_draft_complete": _start_state.is_draft_complete,
                 }
                 for item in items:
                     result = _apply_pick(item)
@@ -244,13 +263,14 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
+    startup_state = _fresh_draft_state()
     print("=" * 70)
     print("Monster Cheese live pick receiver")
     print(f"Listening on http://{HOST}:{PORT}")
     print(f"State file:  {DRAFT_STATE_FILE}")
     print(f"Team order:  {TEAM_ORDER}")
-    print(f"Currently:   next pick #{draft_state.next_overall_pick} "
-          f"({'draft complete' if draft_state.is_draft_complete else draft_state.on_the_clock})")
+    print(f"Currently:   next pick #{startup_state.next_overall_pick} "
+          f"({'draft complete' if startup_state.is_draft_complete else startup_state.on_the_clock})")
     print()
     print("Now paste tools/cbs_console_hook.js into the CBS draft room's")
     print("browser console (see that file's header for exact steps).")
