@@ -240,10 +240,21 @@
     window.__mcHookInstalled = true;
 
     const orig = mainapp.socket.eventPicksCompleted.bind(mainapp.socket);
-    mainapp.socket.eventPicksCompleted = function (payload) {
+    mainapp.socket.eventPicksCompleted = function (outer) {
       try {
-        const picks = (payload && payload.picks) || [];
-        const nextOpick = payload && payload.newstate && payload.newstate.opick;
+        // CONFIRMED LIVE 2026-08-30 (a real mock draft, via instrumented
+        // logging -- the earlier "payload.picks" / "payload.newstate.opick"
+        // shape documented from prior-session exploration was WRONG, and
+        // this bug would have silently done nothing all draft long: the
+        // actual event argument is one level deeper, wrapped as
+        // {type: "picks", subtype: "completed", payload: {picks, newstate,
+        // fullstatedelta}}, and both `teamid` on each pick and `opick` on
+        // newstate arrive as STRINGS ("2", "169"), not numbers -- must
+        // parseInt both or the receiver's int-only validation rejects them.
+        const inner = outer && outer.payload;
+        const picks = (inner && inner.picks) || [];
+        const nextOpickRaw = inner && inner.newstate && inner.newstate.opick;
+        const nextOpick = nextOpickRaw != null ? parseInt(nextOpickRaw, 10) : null;
         if (picks.length && nextOpick) {
           const startOverall = nextOpick - picks.length; // overall_pick of picks[0] - 1
           picks.forEach((pk, i) => {
@@ -251,7 +262,7 @@
             const info = resolvePlayer(pk.playerid);
             enqueue({
               overall_pick: overall,
-              teamid: pk.teamid,
+              teamid: parseInt(pk.teamid, 10),
               player_name: info.name,
               position: info.pos,
               nfl_team: info.team,
@@ -262,7 +273,7 @@
         console.error("[MC sync] hook error", e);
         updateBadge("error", "hook error — see console");
       }
-      return orig(payload);
+      return orig(outer);
     };
 
     updateBadge("ok", "hook installed — waiting for picks");

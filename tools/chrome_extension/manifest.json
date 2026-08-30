@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Monster Cheese Live Draft Sync",
+  "version": "1.0",
+  "description": "Hooks CBS's live draft socket and posts each pick straight to the local Monster Cheese app receiver (tools/live_pick_receiver.py). Runs as an extension instead of a pasted console script because Chrome blocks a plain web page from fetching localhost directly (Private Network Access) -- an extension's background script is exempt.",
+  "permissions": ["scripting"],
+  "host_permissions": [
+    "*://*.cbssports.com/*",
+    "http://127.0.0.1:8765/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.cbssports.com/*"],
+      "js": ["main_world_hook.js"],
+      "world": "MAIN",
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["*://*.cbssports.com/*"],
+      "js": ["bridge.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
