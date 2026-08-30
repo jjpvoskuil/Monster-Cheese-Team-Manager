@@ -73,14 +73,15 @@ def get_config():
 
 
 @st.cache_data
-def get_ranked_players(data_dir: str, _mtimes: tuple, _weights_mtime: float) -> tuple[pd.DataFrame, bool]:
-    """Returns (ranked_df, is_sample_data). _mtimes busts the cache when
-    source files change on disk; _weights_mtime does the same when the
-    per-source weights set on the Projections page change (data/
-    source_weights.json's own mtime) -- without it, this cache would never
-    know a weight changed (no source CSV touched) and would keep serving
-    the old (always-equal-weight) ranking. See src/projections.py's
-    load_source_weights()."""
+def get_ranked_players(data_dir: str, mtimes: tuple, weights_mtime: float) -> tuple[pd.DataFrame, bool]:
+    """Returns (ranked_df, is_sample_data). mtimes/weights_mtime bust the
+    cache when source files or the Projections page's per-source weights
+    change (data/source_weights.json's own mtime). NOTE: these must NOT
+    have a leading underscore -- Streamlit's cache_data silently EXCLUDES
+    underscore-prefixed params from the cache key entirely, which was a
+    real bug here: this cache kept serving its first-ever (always-equal
+    -weight) result forever, ignoring every later weight change. See
+    src/projections.py's load_source_weights()."""
     paths = _data_files(data_dir)
     if not paths:
         return pd.DataFrame(), False
