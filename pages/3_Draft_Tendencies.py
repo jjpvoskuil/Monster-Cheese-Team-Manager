@@ -70,6 +70,51 @@ def load_history() -> pd.DataFrame:
 
 
 
+# ---------------------------------------------------------------------
+# Sidebar filter widgets (years / lookahead) run here, in the OUTER
+# (non-fragment) script -- NOT inside render_tendencies().
+#
+# Streamlit 1.50 raises StreamlitFragmentWidgetsNotAllowedOutsideError
+# ("Fragments cannot write widgets to outside containers") for ANY
+# widget written into a container created outside the fragment's own
+# delta path -- confirmed with a minimal repro against a pinned 1.50.0
+# install (st.button() reproduces it just as well as st.multiselect()
+# did here). See pages/1_Draft_Board.py's matching comment for the full
+# story -- this page is where the bug was first caught.
+#
+# Since selecting either of these widgets always triggers a full rerun
+# anyway (neither lives inside a fragment), moving them to plain
+# top-level code is both correct and simpler than threading their values
+# through a reserved container. render_tendencies() below reads
+# selected_years/rounds_ahead as ordinary module globals -- correct even
+# on a fragment-only (run_every) rerun, since a fragment-only rerun never
+# touches this module-level code, so it always sees whatever value the
+# most recent FULL rerun (i.e. the last time one of these widgets
+# actually changed) left behind.
+# ---------------------------------------------------------------------
+_history_for_sidebar = load_history()
+
+with st.sidebar:
+    st.header("Years to include")
+    if _history_for_sidebar.empty:
+        st.caption("No draft history loaded yet.")
+        selected_years: list[int] = []
+        rounds_ahead = 2
+    else:
+        _years_for_sidebar = available_years(_history_for_sidebar)
+        selected_years = st.multiselect(
+            "Average across", options=_years_for_sidebar, default=_years_for_sidebar,
+            help="Pick one year alone, or several to average together — mirrors "
+                 "how the old TARGETS spreadsheet's 'Alt Targets' tab compared "
+                 "recent years side by side.",
+        )
+        st.divider()
+        rounds_ahead = st.slider(
+            "Look ahead (rounds)", min_value=1, max_value=3, value=2,
+            help="How many rounds ahead to predict positional runs for.",
+        )
+
+
 @st.fragment(run_every=3)
 def render_tendencies() -> None:
     """Everything on this page that reads live draft_state -- the sidebar
@@ -103,23 +148,12 @@ def render_tendencies() -> None:
         f"({', '.join(str(y) for y in years)}), {teams_n} teams/round."
     )
 
-    with st.sidebar:
-        st.header("Years to include")
-        selected_years = st.multiselect(
-            "Average across", options=years, default=years,
-            help="Pick one year alone, or several to average together — mirrors "
-                 "how the old TARGETS spreadsheet's 'Alt Targets' tab compared "
-                 "recent years side by side.",
-        )
-        if not selected_years:
-            st.warning("Select at least one year.")
-            st.stop()
-
-        st.divider()
-        rounds_ahead = st.slider(
-            "Look ahead (rounds)", min_value=1, max_value=3, value=2,
-            help="How many rounds ahead to predict positional runs for.",
-        )
+    # Years / lookahead widgets live in plain top-level sidebar code above
+    # (see the module-level comment there) -- selected_years and
+    # rounds_ahead are read as module globals set by that code.
+    if not selected_years:
+        st.warning("Select at least one year.")
+        st.stop()
 
     # ---------------------------------------------------------------------
     # Live draft state (shared with the Draft Board page)

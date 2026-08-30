@@ -156,18 +156,170 @@ else:
 if "team_names" not in st.session_state:
     st.session_state.team_names = teams
 
+@st.fragment(run_every=3)
+def render_sidebar() -> None:
+    """The entire sidebar -- draft status, live-sync status, undo/reset,
+    picks-by-round history, upcoming picks, and team renaming. Called
+    from inside `with st.sidebar:` below, NOT via `st.sidebar.xxx()`
+    calls made from a fragment whose own position is in the main body.
+
+    That distinction matters a lot on Streamlit 1.50: a fragment whose
+    home delta path is the main body, writing into the sidebar via
+    `st.sidebar` (or a container object created either inside or outside
+    itself), raises StreamlitFragmentWidgetsNotAllowedOutsideError for
+    any WIDGET -- and, worse, for plain non-widget elements it doesn't
+    raise anything but silently fails to clear the sidebar's previous
+    content before redrawing, so the content piles up forever (confirmed
+    live: a single st.write() in that shape duplicated on every
+    run_every(3) tick, 2 copies after ~5s, 7 after ~20s, unbounded). The
+    only combination that behaves correctly is calling the *entire
+    fragment* from inside `with st.sidebar:`, so the fragment's own delta
+    path is rooted in the sidebar -- every plain st.* call inside it,
+    widget or not, is then naturally within that path and gets properly
+    cleared and redrawn each run.
+
+    DraftState is built fresh every run (same reasoning as
+    render_live_board()'s docstring) so Undo/Reset act on current data
+    and the status panel reflects live-synced picks without a manual
+    reload. st.rerun() defaults to scope="app" in Streamlit 1.50, so
+    Undo/Reset here immediately refresh the main board fragment too, not
+    just this sidebar fragment.
+    """
+    draft_state = DraftState(
+        teams=st.session_state.team_names,
+        rounds=config["draft"]["rounds"],
+        my_team=config["league"]["team_name"],
+        state_file=DRAFT_STATE_FILE,
+        reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
+    )
+
+    st.header("Draft status")
+    if draft_state.is_draft_complete:
+        st.success("Draft complete!")
+    else:
+        on_clock = draft_state.on_the_clock
+        rnd, slot = draft_state.round_and_slot_for_pick(draft_state.next_overall_pick)
+        st.metric("On the clock", on_clock)
+        st.caption(f"Pick {draft_state.next_overall_pick} overall (Round {rnd}, Slot {slot})")
+        if draft_state.is_my_pick:
+            st.success("🎯 It's your pick!")
+        else:
+            until = draft_state.picks_until_my_turn()
+            st.caption(f"{until} picks until your turn")
+
+    sync_status = read_sync_status(LIVE_SYNC_STATUS_FILE)
+    if sync_status:
+        st.divider()
+        st.subheader("🔴 Live sync from CBS")
+        synced_at = datetime.fromisoformat(sync_status["last_sync_at"])
+        age_seconds = (datetime.now(timezone.utc) - synced_at).total_seconds()
+        st.caption(f"Last synced pick: #{sync_status['last_synced_overall_pick']}")
+        if age_seconds < 150:
+            st.caption(f"✅ Updated {int(age_seconds)}s ago")
+        elif age_seconds < 600:
+            st.caption(f"⚠️ Updated {int(age_seconds // 60)} min ago — may be behind")
+        else:
+            st.caption(
+                f"🛑 Last update was {int(age_seconds // 60)} min ago — live sync "
+                f"looks stopped. Log picks manually below until it resumes."
+            )
+        if sync_status["mismatches"]:
+            st.error(
+                "Live sync found a mismatch with what's already logged — "
+                "check with whoever is running the sync before trusting "
+                "the board:\n" + "\n".join(f"- {m}" for m in sync_status["mismatches"])
+            )
+        if sync_status["pending_ahead"]:
+            st.caption(
+                f"{len(sync_status['pending_ahead'])} live pick(s) seen out of "
+                f"order, waiting on a gap to close"
+            )
+
+    if st.button("↩️ Undo last pick", use_container_width=True, disabled=not draft_state.picks):
+        undone = draft_state.undo_last_pick()
+        if undone:
+            st.toast(f"Undid: {undone.team} — {undone.player_name}")
+        st.rerun()
+
+    with st.expander("Reset draft (danger zone)"):
+        st.warning("This clears the entire pick log — cannot be undone.")
+        confirm_reset = st.checkbox("Yes, clear every logged pick", key="confirm_reset_draft")
+        if st.button(
+            "Reset draft", type="primary", disabled=not confirm_reset, key="reset_draft_button"
+        ):
+            draft_state.reset()
+            # Force a brand-new, unselected grid widget post-reset too --
+            # not just cosmetic: without this, the grid keeps whatever key
+            # (and therefore whatever session_state) it had before the
+            # reset, and there's no reason to trust stale selection state
+            # against a completely different (now fully available) player
+            # pool. See the grid_pick_nonce comment further down this file.
+            st.session_state.grid_pick_nonce = 0
+            st.toast("✅ Draft reset — all picks cleared.")
+            st.rerun()
+
+    st.divider()
+    st.subheader("Picks by round")
+    if not draft_state.picks:
+        st.caption("No picks logged yet.")
+    else:
+        # Most recent pick first -- this is a live ticker, not a
+        # scorecard, so what just happened belongs at the top.
+        by_round_df = pd.DataFrame(
+            [
+                {"Rd": p.round, "Pick": p.overall_pick, "Team": p.team, "Player": p.player_name, "Pos": p.position}
+                for p in sorted(draft_state.picks, key=lambda p: p.overall_pick, reverse=True)
+            ]
+        )
+        st.dataframe(
+            by_round_df, hide_index=True, use_container_width=True, height=260,
+            column_config={"Team": team_text_column("Team", st.session_state.team_names)},
+        )
+
+    st.subheader("Next 10 picks")
+    upcoming = draft_state.upcoming_picks(10)
+    if not upcoming:
+        st.caption("Draft complete." if draft_state.is_draft_complete else "No upcoming picks.")
+    else:
+        upcoming_df = pd.DataFrame(
+            [
+                {
+                    "Pick": u["overall_pick"],
+                    "Rd": u["round"],
+                    "Team": f"🎯 {u['team']}" if u["team"] == draft_state.my_team else u["team"],
+                }
+                for u in upcoming
+            ]
+        )
+        st.dataframe(
+            upcoming_df, hide_index=True, use_container_width=True, height=260,
+            column_config={"Team": team_text_column("Team", st.session_state.team_names)},
+        )
+    st.page_link("pages/4_My_Roster.py", label="Full roster by position →", icon="📋")
+
+    with st.expander("Rename opponent teams"):
+        for i, name in enumerate(st.session_state.team_names):
+            if name == config["league"]["team_name"]:
+                continue
+            new_name = st.text_input(f"Team {i+1}", value=name, key=f"team_name_{i}")
+            st.session_state.team_names[i] = new_name
+
+
+with st.sidebar:
+    render_sidebar()
+
 
 @st.fragment(run_every=3)
 def render_live_board() -> None:
-    """Everything that should live-update as picks land in
-    data/draft_state.json -- the sidebar draft-status/pick-history/
-    upcoming-picks panels, the suggested-pick panel, and the main
-    player grid. Wrapped in a fragment (not the old whole-page-reload
-    src.live_refresh hack) so a live sync landing a pick updates this
-    in place every few seconds without ever navigating the browser --
-    no flash, no scroll jump, because nothing reloads. A widget
-    interaction in here (clicking a grid row, the position filter,
-    Undo/Reset) also only reruns this fragment, not the whole page.
+    """The main body: the suggested-pick panel and the ranked player grid.
+    (The sidebar -- draft status, pick history, Undo/Reset/Rename -- is
+    its own separate fragment, render_sidebar() above.) Wrapped in a
+    fragment (not the old whole-page-reload src.live_refresh hack) so a
+    live sync landing a pick updates this in place every few seconds
+    without ever navigating the browser -- no flash, no scroll jump,
+    because nothing reloads. A widget interaction in here (clicking a
+    grid row, a filter) also only reruns this fragment, not the whole
+    page.
 
     IMPORTANT: DraftState is constructed FRESH inside this function, on
     every fragment run -- not once at module level. A fragment rerun
@@ -200,123 +352,11 @@ def render_live_board() -> None:
         else:
             players_df["sim_adp"] = pd.NA
 
-    # ---------------------------------------------------------------------
-    # Sidebar: draft status, picks-by-round history, upcoming picks, team
-    # names, undo/reset. My own roster by starting-lineup slot has its own
-    # page now (pages/4_My_Roster.py) -- linked at the bottom of this sidebar.
-    # ---------------------------------------------------------------------
-
-    with st.sidebar:
-        st.header("Draft status")
-        if draft_state.is_draft_complete:
-            st.success("Draft complete!")
-        else:
-            on_clock = draft_state.on_the_clock
-            rnd, slot = draft_state.round_and_slot_for_pick(draft_state.next_overall_pick)
-            st.metric("On the clock", on_clock)
-            st.caption(f"Pick {draft_state.next_overall_pick} overall (Round {rnd}, Slot {slot})")
-            if draft_state.is_my_pick:
-                st.success("🎯 It's your pick!")
-            else:
-                until = draft_state.picks_until_my_turn()
-                st.caption(f"{until} picks until your turn")
-
-        sync_status = read_sync_status(LIVE_SYNC_STATUS_FILE)
-        if sync_status:
-            st.divider()
-            st.subheader("🔴 Live sync from CBS")
-            synced_at = datetime.fromisoformat(sync_status["last_sync_at"])
-            age_seconds = (datetime.now(timezone.utc) - synced_at).total_seconds()
-            st.caption(f"Last synced pick: #{sync_status['last_synced_overall_pick']}")
-            if age_seconds < 150:
-                st.caption(f"✅ Updated {int(age_seconds)}s ago")
-            elif age_seconds < 600:
-                st.caption(f"⚠️ Updated {int(age_seconds // 60)} min ago — may be behind")
-            else:
-                st.caption(
-                    f"🛑 Last update was {int(age_seconds // 60)} min ago — live sync "
-                    f"looks stopped. Log picks manually below until it resumes."
-                )
-            if sync_status["mismatches"]:
-                st.error(
-                    "Live sync found a mismatch with what's already logged — "
-                    "check with whoever is running the sync before trusting "
-                    "the board:\n" + "\n".join(f"- {m}" for m in sync_status["mismatches"])
-                )
-            if sync_status["pending_ahead"]:
-                st.caption(
-                    f"{len(sync_status['pending_ahead'])} live pick(s) seen out of "
-                    f"order, waiting on a gap to close"
-                )
-
-        if st.button("↩️ Undo last pick", use_container_width=True, disabled=not draft_state.picks):
-            undone = draft_state.undo_last_pick()
-            if undone:
-                st.toast(f"Undid: {undone.team} — {undone.player_name}")
-            st.rerun()
-
-        with st.expander("Reset draft (danger zone)"):
-            st.warning("This clears the entire pick log — cannot be undone.")
-            confirm_reset = st.checkbox("Yes, clear every logged pick", key="confirm_reset_draft")
-            if st.button(
-                "Reset draft", type="primary", disabled=not confirm_reset, key="reset_draft_button"
-            ):
-                draft_state.reset()
-                # Force a brand-new, unselected grid widget post-reset too --
-                # not just cosmetic: without this, the grid keeps whatever key
-                # (and therefore whatever session_state) it had before the
-                # reset, and there's no reason to trust stale selection state
-                # against a completely different (now fully available) player
-                # pool. See the grid_pick_nonce comment further down this file.
-                st.session_state.grid_pick_nonce = 0
-                st.toast("✅ Draft reset — all picks cleared.")
-                st.rerun()
-
-        st.divider()
-        st.subheader("Picks by round")
-        if not draft_state.picks:
-            st.caption("No picks logged yet.")
-        else:
-            # Most recent pick first -- this is a live ticker, not a
-            # scorecard, so what just happened belongs at the top.
-            by_round_df = pd.DataFrame(
-                [
-                    {"Rd": p.round, "Pick": p.overall_pick, "Team": p.team, "Player": p.player_name, "Pos": p.position}
-                    for p in sorted(draft_state.picks, key=lambda p: p.overall_pick, reverse=True)
-                ]
-            )
-            st.dataframe(
-                by_round_df, hide_index=True, use_container_width=True, height=260,
-                column_config={"Team": team_text_column("Team", st.session_state.team_names)},
-            )
-
-        st.subheader("Next 10 picks")
-        upcoming = draft_state.upcoming_picks(10)
-        if not upcoming:
-            st.caption("Draft complete." if draft_state.is_draft_complete else "No upcoming picks.")
-        else:
-            upcoming_df = pd.DataFrame(
-                [
-                    {
-                        "Pick": u["overall_pick"],
-                        "Rd": u["round"],
-                        "Team": f"🎯 {u['team']}" if u["team"] == draft_state.my_team else u["team"],
-                    }
-                    for u in upcoming
-                ]
-            )
-            st.dataframe(
-                upcoming_df, hide_index=True, use_container_width=True, height=260,
-                column_config={"Team": team_text_column("Team", st.session_state.team_names)},
-            )
-        st.page_link("pages/4_My_Roster.py", label="Full roster by position →", icon="📋")
-
-        with st.expander("Rename opponent teams"):
-            for i, name in enumerate(st.session_state.team_names):
-                if name == config["league"]["team_name"]:
-                    continue
-                new_name = st.text_input(f"Team {i+1}", value=name, key=f"team_name_{i}")
-                st.session_state.team_names[i] = new_name
+    # The entire sidebar (status, live-sync info, undo/reset, picks
+    # history, rename) now lives in its own separate fragment,
+    # render_sidebar() above, called from inside `with st.sidebar:` --
+    # see that function's docstring for why it has to be structured that
+    # way rather than writing into the sidebar from THIS fragment.
 
     # ---------------------------------------------------------------------
     # Main: ranked available players -- clicking a row logs that pick
