@@ -199,18 +199,24 @@ def render_tendencies() -> None:
     # ---------------------------------------------------------------------
     st.subheader("🎯 Live Draft Tracker")
     st.caption(
-        "One row per round of YOUR draft slot. Each position has TWO narrow "
-        "columns: the position code alone (e.g. **QB**) = historical average "
-        "cumulative count drafted league-wide by this pick (years selected "
-        "in the sidebar); **Δ** + the code (e.g. **ΔQB**) = the ACTUAL draft "
-        "vs. that projection once a round is reached (🔴 running hotter than "
-        "history = scarcer than usual right now, 🟢 running cooler = safer "
-        "than usual; blank for rounds not reached yet). **Consider now** / "
-        "**Can wait** look at the projected run of picks between this round "
-        "and your NEXT pick -- 🔒 marks a position moved to \"can wait\" "
-        "because every opponent picking in that window has already hit this "
-        "league's real roster cap for it (can't legally draft more), "
-        "overriding what history alone would suggest."
+        "One row per ROUND (Pick # / Your pick show YOUR slot in that round "
+        "for reference). Each position has TWO narrow columns, both totaled "
+        "across the WHOLE round (all "
+        f"{teams_n if teams_n else config['league']['teams']} picks in it): "
+        "the position code alone (e.g. **QB**) = historical average "
+        "cumulative count drafted league-wide through the LAST pick of that "
+        "round (years selected in the sidebar) -- round 1 totals to the "
+        "round's full team count, round 2 to double that, and so on; "
+        "**Δ** + the code (e.g. **ΔQB**) = the ACTUAL draft vs. that "
+        "projection once the WHOLE round is complete (🔴 running hotter than "
+        "history = scarcer than usual, 🟢 running cooler = safer than usual; "
+        "blank until the round finishes). **Consider now** / **Can wait** "
+        "are different on purpose -- they stay scoped to YOUR draft position, "
+        "looking at the projected run of picks between this round's pick and "
+        "your NEXT pick, not the whole round -- 🔒 marks a position moved to "
+        "\"can wait\" because every opponent picking in that window has "
+        "already hit this league's real roster cap for it (can't legally "
+        "draft more), overriding what history alone would suggest."
     )
 
     cum_hist = cumulative_counts_by_pick(history, years=selected_years)
@@ -231,34 +237,47 @@ def render_tendencies() -> None:
         for team, picks in draft_state.roster_by_team().items()
     }
 
+    # The position-count columns (proj + Δ) are scoped to the WHOLE round --
+    # round_size teams' worth of picks, ending at round_end -- not just to
+    # YOUR pick within it, per the league manager's request: round 1's
+    # projected totals across positions should sum to a full round of picks
+    # (e.g. 10 in a 10-team league), round 2's to two rounds, etc. teams_n
+    # comes from the historical draft data (see caption above) and is
+    # expected to match the real league's team count -- both are 10 here.
+    round_size = teams_n if teams_n else config["league"]["teams"]
+
     tracker_rows = []
     for rnd in range(1, total_rounds + 1):
-        anchor = draft_state.team_pick_in_round(my_team_name, rnd)
-        if anchor is None:
+        my_anchor = draft_state.team_pick_in_round(my_team_name, rnd)
+        if my_anchor is None:
             continue
-        next_anchor = (
+        next_my_anchor = (
             draft_state.team_pick_in_round(my_team_name, rnd + 1) if rnd < total_rounds else None
         )
-        reached = anchor <= picks_made
+
+        round_end = rnd * round_size
+        round_complete = round_end <= picks_made
 
         proj_row = (
-            historical_cumulative_at_pick(cum_hist, anchor) if not cum_hist.empty
+            historical_cumulative_at_pick(cum_hist, round_end) if not cum_hist.empty
             else pd.Series(0.0, index=list(KNOWN_POSITIONS))
         )
-        actual_counts = actual_cumulative_at_pick(draft_state.picks, anchor) if reached else None
+        actual_counts = actual_cumulative_at_pick(draft_state.picks, round_end) if round_complete else None
 
-        my_pick = picks_by_overall.get(anchor)
+        my_pick = picks_by_overall.get(my_anchor)
         my_pick_label = f"{my_pick.position or '—'} · {my_pick.player_name}" if my_pick else "—"
 
-        # Windowed on THIS round's actual gap to your next pick (not the
-        # sidebar's fixed look-ahead) -- same prediction engine as "What's
-        # likely to happen next" below, just scoped per-row. window_teams is
-        # who's picking in that gap -- fully determined by the snake order,
-        # regardless of what they've actually drafted.
-        if next_anchor is not None and next_anchor > anchor and not cum_hist.empty:
-            window = next_anchor - anchor
-            consider = next_run_positions(history, selected_years, anchor, window, top_n=3, min_expected=0.5)
-            window_teams = [draft_state.team_for_pick(o) for o in range(anchor + 1, next_anchor)]
+        # Consider now / Can wait stay scoped to YOUR draft position (not the
+        # whole-round scope above) -- windowed on THIS round's actual gap to
+        # your next pick (not the sidebar's fixed look-ahead), same
+        # prediction engine as "What's likely to happen next" below, just
+        # scoped per-row. window_teams is who's picking in that gap --
+        # fully determined by the snake order, regardless of what they've
+        # actually drafted.
+        if next_my_anchor is not None and next_my_anchor > my_anchor and not cum_hist.empty:
+            window = next_my_anchor - my_anchor
+            consider = next_run_positions(history, selected_years, my_anchor, window, top_n=3, min_expected=0.5)
+            window_teams = [draft_state.team_for_pick(o) for o in range(my_anchor + 1, next_my_anchor)]
         else:
             consider = []
             window_teams = []
@@ -268,11 +287,13 @@ def render_tendencies() -> None:
         consider_final = [p for p in consider if p not in demoted]
         can_wait_final = [p for p in KNOWN_POSITIONS if p not in consider_final]
 
-        row = {"Round": rnd, "Pick #": anchor, "Your pick": my_pick_label}
+        row = {"Round": rnd, "Pick #": my_anchor, "Your pick": my_pick_label}
         for pos in KNOWN_POSITIONS:
             proj_val = float(proj_row.get(pos, 0.0))
             row[pos] = round(proj_val, 1)
-            row[f"Δ{pos}"] = round(actual_counts.get(pos, 0) - proj_val, 1) if reached else float("nan")
+            row[f"Δ{pos}"] = (
+                round(actual_counts.get(pos, 0) - proj_val, 1) if round_complete else float("nan")
+            )
         row["Consider now"] = ", ".join(consider_final) if consider_final else "—"
         row["Can wait"] = (
             ", ".join(f"{p}🔒" if p in demoted else p for p in can_wait_final) if can_wait_final else "—"
