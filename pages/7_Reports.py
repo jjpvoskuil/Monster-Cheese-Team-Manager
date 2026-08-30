@@ -25,7 +25,6 @@ import streamlit as st
 
 from src.data_sources.manual_import import load_many
 from src.draft_state import DraftState
-from src.live_refresh import inject_autorefresh
 from src.projections import build_draft_board
 from src.report_catalog import REPORTS, ReportContext, build_workbook_sheets
 from src.scoring import load_config
@@ -88,86 +87,100 @@ def build_workbook_bytes(sheets: dict[str, pd.DataFrame]) -> bytes:
     return buffer.getvalue()
 
 
-config = get_config()
-real_team_order = config.get("draft", {}).get("team_order") or []
-using_real_team_order = bool(real_team_order) and config["league"]["team_name"] in real_team_order
-if using_real_team_order:
-    teams = real_team_order
-else:
-    teams = [config["league"]["team_name"]] + [f"Team {i}" for i in range(1, config["league"]["teams"])]
 
-draft_state = DraftState(
-    teams=teams,
-    rounds=config["draft"]["rounds"],
-    my_team=config["league"]["team_name"],
-    state_file=DRAFT_STATE_FILE,
-    reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
-)
-inject_autorefresh()
+@st.fragment(run_every=3)
+def render_reports() -> None:
+    """Everything on this page that reads live draft_state. DraftState is
+    constructed fresh at the top of this function on every fragment run
+    (not once at module level) -- see pages/1_Draft_Board.py's
+    render_live_board() docstring for why: a fragment rerun only
+    re-executes this function's body, so a DraftState built outside it
+    would never notice new picks an external live-sync process writes
+    into the JSON file. (This page's download button works fine inside
+    a fragment -- it's still a normal Streamlit widget.)
+    """
+    config = get_config()
+    real_team_order = config.get("draft", {}).get("team_order") or []
+    using_real_team_order = bool(real_team_order) and config["league"]["team_name"] in real_team_order
+    if using_real_team_order:
+        teams = real_team_order
+    else:
+        teams = [config["league"]["team_name"]] + [f"Team {i}" for i in range(1, config["league"]["teams"])]
 
-players_df, is_sample = load_players()
-my_team = config["league"]["team_name"]
-
-st.title("📥 Reports")
-st.caption(
-    "Pick any grids/reports below and download them all in one Excel "
-    "workbook — one sheet per report (League Rosters expands into one "
-    "sheet per team)."
-)
-
-if players_df.empty:
-    st.error(
-        "No projection data found. Drop CSV/Excel projection files into "
-        "`data/projections/` (real 2026 data) or `data/sample/` (fallback) "
-        "and reload."
-    )
-    st.stop()
-
-if is_sample:
-    st.warning(
-        "⚠️ Using **data/sample/** — this is last season's (2025) placeholder "
-        "data, not real 2026 projections.",
-        icon="⚠️",
+    draft_state = DraftState(
+        teams=teams,
+        rounds=config["draft"]["rounds"],
+        my_team=config["league"]["team_name"],
+        state_file=DRAFT_STATE_FILE,
+        reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
     )
 
-points_by_name = players_df.set_index("name")["score_total"]
-ctx = ReportContext(
-    config=config, draft_state=draft_state, teams=teams, my_team=my_team,
-    players_df=players_df, points_by_name=points_by_name,
-)
+    players_df, is_sample = load_players()
+    my_team = config["league"]["team_name"]
 
-label_to_report = {r.label: r for r in REPORTS}
-selected_labels = st.multiselect(
-    "Reports to include",
-    options=list(label_to_report.keys()),
-    default=list(label_to_report.keys()),
-    help="Everything's selected by default -- deselect anything you don't want in the download.",
-)
+    st.title("📥 Reports")
+    st.caption(
+        "Pick any grids/reports below and download them all in one Excel "
+        "workbook — one sheet per report (League Rosters expands into one "
+        "sheet per team)."
+    )
 
-if not selected_labels:
-    st.info("Select at least one report above to build a download.")
-    st.stop()
+    if players_df.empty:
+        st.error(
+            "No projection data found. Drop CSV/Excel projection files into "
+            "`data/projections/` (real 2026 data) or `data/sample/` (fallback) "
+            "and reload."
+        )
+        st.stop()
 
-selected_reports = [label_to_report[label] for label in selected_labels]
-sheets = build_workbook_sheets(selected_reports, ctx)
+    if is_sample:
+        st.warning(
+            "⚠️ Using **data/sample/** — this is last season's (2025) placeholder "
+            "data, not real 2026 projections.",
+            icon="⚠️",
+        )
 
-st.caption(f"Will produce {len(sheets)} sheet(s): " + ", ".join(sheets.keys()))
+    points_by_name = players_df.set_index("name")["score_total"]
+    ctx = ReportContext(
+        config=config, draft_state=draft_state, teams=teams, my_team=my_team,
+        players_df=players_df, points_by_name=points_by_name,
+    )
 
-workbook_bytes = build_workbook_bytes(sheets)
-timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M")
-st.download_button(
-    "⬇️ Download selected reports as Excel",
-    data=workbook_bytes,
-    file_name=f"monster_cheese_reports_{timestamp}.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    use_container_width=True,
-)
+    label_to_report = {r.label: r for r in REPORTS}
+    selected_labels = st.multiselect(
+        "Reports to include",
+        options=list(label_to_report.keys()),
+        default=list(label_to_report.keys()),
+        help="Everything's selected by default -- deselect anything you don't want in the download.",
+    )
 
-st.divider()
-st.subheader("Preview")
-preview_labels = list(sheets.keys())
-preview_choice = st.selectbox("Sheet", preview_labels)
-st.dataframe(sheets[preview_choice], hide_index=True, use_container_width=True)
+    if not selected_labels:
+        st.info("Select at least one report above to build a download.")
+        st.stop()
 
-st.divider()
-st.page_link("pages/1_Draft_Board.py", label="← Back to Draft Board", icon="🏈")
+    selected_reports = [label_to_report[label] for label in selected_labels]
+    sheets = build_workbook_sheets(selected_reports, ctx)
+
+    st.caption(f"Will produce {len(sheets)} sheet(s): " + ", ".join(sheets.keys()))
+
+    workbook_bytes = build_workbook_bytes(sheets)
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M")
+    st.download_button(
+        "⬇️ Download selected reports as Excel",
+        data=workbook_bytes,
+        file_name=f"monster_cheese_reports_{timestamp}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        use_container_width=True,
+    )
+
+    st.divider()
+    st.subheader("Preview")
+    preview_labels = list(sheets.keys())
+    preview_choice = st.selectbox("Sheet", preview_labels)
+    st.dataframe(sheets[preview_choice], hide_index=True, use_container_width=True)
+
+    st.divider()
+    st.page_link("pages/1_Draft_Board.py", label="← Back to Draft Board", icon="🏈")
+
+
+render_reports()

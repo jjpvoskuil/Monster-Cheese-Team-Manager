@@ -42,7 +42,6 @@ import streamlit as st
 from src.data_sources.manual_import import load_many
 from src.draft_state import DraftState
 from src.league_grid import LeagueGrid, build_league_grid
-from src.live_refresh import inject_autorefresh
 from src.projections import build_draft_board
 from src.scoring import load_config
 
@@ -190,77 +189,90 @@ def render_grid_html(grid: LeagueGrid, my_team: str) -> str:
     return "".join(parts)
 
 
-config = get_config()
-real_team_order = config.get("draft", {}).get("team_order") or []
-using_real_team_order = bool(real_team_order) and config["league"]["team_name"] in real_team_order
-if using_real_team_order:
-    teams = real_team_order
-else:
-    teams = [config["league"]["team_name"]] + [f"Team {i}" for i in range(1, config["league"]["teams"])]
 
-draft_state = DraftState(
-    teams=teams,
-    rounds=config["draft"]["rounds"],
-    my_team=config["league"]["team_name"],
-    state_file=DRAFT_STATE_FILE,
-    reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
-)
-inject_autorefresh()
+@st.fragment(run_every=3)
+def render_league_rosters() -> None:
+    """Everything on this page that reads live draft_state. DraftState is
+    constructed fresh at the top of this function on every fragment run
+    (not once at module level) -- see pages/1_Draft_Board.py's
+    render_live_board() docstring for why: a fragment rerun only
+    re-executes this function's body, so a DraftState built outside it
+    would never notice new picks an external live-sync process writes
+    into the JSON file.
+    """
+    config = get_config()
+    real_team_order = config.get("draft", {}).get("team_order") or []
+    using_real_team_order = bool(real_team_order) and config["league"]["team_name"] in real_team_order
+    if using_real_team_order:
+        teams = real_team_order
+    else:
+        teams = [config["league"]["team_name"]] + [f"Team {i}" for i in range(1, config["league"]["teams"])]
 
-players_df, is_sample = load_players()
-starters = config["roster"]["starters"]
-my_team = config["league"]["team_name"]
-
-st.title("🏆 League Rosters")
-st.caption(
-    "Every team's drafted roster, side by side, updating live as picks are "
-    "logged. Use this to spot other teams' needs (and gaps you might be able "
-    "to exploit) and to see how your own roster stacks up on projected "
-    "points. Scroll right for the rest of the league — Roster Position stays "
-    "pinned on the left."
-)
-
-if players_df.empty:
-    st.error(
-        "No projection data found. Drop CSV/Excel projection files into "
-        "`data/projections/` (real 2026 data) or `data/sample/` (fallback) "
-        "and reload."
-    )
-    st.stop()
-
-if is_sample:
-    st.warning(
-        "⚠️ Using **data/sample/** — this is last season's (2025) placeholder "
-        "data, not real 2026 projections.",
-        icon="⚠️",
+    draft_state = DraftState(
+        teams=teams,
+        rounds=config["draft"]["rounds"],
+        my_team=config["league"]["team_name"],
+        state_file=DRAFT_STATE_FILE,
+        reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
     )
 
-if not using_real_team_order:
-    st.warning(
-        "⚠️ No real draft order found — using placeholder team names "
-        "(Team 1, Team 2, ...). See the Draft Board page to set the real order.",
-        icon="⚠️",
-    )
+    players_df, is_sample = load_players()
+    starters = config["roster"]["starters"]
+    my_team = config["league"]["team_name"]
 
-points_by_name = players_df.set_index("name")["score_total"]
-rosters = draft_state.roster_by_team()
-
-grid = build_league_grid(rosters, teams, starters, points_by_name)
-
-st.markdown(GRID_CSS, unsafe_allow_html=True)
-st.markdown(render_grid_html(grid, my_team), unsafe_allow_html=True)
-
-all_missing = sorted({
-    f"{name} ({col.team})"
-    for col in grid.columns
-    for name in col.missing_projection
-})
-if all_missing:
+    st.title("🏆 League Rosters")
     st.caption(
-        "⚠️ No projection found for: " + ", ".join(all_missing) +
-        " — scored as 0 pts above (name mismatch between the draft log and "
-        "projections data, or an undrafted-in-projections player)."
+        "Every team's drafted roster, side by side, updating live as picks are "
+        "logged. Use this to spot other teams' needs (and gaps you might be able "
+        "to exploit) and to see how your own roster stacks up on projected "
+        "points. Scroll right for the rest of the league — Roster Position stays "
+        "pinned on the left."
     )
 
-st.divider()
-st.page_link("pages/1_Draft_Board.py", label="← Back to Draft Board", icon="🏈")
+    if players_df.empty:
+        st.error(
+            "No projection data found. Drop CSV/Excel projection files into "
+            "`data/projections/` (real 2026 data) or `data/sample/` (fallback) "
+            "and reload."
+        )
+        st.stop()
+
+    if is_sample:
+        st.warning(
+            "⚠️ Using **data/sample/** — this is last season's (2025) placeholder "
+            "data, not real 2026 projections.",
+            icon="⚠️",
+        )
+
+    if not using_real_team_order:
+        st.warning(
+            "⚠️ No real draft order found — using placeholder team names "
+            "(Team 1, Team 2, ...). See the Draft Board page to set the real order.",
+            icon="⚠️",
+        )
+
+    points_by_name = players_df.set_index("name")["score_total"]
+    rosters = draft_state.roster_by_team()
+
+    grid = build_league_grid(rosters, teams, starters, points_by_name)
+
+    st.markdown(GRID_CSS, unsafe_allow_html=True)
+    st.markdown(render_grid_html(grid, my_team), unsafe_allow_html=True)
+
+    all_missing = sorted({
+        f"{name} ({col.team})"
+        for col in grid.columns
+        for name in col.missing_projection
+    })
+    if all_missing:
+        st.caption(
+            "⚠️ No projection found for: " + ", ".join(all_missing) +
+            " — scored as 0 pts above (name mismatch between the draft log and "
+            "projections data, or an undrafted-in-projections player)."
+        )
+
+    st.divider()
+    st.page_link("pages/1_Draft_Board.py", label="← Back to Draft Board", icon="🏈")
+
+
+render_league_rosters()

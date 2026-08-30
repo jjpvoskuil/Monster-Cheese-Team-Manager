@@ -1,4 +1,22 @@
 """
+SUPERSEDED, 2026-08-30 -- no longer imported by any page. Kept only for
+the debugging history in this docstring (two real, hard-won Streamlit
+bugs, in case a future full-page-reload approach is ever needed again).
+
+Both live pages' auto-refresh now uses `@st.fragment(run_every=...)`
+instead (see e.g. pages/1_Draft_Board.py's render_live_board()) -- a
+fragment rerun updates the page's content in place without ever
+navigating the browser, which sidesteps both bugs documented below at
+the root: there is no reload, so there is nothing to lose scroll
+position OR stack reload timers on. It also fixed a real complaint this
+iframe approach never could -- even with the scroll-jump fixed, a full
+reload every few seconds still flashes/redraws the whole page, which the
+league manager flagged as "really distracting" during 2026-08-30 testing.
+The one thing this module's approach could do that a fragment can't:
+work on a page reached by a mechanism other than Streamlit's own script
+re-execution model. That's not a real constraint for this app, so there
+was no reason to keep both.
+
 Lightweight, dependency-free auto-refresh for pages that show live draft
 state (data/draft_state.json can change out from under Streamlit at any
 moment via an active Claude session's CBS live-sync -- see
