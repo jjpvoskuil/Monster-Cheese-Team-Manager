@@ -48,13 +48,19 @@ In a **second** terminal tab, same repo folder:
 python3 tools/live_pick_receiver.py
 ```
 
-The receiver only needs one third-party package (PyYAML) — if this
-terminal's `python3` doesn't have it, you'll see
-`ModuleNotFoundError: No module named 'yaml'` and the receiver won't
-actually start (and the `curl` check in step 4 will then fail too, since
-nothing is listening). If your normal setup uses a virtualenv, activate it
-first in this terminal the same way you would before `streamlit run
-app.py`. Otherwise, fix it directly for this terminal's `python3`:
+The receiver only needs one third-party package (PyYAML). **Already fixed
+as of the 2026-08-30 mock draft test** — `pip install` installs it
+permanently for that `python3`, on disk, not just for that terminal
+session, so it's still there after closing the terminal, opening a new
+one, or restarting your Mac. No need to redo this for the real draft
+unless you're on a different machine or a freshly reinstalled Python.
+
+If it ever comes back (you'll see `ModuleNotFoundError: No module named
+'yaml'` and the receiver won't actually start — the `curl` check in step 4
+will then fail too, since nothing is listening): if your normal setup uses
+a virtualenv, activate it first in this terminal the same way you would
+before `streamlit run app.py`. Otherwise, fix it directly for this
+terminal's `python3`:
 
 ```bash
 python3 -m pip install pyyaml
