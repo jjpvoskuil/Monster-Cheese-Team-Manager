@@ -32,6 +32,7 @@ from src.draft_tendencies import (
     cumulative_counts_by_pick,
     historical_cumulative_at_pick,
     next_run_positions,
+    normalize_weights,
     predict_position_counts,
     round_preserve_sum,
     round_table_preserve_row_sums,
@@ -100,6 +101,7 @@ with st.sidebar:
         st.caption("No draft history loaded yet.")
         selected_years: list[int] = []
         rounds_ahead = 2
+        year_weights: dict[int, float] = {}
     else:
         _years_for_sidebar = available_years(_history_for_sidebar)
         selected_years = st.multiselect(
@@ -113,6 +115,40 @@ with st.sidebar:
             "Look ahead (rounds)", min_value=1, max_value=3, value=2,
             help="How many rounds ahead to predict positional runs for.",
         )
+
+        # ---------------------------------------------------------------
+        # Punch list #8: "add a slider so that I can adjust the weight of
+        # each year with the total going to 100%". One slider per
+        # currently-selected year; raw slider values don't need to add to
+        # 100 themselves -- normalize_weights() rescales them
+        # proportionally, and the caption below shows the resulting
+        # normalized split so it's clear it always lands on 100%. Plain
+        # top-level sidebar code (not inside the fragment) for the same
+        # reason selected_years/rounds_ahead are above.
+        # ---------------------------------------------------------------
+        st.divider()
+        st.header("Year weights")
+        year_weights = {}
+        if not selected_years:
+            st.caption("Select at least one year above to set weights.")
+        else:
+            st.caption(
+                "Weight each selected year's influence on the historical "
+                "averages below — e.g. weigh last season heaviest. Values "
+                "are normalized to sum to 100% automatically."
+            )
+            _default_weight = round(100 / len(selected_years))
+            for _y in selected_years:
+                year_weights[_y] = st.slider(
+                    str(_y), min_value=0, max_value=100, value=_default_weight,
+                    key=f"year_weight_{_y}",
+                    help=f"Relative weight for {_y} (normalized together with the other selected years).",
+                )
+            _normalized = normalize_weights(selected_years, year_weights)
+            st.caption(
+                "Normalized: "
+                + " · ".join(f"{y}: {w * 100:.0f}%" for y, w in sorted(_normalized.items()))
+            )
 
 
 @st.fragment(run_every=3)
@@ -222,7 +258,7 @@ def render_tendencies() -> None:
         "draft more), overriding what history alone would suggest."
     )
 
-    cum_hist = cumulative_counts_by_pick(history, years=selected_years)
+    cum_hist = cumulative_counts_by_pick(history, years=selected_years, weights=year_weights)
     my_team_name = config["league"]["team_name"]
     picks_made = len(draft_state.picks)
     picks_by_overall = {p.overall_pick: p for p in draft_state.picks}
@@ -288,7 +324,9 @@ def render_tendencies() -> None:
         # actually drafted.
         if next_my_anchor is not None and next_my_anchor > my_anchor and not cum_hist.empty:
             window = next_my_anchor - my_anchor
-            consider = next_run_positions(history, selected_years, my_anchor, window, top_n=3, min_expected=0.5)
+            consider = next_run_positions(
+                history, selected_years, my_anchor, window, top_n=3, min_expected=0.5, weights=year_weights
+            )
             window_teams = [draft_state.team_for_pick(o) for o in range(my_anchor + 1, next_my_anchor)]
         else:
             consider = []
@@ -409,7 +447,7 @@ def render_tendencies() -> None:
             "selected years. This is the base pattern the tracker above and "
             "the predictions below are built from."
         )
-        by_round = counts_by_round(history, years=selected_years)
+        by_round = counts_by_round(history, years=selected_years, weights=year_weights)
         if by_round.empty:
             st.info("No data for the selected years.")
         else:
@@ -422,12 +460,14 @@ def render_tendencies() -> None:
         picks_ahead = rounds_ahead * teams_n if teams_n else rounds_ahead * config["league"]["teams"]
         predict_from = current_pick if current_pick is not None else 1
 
-        predicted = predict_position_counts(history, selected_years, predict_from, picks_ahead)
+        predicted = predict_position_counts(history, selected_years, predict_from, picks_ahead, weights=year_weights)
         if predicted.empty:
             st.info("No prediction available (no historical data for the selected years).")
         else:
             predicted_int = round_preserve_sum(predicted, picks_ahead)
-            hot = next_run_positions(history, selected_years, predict_from, picks_ahead, top_n=2)
+            hot = next_run_positions(
+                history, selected_years, predict_from, picks_ahead, top_n=2, weights=year_weights
+            )
             if hot:
                 st.info(
                     f"**Likely run in the next {rounds_ahead} round(s):** "

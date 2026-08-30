@@ -46,6 +46,33 @@ def teams_per_round(df: pd.DataFrame) -> int:
     return int(df["pick_in_round"].max())
 
 
+def normalize_weights(years: list[int], weights: dict[int, float] | None) -> dict[int, float]:
+    """Turn a raw {year: weight} mapping (e.g. straight off UI sliders,
+    which have no reason to add up to anything in particular) into
+    weights that sum to EXACTLY 1.0 across `years` -- punch-list item #8's
+    "a slider so I can adjust the weight of each year with the total
+    going to 100%". Not a strict UI validation step: any positive numbers
+    work and get rescaled proportionally, so a person doesn't have to
+    fuss with getting sliders to add to exactly 100 themselves.
+
+    Falls back to equal weighting across `years` (reproducing the
+    original unweighted .mean() behavior exactly) when `weights` is
+    None/empty, covers none of the given years, or every relevant weight
+    is zero/negative -- so every existing call site that doesn't pass
+    `weights` keeps working unchanged."""
+    if not years:
+        return {}
+    if not weights:
+        share = 1.0 / len(years)
+        return {y: share for y in years}
+    relevant = {y: max(0.0, float(weights.get(y, 0.0))) for y in years}
+    total = sum(relevant.values())
+    if total <= 0:
+        share = 1.0 / len(years)
+        return {y: share for y in years}
+    return {y: w / total for y, w in relevant.items()}
+
+
 def round_preserve_sum(values: pd.Series, target: int) -> pd.Series:
     """Round every value to the nearest integer using the largest
     -remainder method (a.k.a. Hamilton apportionment), so the rounded
@@ -95,14 +122,24 @@ def round_table_preserve_row_sums(table: pd.DataFrame, target: int) -> pd.DataFr
     return table.apply(lambda row: round_preserve_sum(row, target), axis=1)
 
 
-def counts_by_round(df: pd.DataFrame, years: list[int] | None = None) -> pd.DataFrame:
+def counts_by_round(
+    df: pd.DataFrame,
+    years: list[int] | None = None,
+    weights: dict[int, float] | None = None,
+) -> pd.DataFrame:
     """Average number of each position drafted per round, across the
     selected years. Index = round (1..max), columns = KNOWN_POSITIONS
-    (plus any other position values encountered), values = mean count.
+    (plus any other position values encountered), values = weighted mean
+    count.
 
     This is the headline "league tendency" table: e.g. a value of 3.5 for
     (round=1, position=RB) means an average of 3.5 RBs get taken in round
     1 across the selected seasons.
+
+    `weights` is an optional {year: weight} mapping (see
+    normalize_weights()) letting some years count more than others --
+    e.g. weighting last season heaviest. Omitting it (the default)
+    reproduces the original equal-weighted mean exactly.
     """
     picks = _valid_picks(df, years)
     if picks.empty:
@@ -115,8 +152,8 @@ def counts_by_round(df: pd.DataFrame, years: list[int] | None = None) -> pd.Data
         .reset_index()
     )
     # Every (year, round) combo needs an explicit 0 for positions that
-    # didn't get drafted that round, or the later mean() would silently
-    # average over fewer years than actually happened for that position.
+    # didn't get drafted that round, or the later weighted sum would
+    # silently skip fewer years than actually happened for that position.
     all_years = sorted(picks["year"].unique())
     all_rounds = sorted(picks["round"].unique())
     all_positions = sorted(picks["position"].unique())
@@ -128,11 +165,19 @@ def counts_by_round(df: pd.DataFrame, years: list[int] | None = None) -> pd.Data
         .reindex(full_index, fill_value=0)
         .reset_index()
     )
-    avg = filled.groupby(["round", "position"])["n"].mean().unstack("position").fillna(0.0)
+    year_weights = normalize_weights(all_years, weights)
+    # Weights sum to exactly 1.0 across all_years, so a weighted SUM here
+    # is equivalent to (and replaces) the original weighted MEAN.
+    filled["weighted_n"] = filled["n"] * filled["year"].map(year_weights)
+    avg = filled.groupby(["round", "position"])["weighted_n"].sum().unstack("position").fillna(0.0)
     return avg.sort_index()
 
 
-def cumulative_counts_by_pick(df: pd.DataFrame, years: list[int] | None = None) -> pd.DataFrame:
+def cumulative_counts_by_pick(
+    df: pd.DataFrame,
+    years: list[int] | None = None,
+    weights: dict[int, float] | None = None,
+) -> pd.DataFrame:
     """Average CUMULATIVE count of each position drafted through (and
     including) each overall pick number, across the selected years.
     Index = overall_pick (1..max shared pick count), columns = positions.
@@ -145,6 +190,11 @@ def cumulative_counts_by_pick(df: pd.DataFrame, years: list[int] | None = None) 
     their cumulative curve is forward-filled flat past their own last
     pick, which is a reasonable "nothing more happened" assumption for a
     league that hasn't changed size mid-history.
+
+    `weights` is an optional {year: weight} mapping (see
+    normalize_weights()) letting some years count more than others.
+    Omitting it (the default) reproduces the original equal-weighted
+    average exactly.
     """
     picks = _valid_picks(df, years)
     if picks.empty:
@@ -153,8 +203,14 @@ def cumulative_counts_by_pick(df: pd.DataFrame, years: list[int] | None = None) 
     all_positions = sorted(picks["position"].unique())
     max_pick = int(picks["overall_pick"].max())
     pick_index = pd.RangeIndex(1, max_pick + 1, name="overall_pick")
+    all_years = sorted(picks["year"].unique())
+    year_weights = normalize_weights(all_years, weights)
 
-    per_year_curves = []
+    # Weighted sum of each year's curve, rather than concat + groupby
+    # .mean() -- since year_weights sums to exactly 1.0 across all_years,
+    # a weighted sum here IS a weighted average, and collapses to the
+    # original equal-weighted mean when weights is None.
+    weighted_total = pd.DataFrame(0.0, index=pick_index, columns=all_positions)
     for year, year_df in picks.groupby("year"):
         year_curve = pd.DataFrame(0, index=pick_index, columns=all_positions, dtype=float)
         for pos in all_positions:
@@ -166,10 +222,9 @@ def cumulative_counts_by_pick(df: pd.DataFrame, years: list[int] | None = None) 
         # forward-fill flat past this year's own last observed pick (only
         # matters if a year's total pick count differs from max_pick)
         year_curve = year_curve.reindex(pick_index).ffill().fillna(0.0)
-        per_year_curves.append(year_curve)
+        weighted_total = weighted_total + year_curve * year_weights.get(year, 0.0)
 
-    stacked = pd.concat(per_year_curves, keys=range(len(per_year_curves)))
-    return stacked.groupby(level=1).mean()
+    return weighted_total
 
 
 def predict_position_counts(
@@ -177,6 +232,7 @@ def predict_position_counts(
     years: list[int] | None,
     current_overall_pick: int,
     picks_ahead: int,
+    weights: dict[int, float] | None = None,
 ) -> pd.Series:
     """Expected number of each position to be drafted in the NEXT
     `picks_ahead` picks (i.e. picks current_overall_pick+1 through
@@ -185,9 +241,10 @@ def predict_position_counts(
 
     `current_overall_pick` is the overall pick about to happen (1-indexed
     -- e.g. if 14 picks have already happened, pass 15). Clipped to the
-    available historical pick range.
+    available historical pick range. `weights` is passed straight through
+    to cumulative_counts_by_pick() -- see its docstring.
     """
-    cum = cumulative_counts_by_pick(df, years)
+    cum = cumulative_counts_by_pick(df, years, weights=weights)
     if cum.empty:
         return pd.Series(dtype=float)
 
@@ -208,14 +265,17 @@ def next_run_positions(
     picks_ahead: int,
     top_n: int = 2,
     min_expected: float = 0.5,
+    weights: dict[int, float] | None = None,
 ) -> list[str]:
     """Ranked shortlist of positions most likely to see a "run" in the
     next `picks_ahead` picks, e.g. ["RB", "WR"] -- mirrors the manually
     -typed "Next Run" hints in the Alt Targets spreadsheet. Positions
     with a historically negligible expected count (< min_expected) are
     dropped even if top_n isn't filled, so a quiet position doesn't get
-    flagged just to pad the list."""
-    predicted = predict_position_counts(df, years, current_overall_pick, picks_ahead)
+    flagged just to pad the list. `weights` is passed straight through to
+    predict_position_counts() -- see cumulative_counts_by_pick()'s
+    docstring."""
+    predicted = predict_position_counts(df, years, current_overall_pick, picks_ahead, weights=weights)
     predicted = predicted[predicted >= min_expected]
     return predicted.head(top_n).index.tolist()
 

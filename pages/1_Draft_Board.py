@@ -22,7 +22,7 @@ import streamlit as st
 
 from src.data_sources.draft_history import load_draft_history
 from src.data_sources.manual_import import load_many
-from src.data_sources.simulation_results import load_adp, load_team_points
+from src.data_sources.simulation_results import format_adp_as_round_pick, load_adp, load_team_points
 from src.draft_state import DraftState
 from src.live_sync import read_sync_status
 from src.pick_suggestion import suggest_position, top_available_players
@@ -584,6 +584,14 @@ def render_live_board() -> None:
         "score_total": "Proj Pts", "vor": "VOR", "tier": "Tier", "num_sources": "# Sources",
         "sim_adp": "ADP",
     })
+    # Punch-list item #9: show ADP as "round.pick" (e.g. "5.3" for round 5,
+    # 3rd pick in that round) instead of a raw overall-pick number like
+    # 43.2 -- applied here, after sorting/filtering, so sort_by above still
+    # sorts by the underlying rank columns (unaffected -- ADP was never a
+    # sort option) and this only ever touches the display copy.
+    display_view["ADP"] = display_view["ADP"].apply(
+        lambda v: format_adp_as_round_pick(v, len(teams))
+    )
     has_tier_dividers = len(pos_filter) == 1
     if has_tier_dividers:
         display_view = add_tier_divider_rows(display_view, tier_col="Tier", label_col="Player")

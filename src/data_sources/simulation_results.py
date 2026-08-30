@@ -38,3 +38,31 @@ def load_team_points(csv_path: str) -> pd.DataFrame:
     if not os.path.exists(csv_path):
         return pd.DataFrame()
     return pd.read_csv(csv_path)
+
+
+def format_adp_as_round_pick(adp: float, teams_per_round: int) -> str:
+    """Punch-list item #9: display a raw overall-pick ADP (e.g. 43.2,
+    meaning "on average this player goes 43rd overall") as "round.pick"
+    instead -- e.g. "5.3" for "5th round, 3rd pick in that round", the
+    league manager's own example (a player picked 3rd in round 5 is
+    overall pick 43 in a 10-team league, so adp=43.2 -> "5.3").
+
+    NaN (a player never drafted in any simulated trial -- see load_adp's
+    docstring) and a non-positive `teams_per_round` both return an em
+    dash rather than raising or printing "nan.nan", since this is a
+    display-only helper and the underlying missing-ness is intentional,
+    not an error.
+
+    The pick-within-round part is rounded (not truncated) to the nearest
+    whole pick and clamped to [1, teams_per_round] -- an ADP that rounds
+    up past a round's last pick (e.g. 10.6 in a 10-team league) is
+    clamped to that round's final pick (10) rather than spilling into
+    "11", which isn't a valid pick-in-round number.
+    """
+    if pd.isna(adp) or teams_per_round <= 0:
+        return "—"
+    overall = float(adp)
+    rnd = int((overall - 1) // teams_per_round) + 1
+    pick_in_round = round(overall - (rnd - 1) * teams_per_round)
+    pick_in_round = max(1, min(teams_per_round, pick_in_round))
+    return f"{rnd}.{pick_in_round}"
