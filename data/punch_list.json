@@ -1,5 +1,5 @@
 {
-  "next_number": 8,
+  "next_number": 10,
   "items": [
     {
       "id": "7d9bb554",
@@ -51,10 +51,10 @@
       "number": 5,
       "description": "For the actual draft we will have 2 users logged into CBS.  My co-owner Sam and me.  Sam will do the actually picking on the cbs site during the draft and I'll be watching the app primarily.  What I would like to have claude do is watch my logged in CBS view with Claude in Chrome and make the picks on the app as they occur on the CBS site.  Claude does not have to pick anything live from the CBS draft, just watch and update the app.  To simulate this, we'll run a mock draft in CBS and I'll set it to autodraft and let the draft run.  Claude will watch this mock draft and make the associated picks on the app.  I'll be watch the app like I would during the real draft to see how it goes.",
       "priority": "Medium",
-      "status": "Open",
+      "status": "Closed",
       "created_at": "2026-08-28T20:08:44.527350+00:00",
-      "updated_at": "2026-08-28T20:08:44.527359+00:00",
-      "closed_at": null
+      "updated_at": "2026-08-30T17:32:53.254493+00:00",
+      "closed_at": "2026-08-30T17:32:53.254493+00:00"
     },
     {
       "id": "92b8f2b4",
@@ -77,6 +77,28 @@
       "created_at": "2026-08-28T20:08:44.528115+00:00",
       "updated_at": "2026-08-28T21:10:49.631029+00:00",
       "closed_at": "2026-08-28T21:10:49.631029+00:00"
+    },
+    {
+      "id": "4b0406a7",
+      "title": "tendancies - 70%, 20%, 10% weight",
+      "number": 8,
+      "description": "For calulating the average historical positions drafted by round, lets add a slider so that I can adjust the weight of each year with the total going to 100%",
+      "priority": "Medium",
+      "status": "Closed",
+      "created_at": "2026-08-30T16:18:53.179563+00:00",
+      "updated_at": "2026-08-30T17:48:48.907013+00:00",
+      "closed_at": "2026-08-30T17:48:48.907013+00:00"
+    },
+    {
+      "id": "dab08d3d",
+      "title": "ADP Calc",
+      "number": 9,
+      "description": "Change the adp calc so that the ADP is in the format of \"x.y\", with x being the ADP round and y being the pick from 1 to 10 withing that round.  Example:  player picker 3rd in the 5th round would be 5.3.",
+      "priority": "Medium",
+      "status": "Closed",
+      "created_at": "2026-08-30T16:20:42.063537+00:00",
+      "updated_at": "2026-08-30T17:48:48.908170+00:00",
+      "closed_at": "2026-08-30T17:48:48.908170+00:00"
     }
   ]
 }
