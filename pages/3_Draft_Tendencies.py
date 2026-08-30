@@ -207,10 +207,13 @@ def render_tendencies() -> None:
         "cumulative count drafted league-wide through the LAST pick of that "
         "round (years selected in the sidebar) -- round 1 totals to the "
         "round's full team count, round 2 to double that, and so on; "
-        "**Δ** + the code (e.g. **ΔQB**) = the ACTUAL draft vs. that "
-        "projection once the WHOLE round is complete (🔴 running hotter than "
-        "history = scarcer than usual, 🟢 running cooler = safer than usual; "
-        "blank until the round finishes). **Consider now** / **Can wait** "
+        "**Δ** + the code (e.g. **ΔQB**) = the ACTUAL draft (cumulative "
+        "through the most recent pick) vs. that round's full projection -- "
+        "updates live pick by pick as the round plays out (🔴 running "
+        "hotter than history = scarcer than usual, 🟢 running cooler = "
+        "safer than usual), then holds its final value once the round "
+        "wraps up; blank until the round's first pick lands. **Consider "
+        "now** / **Can wait** "
         "are different on purpose -- they stay scoped to YOUR draft position, "
         "looking at the projected run of picks between this round's pick and "
         "your NEXT pick, not the whole round -- 🔒 marks a position moved to "
@@ -255,14 +258,23 @@ def render_tendencies() -> None:
             draft_state.team_pick_in_round(my_team_name, rnd + 1) if rnd < total_rounds else None
         )
 
+        round_start = (rnd - 1) * round_size + 1
         round_end = rnd * round_size
-        round_complete = round_end <= picks_made
+        # True as soon as this round's FIRST pick has landed -- not just once
+        # the whole round wraps up -- so Δ updates live, pick by pick, as the
+        # round plays out (per the league manager's request), then holds its
+        # final value once the round is done.
+        round_started = picks_made >= round_start
 
         proj_row = (
             historical_cumulative_at_pick(cum_hist, round_end) if not cum_hist.empty
             else pd.Series(0.0, index=list(KNOWN_POSITIONS))
         )
-        actual_counts = actual_cumulative_at_pick(draft_state.picks, round_end) if round_complete else None
+        # Cumulative actual counts through RIGHT NOW, capped at this round's
+        # own last pick so a round already fully drafted still shows its
+        # final (not still-growing-from-later-rounds) total.
+        actual_cutoff = min(picks_made, round_end)
+        actual_counts = actual_cumulative_at_pick(draft_state.picks, actual_cutoff) if round_started else None
 
         my_pick = picks_by_overall.get(my_anchor)
         my_pick_label = f"{my_pick.position or '—'} · {my_pick.player_name}" if my_pick else "—"
@@ -292,7 +304,7 @@ def render_tendencies() -> None:
             proj_val = float(proj_row.get(pos, 0.0))
             row[pos] = round(proj_val, 1)
             row[f"Δ{pos}"] = (
-                round(actual_counts.get(pos, 0) - proj_val, 1) if round_complete else float("nan")
+                round(actual_counts.get(pos, 0) - proj_val, 1) if round_started else float("nan")
             )
         row["Consider now"] = ", ".join(consider_final) if consider_final else "—"
         row["Can wait"] = (
