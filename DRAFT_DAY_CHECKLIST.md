@@ -48,6 +48,23 @@ In a **second** terminal tab, same repo folder:
 python3 tools/live_pick_receiver.py
 ```
 
+The receiver only needs one third-party package (PyYAML) — if this
+terminal's `python3` doesn't have it, you'll see
+`ModuleNotFoundError: No module named 'yaml'` and the receiver won't
+actually start (and the `curl` check in step 4 will then fail too, since
+nothing is listening). If your normal setup uses a virtualenv, activate it
+first in this terminal the same way you would before `streamlit run
+app.py`. Otherwise, fix it directly for this terminal's `python3`:
+
+```bash
+python3 -m pip install pyyaml
+```
+
+(If that errors with `externally-managed-environment`, use
+`python3 -m pip install --user pyyaml` instead.) Then re-run the receiver
+command above — it should print a startup line like
+`Serving on http://127.0.0.1:8765`.
+
 Leave this running too — it prints one line per pick as it lands, so you
 can watch it work without checking anything else. `Ctrl+C` to stop it when
 you're done. You should see it start up with something like:
