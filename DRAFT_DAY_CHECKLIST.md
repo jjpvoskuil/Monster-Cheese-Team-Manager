@@ -163,10 +163,42 @@ number, and a rejected pick is retried a few times, then skipped (loudly,
 with a running failure count and `window.__mcSyncFailures` for the full
 list) instead of blocking everything behind it.
 
-**This has NOT been re-verified against a live CBS draft room yet** (only
-against the test suite and isolated logic tests) — run one more mock
-draft before trusting it again next year, the same way every fix this
-season was verified before relying on it live.
+Two more bugs turned up while backfilling the real draft's 220 picks
+after the fact (2026-09-01), fixed the same day:
+- CBS's team display name includes the owner's name in parens (e.g.
+  "Monster Cheese (John,Sam Cardinal)"), which broke every exact-match
+  team lookup — added `shortTeamName()` to strip that before matching, in
+  both hook files.
+- The backfill-from-results-table code path (used when the hook attaches
+  mid-draft) never actually worked at all: its selector
+  `#DraftRoom .views.results ...` assumed three nested elements, but
+  `"DraftRoom.views.results"` is CBS's own literal element id (the dots
+  are part of the id string) — switched to `getElementById`. Also hit
+  and fixed the same `new Event(...)` collision (CBS's page redefines the
+  global `Event` identifier) in both hook files' round-filter code, not
+  just the one-off backfill script that surfaced it first.
+
+**Still NOT re-verified against a live CBS draft room** (only against the
+test suite, isolated logic tests, and a backfill against the completed
+2026-08-30 results) — run one more mock draft before trusting the LIVE
+sync path again next year. The backfill path is now separately verified:
+rebuilding `data/draft_state.json` from CBS's real completed-draft
+results reproduced all 220 picks with 0 team mismatches once
+`reverse_last_n_rounds` was corrected (see below).
+
+### Bonus finding: the "reverse last 2 rounds" rule was wrong
+
+Checked `team_for_pick()`'s prediction for every one of the 220 real
+picks against what CBS actually did. With `reverse_last_n_rounds: 2` (the
+value in use all draft day), all 20 picks in rounds 21-22 predicted the
+wrong team. With it set to `0` (plain, uninterrupted snake for all 22
+rounds, no special-cased override), all 220 picks matched exactly. The
+`2` value came from league-manager feedback describing a forced-reverse
+override for the final 2 rounds that, per this real data, CBS did not
+actually implement that day. Config now reads `0`; see
+`config/league_settings.yaml`'s comment for the full writeup. Re-confirm
+with the league manager before next year's draft if this was ever
+supposed to apply.
 
 ## Before the real draft specifically
 
