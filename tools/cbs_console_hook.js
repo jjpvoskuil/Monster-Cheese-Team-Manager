@@ -196,6 +196,21 @@
   }
 
   // ---------------------------------------------------------------
+  // mainapp.teams.teams[].name includes the owner's name in parens --
+  // e.g. "Monster Cheese (John,Sam Cardinal)" -- confirmed live
+  // 2026-09-01 while backfilling the real draft's results by hand. Our
+  // config's team_order (and CBS's own Draft Results panel) only ever
+  // uses the bare team name, so every place this file reads a team name
+  // off mainapp must strip the "(...)" suffix or nothing will ever
+  // match. Splits on the first "(" rather than parsing the owner text
+  // itself, since that part's format varies wildly (one name, "A/B",
+  // "A & B", "A,B", extra spaces...).
+  // ---------------------------------------------------------------
+  function shortTeamName(rawName) {
+    return String(rawName || "").split("(")[0].trim();
+  }
+
+  // ---------------------------------------------------------------
   // Resolve a CBS teamid into that team's real display NAME, from CBS's
   // own in-page team data (mainapp.teams.teams) -- the same "ask the
   // page itself" approach resolvePlayer() above uses for players.
@@ -214,9 +229,9 @@
     try {
       const teams = mainapp.teams.teams || {};
       const direct = teams[teamid];
-      if (direct && direct.name) return direct.name.trim();
+      if (direct && direct.name) return shortTeamName(direct.name);
       const found = Object.values(teams).find((t) => t && String(t.teamid) === String(teamid));
-      return found && found.name ? found.name.trim() : null;
+      return found && found.name ? shortTeamName(found.name) : null;
     } catch (e) {
       return null;
     }
@@ -250,7 +265,7 @@
       // why that indirection was the bug.
       const knownNames = new Set(
         Object.values(mainapp.teams.teams || {})
-          .map((t) => t && t.name && t.name.trim())
+          .map((t) => t && t.name && shortTeamName(t.name))
           .filter(Boolean)
       );
 
