@@ -71,15 +71,38 @@
   }
 
   // ---------------------------------------------------------------
-  // Send queue (fire-and-forget with retry) -- unchanged in spirit from
-  // the console-paste version, just posts through the bridge instead of
-  // calling fetch() directly.
+  // Send queue -- fire-and-forget with retry, BUT bounded for a pick the
+  // receiver actively REJECTS (e.g. a validation error), not just for a
+  // pick that can't be delivered at all. This distinction is the fix for
+  // a real incident (2026-08-30 real draft): one pick got a teamid the
+  // receiver couldn't match, the receiver correctly rejected it with a
+  // 400, and the OLD code here treated that identically to "can't reach
+  // the receiver at all" -- retrying the same pick forever and, because
+  // this is a FIFO queue that only advances past its head on success,
+  // silently blocking EVERY pick after it for the rest of the draft. The
+  // badge kept saying "retrying #99" while ~120 later picks piled up
+  // behind it, unsynced, with no visible indication anything past #99
+  // had stopped working at all.
+  //
+  // background.js's response shape (see that file) is what makes the two
+  // cases distinguishable: a real network/connection failure never gets a
+  // response at all (`{ok:false, error: "..."}`, no `status`), while ANY
+  // reply from the receiver -- even a 400 -- carries a `status` field,
+  // because the receiver process was reachable and answered.
   // ---------------------------------------------------------------
+  const MAX_REJECT_ATTEMPTS = 4;
+  const failures = []; // {payload, reason} -- picks given up on; see console.table(window.__mcSyncFailures)
+  window.__mcSyncFailures = failures;
+
   const queue = [];
   let sending = false;
 
+  function itemLabel(payload) {
+    return `#${payload.overall_pick} (${payload.team || "team?"} / ${payload.player_name || "?"})`;
+  }
+
   function enqueue(payload) {
-    queue.push(payload);
+    queue.push({ payload, attempts: 0 });
     flush();
   }
 
@@ -87,21 +110,52 @@
     if (sending) return;
     sending = true;
     while (queue.length) {
-      const payload = queue[0];
-      const response = await postToReceiver("/pick", payload);
+      const item = queue[0];
+      const response = await postToReceiver("/pick", item.payload);
+
       if (response.ok) {
         queue.shift();
         const data = response.data || {};
+        const failNote = failures.length ? ` — ${failures.length} pick(s) FAILED, see console` : "";
         if (data.mismatches && data.mismatches.length) {
-          updateBadge("error", "MISMATCH reported by receiver — check its terminal");
+          updateBadge("error", `MISMATCH reported by receiver — check its terminal${failNote}`);
         } else {
-          updateBadge("ok", `synced #${payload.overall_pick} — on the clock: ${data.on_the_clock || "—"}`);
+          updateBadge("ok", `synced ${itemLabel(item.payload)} — on the clock: ${data.on_the_clock || "—"}${failNote}`);
         }
-      } else {
-        const reason = (response.data && response.data.error) || response.error || `HTTP ${response.status}`;
-        updateBadge("error", `receiver unreachable — retrying #${payload.overall_pick} (${reason})`);
-        await new Promise((r) => setTimeout(r, 2000));
+        continue;
       }
+
+      const reachedReceiver = "status" in response; // got an HTTP response at all, even non-ok
+      const reason = (response.data && response.data.error) || response.error || `HTTP ${response.status}`;
+
+      if (!reachedReceiver) {
+        // Genuine connectivity failure -- every other queued pick needs
+        // this same receiver, so there's nothing to gain by skipping
+        // ahead. Keep retrying THIS item indefinitely; the badge wording
+        // is accurate here.
+        updateBadge("error", `receiver unreachable — retrying ${itemLabel(item.payload)} (${reason})`);
+        await new Promise((r) => setTimeout(r, 2000));
+        continue;
+      }
+
+      // The receiver IS up and responded -- it just rejected this specific
+      // pick (e.g. couldn't match the team). Retrying won't fix a
+      // validation error, and letting it sit at the head of the queue
+      // forever would silently stall every pick behind it, so give up
+      // after a few tries and move on -- loudly.
+      item.attempts += 1;
+      if (item.attempts >= MAX_REJECT_ATTEMPTS) {
+        queue.shift();
+        failures.push({ payload: item.payload, reason });
+        console.error(`[MC sync] giving up on ${itemLabel(item.payload)} after ${MAX_REJECT_ATTEMPTS} attempts: ${reason}`);
+        updateBadge(
+          "error",
+          `SYNC FAILED for ${itemLabel(item.payload)}: ${reason} — log this pick manually! (${failures.length} failed so far — console.table(window.__mcSyncFailures) for the list)`
+        );
+        continue;
+      }
+      updateBadge("warn", `receiver rejected ${itemLabel(item.payload)}, retry ${item.attempts}/${MAX_REJECT_ATTEMPTS}: ${reason}`);
+      await new Promise((r) => setTimeout(r, 1500));
     }
     sending = false;
   }
@@ -137,6 +191,37 @@
   }
 
   // ---------------------------------------------------------------
+  // Resolve a CBS teamid into that team's real display NAME, using CBS's
+  // own in-page team data (mainapp.teams.teams) -- exactly the same "ask
+  // the page itself" approach resolvePlayer() above already uses for
+  // players.
+  //
+  // BUG FOUND LIVE 2026-08-30 (the REAL draft, not a mock): this used to
+  // not exist at all -- the receiver was trusted to convert a numeric
+  // teamid into a team name by treating it as a 1..N index into
+  // config/league_settings.yaml's team_order, which happened to be true
+  // for every MOCK draft room tested (CBS numbers mock-room teams 1..N
+  // fresh each time) but is FALSE for this real, long-running league,
+  // whose teams carry persistent CBS franchise ids that aren't 1..10 at
+  // all (teamid 27 showed up in a 10-team league). Resolving the name
+  // HERE, from CBS's own authoritative data, instead of asking the
+  // receiver to guess from a slot number, removes that assumption
+  // entirely -- whatever teamid CBS uses, mainapp.teams.teams already
+  // knows its real name.
+  // ---------------------------------------------------------------
+  function resolveTeamName(teamid) {
+    try {
+      const teams = mainapp.teams.teams || {};
+      const direct = teams[teamid];
+      if (direct && direct.name) return direct.name.trim();
+      const found = Object.values(teams).find((t) => t && String(t.teamid) === String(teamid));
+      return found && found.name ? found.name.trim() : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // ---------------------------------------------------------------
   // Best-effort backfill from the draft room's own results table (picks
   // made before this script attached, e.g. joining mid-draft). See
   // tools/cbs_console_hook.js's equivalent function for the same caveats.
@@ -153,37 +238,46 @@
         updateBadge("warn", "no history table found — starting fresh from live picks only");
         return;
       }
-      const nameToTeamId = {};
-      Object.values(mainapp.teams.teams || {}).forEach((t) => {
-        if (t && t.teamid != null && t.name) nameToTeamId[t.name.trim()] = t.teamid;
-      });
+      const knownNames = new Set(
+        Object.values(mainapp.teams.teams || {})
+          .map((t) => t && t.name && t.name.trim())
+          .filter(Boolean)
+      );
 
       const batch = [];
       rows.forEach((row) => {
         const cells = row.querySelectorAll("td");
         if (cells.length < 3) return;
         const text = Array.from(cells).map((c) => c.textContent.trim());
-        const teamCellIdx = text.findIndex((t) => nameToTeamId[t] != null);
+        // Match the cell against CBS's own team names directly -- no
+        // numeric teamid involved at all, see resolveTeamName()'s comment
+        // above for why that indirection was the bug.
+        const teamCellIdx = text.findIndex((t) => knownNames.has(t));
         if (teamCellIdx === -1) return;
-        const teamid = nameToTeamId[text[teamCellIdx]];
+        const teamName = text[teamCellIdx]; // the FANTASY team's name (e.g. "Monster Cheese")
         const playerCell = text[teamCellIdx + 1] || "";
-        const m = playerCell.match(/^\*?(.+?),\s*(.+?)\s*\(([A-Z]+)\s*([A-Z]*)\)$/);
-        const noComma = playerCell.match(/^\*?(.+?)\s*\(([A-Z]+)\s*([A-Z]*)\)$/);
-        let name, pos, team;
+        const m = playerCell.match(/^\*?(.+?),\s*(.+?)\s*\(([A-Z][A-Z-]*)\s*([A-Z]*)\)$/);
+        const noComma = playerCell.match(/^\*?(.+?)\s*\(([A-Z][A-Z-]*)\s*([A-Z]*)\)$/);
+        let name, pos, nflTeam; // the drafted PLAYER's NFL team (e.g. "DET") -- distinct from teamName above
         if (m) {
           name = `${m[2].trim()} ${m[1].trim()}`;
           pos = m[3];
-          team = m[4];
+          nflTeam = m[4];
         } else if (noComma) {
           name = noComma[1].trim();
           pos = noComma[2];
-          team = noComma[3];
+          nflTeam = noComma[3];
         } else {
-          return;
+          // "No Player Selected" or similar -- still record the slot so
+          // this pick number doesn't silently shift every later pick's
+          // numbering when reconciled by hand.
+          name = playerCell.replace(/^\*/, "").trim();
+          pos = "";
+          nflTeam = "";
         }
         const pickNum = parseInt(text[0], 10);
         if (!pickNum) return;
-        batch.push({ overall_pick: pickNum, teamid: parseInt(teamid, 10), player_name: name, position: pos, nfl_team: team });
+        batch.push({ overall_pick: pickNum, team: teamName, player_name: name, position: pos, nfl_team: nflTeam });
       });
 
       const usable = batch.filter((b) => b.overall_pick < expectedUpTo);
@@ -242,9 +336,20 @@
           picks.forEach((pk, i) => {
             const overall = nextOpick - picks.length + i;
             const info = resolvePlayer(pk.playerid);
+            const teamName = resolveTeamName(pk.teamid);
+            if (!teamName) {
+              // Don't even send this one -- there's no team_order match to
+              // hope for server-side any more (see resolveTeamName()'s
+              // docstring), so failing fast here with a clear console
+              // message is more useful than a round-trip 400.
+              console.error(`[MC sync] could not resolve team name for CBS teamid ${pk.teamid} (pick #${overall})`);
+              updateBadge("error", `can't identify the team for pick #${overall} (teamid ${pk.teamid}) — log it manually!`);
+              return;
+            }
             enqueue({
               overall_pick: overall,
-              teamid: parseInt(pk.teamid, 10),
+              team: teamName,
+              teamid: parseInt(pk.teamid, 10), // kept for debugging only -- the receiver matches on `team`, not this
               player_name: info.name,
               position: info.pos,
               nfl_team: info.team,

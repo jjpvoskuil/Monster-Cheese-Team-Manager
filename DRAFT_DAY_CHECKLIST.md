@@ -124,7 +124,16 @@ As picks land in the draft room:
 ## 7. If something looks wrong
 
 - Badge says **"receiver unreachable"** → the receiver (step 3) isn't
-  running, or crashed. Check its terminal for an error.
+  running, or crashed. Check its terminal for an error. (This wording now
+  ONLY appears for a genuine connection failure — see the incident note
+  below for why that distinction matters.)
+- Badge says **"receiver rejected"** or **"SYNC FAILED"** for a specific
+  pick → the receiver IS running and reachable, it just couldn't match
+  that one pick (almost always a team-name mismatch). It gives up after a
+  few retries and moves on to the NEXT pick automatically — it no longer
+  gets stuck. Log that one pick manually on the Draft Board and keep
+  going; run `console.table(window.__mcSyncFailures)` in DevTools any
+  time to see every pick that failed this way.
 - Badge never appears at all → the extension likely isn't matching this
   page; refresh once, and if it still doesn't show up, tell me the exact
   URL you're on.
@@ -134,9 +143,34 @@ As picks land in the draft room:
   picks manually by clicking a row, regardless of whether live sync is
   working. That's always the fallback.
 
+## Incident from the 2026-08-30 real draft (fixed, but re-verify before trusting it again)
+
+Live sync effectively stopped working partway through the real draft.
+Root cause: the receiver identified teams by treating CBS's numeric
+`teamid` as a small 1..N slot number matching `team_order` — true for
+every MOCK draft room tested (CBS numbers those fresh, 1..N, every time)
+but false for this real, long-running league, whose teams carry
+persistent CBS ids that aren't 1..10 at all. One pick's teamid fell
+outside that range, the receiver correctly rejected it, and the OLD code
+treated "rejected" exactly like "can't reach the receiver at all" —
+retrying that one pick forever and silently blocking every pick after it
+for the rest of the draft (the badge kept saying "retrying #99" while
+~120 later picks piled up behind it, unsynced).
+
+Both parts are fixed: team identification now resolves the real team
+NAME directly from CBS's own page data instead of guessing from a slot
+number, and a rejected pick is retried a few times, then skipped (loudly,
+with a running failure count and `window.__mcSyncFailures` for the full
+list) instead of blocking everything behind it.
+
+**This has NOT been re-verified against a live CBS draft room yet** (only
+against the test suite and isolated logic tests) — run one more mock
+draft before trusting it again next year, the same way every fix this
+season was verified before relying on it live.
+
 ## Before the real draft specifically
 
-Repeat steps 1–4 one more time right before 2:30pm ET, even if you tested
-earlier today — step 1 (resetting the pick log) is the one that matters
-most, since today's mock draft test will otherwise still be sitting in
+Repeat steps 1–4 one more time right before the draft starts, even if you
+tested earlier — step 1 (resetting the pick log) is the one that matters
+most, since an earlier mock draft test will otherwise still be sitting in
 `data/draft_state.json`.

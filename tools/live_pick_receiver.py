@@ -127,22 +127,60 @@ _lock = threading.Lock()
 
 
 def _team_for_cbs_slot(teamid: int) -> str | None:
+    """DEPRECATED fallback only -- see _match_team_name() below, which is
+    now the primary path. This function assumes CBS numbers a room's
+    teams 1..N matching team_order's position, which held for every mock
+    draft tested this season but was FALSE for the real 2026-08-30 draft
+    (a real, long-running league whose teams carry persistent CBS
+    franchise ids -- teamid 27 showed up in a 10-team league, well
+    outside 1..10). Kept only in case an old cached copy of a hook script
+    is ever pasted again and sends `teamid` with no `team` name at all."""
     if not isinstance(teamid, int) or not (1 <= teamid <= len(TEAM_ORDER)):
         return None
     return TEAM_ORDER[teamid - 1]
 
 
+def _match_team_name(name: object) -> str | None:
+    """Match a CBS-reported team display NAME to our config's team_order,
+    case/whitespace-insensitive. This is the real fix for the
+    2026-08-30 incident above: instead of asking the receiver to guess a
+    team from a numeric slot, the browser hook now resolves the name
+    directly from CBS's own in-page team data (mainapp.teams.teams) and
+    sends that name here -- so whatever numbering scheme CBS uses
+    internally for this particular league no longer matters at all."""
+    if not isinstance(name, str) or not name.strip():
+        return None
+    target = name.strip().casefold()
+    for t in TEAM_ORDER:
+        if t.strip().casefold() == target:
+            return t
+    return None
+
+
 def _apply_pick(payload: dict) -> dict:
-    """Turn one {overall_pick, teamid, player_name, position, nfl_team}
+    """Turn one {overall_pick, team, player_name, position, nfl_team}
     payload from the browser hook into a LivePick, merge it in, and return
-    a small JSON-able status dict for the browser badge to display."""
+    a small JSON-able status dict for the browser badge to display.
+    `team` (a CBS display name, e.g. "Monster Cheese") is the primary way
+    the team is identified -- see _match_team_name()'s docstring. A
+    legacy `teamid`-only payload (no `team` field) still falls back to
+    the old slot-number guess via _team_for_cbs_slot(), but that path is
+    known-unreliable for a real league; every current hook script always
+    sends `team` now."""
     overall = payload.get("overall_pick")
-    teamid = payload.get("teamid")
     if not isinstance(overall, int) or overall < 1:
         raise ValueError(f"bad overall_pick: {overall!r}")
-    team = _team_for_cbs_slot(teamid)
+
+    raw_team = payload.get("team")
+    team = _match_team_name(raw_team)
     if team is None:
-        raise ValueError(f"teamid {teamid!r} out of range for team_order ({len(TEAM_ORDER)} teams)")
+        teamid = payload.get("teamid")
+        team = _team_for_cbs_slot(teamid) if isinstance(teamid, int) else None
+    if team is None:
+        raise ValueError(
+            f"could not identify team for pick #{overall}: team={raw_team!r}, "
+            f"teamid={payload.get('teamid')!r}; known teams: {TEAM_ORDER}"
+        )
 
     with _lock:
         _live_picks[overall] = LivePick(
