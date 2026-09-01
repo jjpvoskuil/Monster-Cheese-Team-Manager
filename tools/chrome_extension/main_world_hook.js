@@ -246,9 +246,24 @@
       const sel = document.querySelector("#selectRoundResults");
       if (sel) {
         sel.value = "all";
-        sel.dispatchEvent(new Event("change", { bubbles: true }));
+        // NOT `new Event(...)` -- CBS's own page code redefines the global
+        // `Event` identifier for its own socket/messaging system, so that
+        // constructor throws ("Event is not a constructor") in this main-
+        // world context. document.createEvent is a method, not the global
+        // identifier, so it isn't affected. Confirmed live 2026-09-01.
+        const ev = document.createEvent("HTMLEvents");
+        ev.initEvent("change", true, true);
+        sel.dispatchEvent(ev);
       }
-      const rows = document.querySelectorAll("#DraftRoom .views.results .SLTables1 table.data tr");
+      // NOTE: "DraftRoom.views.results" is CBS's own literal element id --
+      // the dots are part of the id string, not CSS-selector descendant
+      // combinators. `#DraftRoom .views.results ...` (space-separated) was
+      // silently matching nothing; confirmed live 2026-09-01 via a DOM scan
+      // of the completed draft room (the id showed up as one element's
+      // parentId, not three nested ones). getElementById sidesteps the
+      // escaping entirely.
+      const resultsPanel = document.getElementById("DraftRoom.views.results");
+      const rows = resultsPanel ? resultsPanel.querySelectorAll(".SLTables1 table.data tr") : [];
       if (!rows || !rows.length) {
         updateBadge("warn", "no history table found — starting fresh from live picks only");
         return;
