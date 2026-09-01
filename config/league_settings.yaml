@@ -50,17 +50,23 @@ draft:
     - "Ball Busters"
   seconds_per_pick: 70
   autopick_on_expire: true  # "draft robot" fills any team that lets the clock expire
-  reverse_last_n_rounds: 2
-  # Per league-manager feedback (2026-08-26), the final 2 rounds don't
-  # just continue the normal alternating snake -- the FIRST of those 2
-  # rounds is forced to reverse order (team_order's last team, "#10",
-  # picks first), then it snakes normally into the actual last round.
-  # With 22 total rounds this genuinely flips both rounds relative to
-  # what uninterrupted alternation would have given (round 21 would
-  # otherwise be forward, round 22 reverse) -- see
-  # src/draft_state.py's _round_is_forward() docstring for the exact
-  # mechanics. Not independently confirmed against CBS's UI/rules page
-  # this session -- taken as stated by the league manager.
+  reverse_last_n_rounds: 0
+  # CORRECTED 2026-09-01 against the real 2026-08-30 draft's completed
+  # results (all 220 picks, pulled straight from CBS's own draft room):
+  # plain, unbroken snake for all 22 rounds -- round 21 forward, round 22
+  # reverse, exactly what uninterrupted alternation gives -- matched the
+  # real team-for-pick outcome on EVERY one of the 220 picks with this set
+  # to 0. This had been set to 2 based on league-manager feedback
+  # (2026-08-26) describing a special forced-reverse override for the
+  # final 2 rounds; that override does NOT match what CBS actually did,
+  # and was silently giving wrong on-the-clock predictions for rounds
+  # 21-22 all draft long. See src/draft_state.py's _round_is_forward()
+  # docstring for the mechanics this now falls back to (its special-case
+  # branch is now dead code with this at 0, kept in case a real reversed
+  # league is configured in the future). Re-confirm with the league
+  # manager before next year's draft if this behavior was ever intended
+  # to apply and CBS just didn't implement it that day -- but until then,
+  # trust the real data over the earlier secondhand description.
 
 roster:
   # Active starting lineup slots (12 total), from the league Constitution
