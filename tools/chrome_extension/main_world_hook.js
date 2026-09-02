@@ -291,11 +291,20 @@
         let name, pos, nflTeam; // the drafted PLAYER's NFL team (e.g. "DET") -- distinct from teamName above
         if (m) {
           name = `${m[2].trim()} ${m[1].trim()}`;
-          pos = m[3];
+          // This league's roster has no dedicated single-WR slot (only a
+          // combined WR/TE flex), so CBS's OWN results table labels every
+          // real wide receiver "WR-TE" here -- confirmed live 2026-09-01
+          // backfilling the real draft: every "WR-TE" row was a true WR,
+          // every plain "TE" row a true TE. Keeping the compound string as
+          // the stored position broke roster-slot assignment everywhere
+          // (src/roster_needs.py matches on exact position, "WR-TE" is
+          // never "WR" or "TE"), so take the first component, same
+          // convention as the comma-separated case elsewhere in this file.
+          pos = m[3].split("-")[0];
           nflTeam = m[4];
         } else if (noComma) {
           name = noComma[1].trim();
-          pos = noComma[2];
+          pos = noComma[2].split("-")[0];
           nflTeam = noComma[3];
         } else {
           // "No Player Selected" or similar -- still record the slot so
