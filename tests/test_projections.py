@@ -3,7 +3,7 @@ import pytest
 import yaml
 import os
 
-from src.projections import compute_position_demand, compute_tiers
+from src.projections import blend_projections, compute_position_demand, compute_tiers
 
 CONFIG_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -136,3 +136,62 @@ def test_superflex_demand_is_now_overwhelmingly_qb():
     teams = config["league"]["teams"]
     assert demand["QB"] == pytest.approx(teams * 1 + teams * 1.0)
     assert demand["QB"] / teams > 1.8
+
+
+def _dst_row(source: str, weight_col_value, **overrides) -> dict:
+    """One DST source row with every stat column present. weight_col_value
+    is the value for points_allowed_per_game/yards_allowed_per_game --
+    pass None to simulate a source that doesn't provide those fields
+    (NaN, same as manual_import.load_table leaves an existing-but-empty
+    CSV cell)."""
+    row = {
+        "name": "Broncos", "name_key": "broncos", "position": "DST", "nfl_team": "DEN",
+        "games": 17, "source": source,
+        "pass_yards": 0, "pass_td": 0, "pass_int": 0, "pass_two_pt": 0,
+        "rush_yards": 0, "rush_td": 0, "rush_two_pt": 0,
+        "receptions": 0, "rec_yards": 0, "rec_td": 0, "rec_two_pt": 0,
+        "fumbles_lost": 0, "off_fumble_rec_td": 0, "fumble_rec_two_pt": 0,
+        "fg_made": 0, "xp_made": 0, "xp_missed": 0,
+        "kick_return_td": 0, "punt_return_td": 0,
+        "def_sacks": 40, "def_int": 12, "def_fumble_rec": 8, "def_td": 2,
+        "def_blocked_fg": 0, "def_blocked_punt": 0, "def_blocked_xp": 0, "def_safeties": 0,
+        "points_allowed_per_game": weight_col_value, "yards_allowed_per_game": weight_col_value,
+    }
+    row.update(overrides)
+    return row
+
+
+def test_blend_weighted_average_ignores_sources_missing_that_column():
+    """Regression for the 2026-09-02 draft-grades bug: fantasypoints_2026
+    (the only source weighted >0 in the real league config at the time)
+    never fills in points_allowed_per_game/yards_allowed_per_game for any
+    DST -- those cells are legitimately empty (NaN) in that source, while
+    three OTHER sources (weighted to 0 by the league manager) had real
+    per-game averages around 18-21. The old code normalized each column's
+    weighted sum by the player's TOTAL weight across all sources
+    (`total_w = w.sum()`), even though pandas' Series.sum() silently
+    dropped the NaN term from the numerator -- so a player whose only
+    nonzero-weight source had no data for a column got 0.0 for that
+    column instead of a sensible fallback. A points_allowed_per_game of
+    0.0 reads as a literal shutout defense to the scoring engine (its
+    best tier), which inflated every DST's projected season score by
+    ~300+ phantom points (~528 vs. a realistic ~100). The fix normalizes
+    each column independently by the weight of only the sources that
+    actually have a value for THAT column, falling back to a plain
+    average of whatever data exists when none of the contributors with
+    real data carry any weight."""
+    df = pd.DataFrame([
+        _dst_row("fantasypoints_2026", None),  # weight 1.0, no PA/YA data
+        _dst_row("cbs_2026", 18.0),            # weight 0.0, has real data
+        _dst_row("fftoday_2026", 20.0),        # weight 0.0, has real data
+    ])
+    blended = blend_projections(df, {"fantasypoints_2026": 1.0, "cbs_2026": 0.0, "fftoday_2026": 0.0})
+    assert len(blended) == 1
+    row = blended.iloc[0]
+    # Should fall back to the average of the sources that DO have data
+    # (18.0, 20.0 -> 19.0), never silently default to 0.0.
+    assert row["points_allowed_per_game"] == pytest.approx(19.0)
+    assert row["yards_allowed_per_game"] == pytest.approx(19.0)
+    # Sanity check the rest of the row still blended normally (weighted
+    # 100% onto the one source with real sack/int/etc. data).
+    assert row["def_sacks"] == pytest.approx(40.0)

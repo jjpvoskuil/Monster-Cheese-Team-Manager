@@ -91,10 +91,46 @@ def blend_projections(df: pd.DataFrame, source_weights: Optional[dict[str, float
 
     def _agg(group: pd.DataFrame) -> pd.Series:
         w = group["_weight"]
-        total_w = w.sum() or 1.0
         out = {}
         for col in _STAT_COLUMNS + ["games"]:
-            out[col] = (group[col] * w).sum() / total_w
+            # Per-column weighted average, normalized by the weight of only
+            # the sources that actually HAVE a value for this column --
+            # not the player's total weight across all sources.
+            #
+            # Bug found 2026-09-02 building the draft-grades report: some
+            # stat columns (points_allowed_per_game/yards_allowed_per_game
+            # for DST) are populated by only a subset of sources -- e.g.
+            # fantasypoints_2026.csv never fills them in (NaN for every
+            # DST row) while cbs_2026/fftoday_2026/fantasypros_2026 all
+            # do. When source_weights gave 100% weight to
+            # fantasypoints_2026 and 0% to the rest, the old code did
+            # `(group[col] * w).sum() / total_w`: pandas' .sum() silently
+            # skips the NaN term (dropping fantasypoints_2026's
+            # contribution to the numerator), but total_w still included
+            # its full 1.0 weight in the denominator -- so the result was
+            # 0.0 / 1.0 = 0.0 for every DST, even though three other
+            # sources had real per-game averages around 18-21. A pa_pg of
+            # 0.0 reads as a literal shutout defense to the scoring
+            # engine's tier table (15 pts/game, the best possible tier),
+            # inflating every DST's season score by ~300+ phantom points
+            # (528 pts for a top defense vs. a realistic ~150-200).
+            #
+            # Fix: normalize by the weight of only the non-null
+            # contributors for THIS column. If none of them have any
+            # weight (every source with real data was weighted to 0), fall
+            # back to a plain unweighted average of whatever data exists
+            # rather than silently defaulting to 0.
+            col_values = group[col]
+            has_value = col_values.notna()
+            if not has_value.any():
+                out[col] = 0.0
+                continue
+            w_avail = w[has_value]
+            w_sum = w_avail.sum()
+            if w_sum:
+                out[col] = (col_values[has_value] * w_avail).sum() / w_sum
+            else:
+                out[col] = col_values[has_value].mean()
         # keep the most common display name / nfl_team across sources
         out["name"] = group["name"].mode().iat[0] if not group["name"].mode().empty else group["name"].iat[0]
         out["nfl_team"] = (
