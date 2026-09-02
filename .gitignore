@@ -2,6 +2,8 @@ __pycache__/
 *.pyc
 .pytest_cache/
 data/draft_state.json
+data/source_weights.json
+data/live_sync_status.json
 .venv/
 venv/
 .DS_Store
