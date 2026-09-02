@@ -29,6 +29,53 @@ from .tiering import jenks_auto_labels
 
 _STAT_COLUMNS = [c for c in CANONICAL_COLUMNS if c not in ("name", "position", "nfl_team", "games")]
 
+# All 4 real projection sources (data/projections/*.csv) name DST rows by
+# CITY in their "name" column ("Denver", "L.A. Rams", "San Francisco").
+# CBS's OWN draft room -- and therefore every pick this app ever logs,
+# whether typed in manually, synced live off CBS's socket, or backfilled
+# from CBS's completed-draft results table -- names DST picks by MASCOT
+# ("Broncos", "Rams", "49ers") instead. Every downstream lookup that joins
+# a drafted DST pick back to its projected score by exact player_name
+# (src/league_grid.py's points_by_name, pages/6 and 7's same pattern) was
+# silently failing 100% of the time for every single DST pick in the
+# league -- confirmed live 2026-09-02 via the League Rosters page's own
+# "No projection found for" warning listing every drafted defense. Fixed
+# at the source here so every consumer of build_draft_board()/
+# blend_projections() gets DST rows already renamed to match CBS's
+# convention, rather than patching each page's own matching logic
+# separately.
+NFL_CITY_TO_MASCOT = {
+    "Arizona": "Cardinals", "Atlanta": "Falcons", "Baltimore": "Ravens",
+    "Buffalo": "Bills", "Carolina": "Panthers", "Chicago": "Bears",
+    "Cincinnati": "Bengals", "Cleveland": "Browns", "Dallas": "Cowboys",
+    "Denver": "Broncos", "Detroit": "Lions", "Green Bay": "Packers",
+    "Houston": "Texans", "Indianapolis": "Colts", "Jacksonville": "Jaguars",
+    "Kansas City": "Chiefs", "L.A. Chargers": "Chargers", "L.A. Rams": "Rams",
+    "Las Vegas": "Raiders", "Miami": "Dolphins", "Minnesota": "Vikings",
+    "New England": "Patriots", "New Orleans": "Saints", "N.Y. Giants": "Giants",
+    "N.Y. Jets": "Jets", "Philadelphia": "Eagles", "Pittsburgh": "Steelers",
+    "San Francisco": "49ers", "Seattle": "Seahawks", "Tampa Bay": "Buccaneers",
+    "Tennessee": "Titans", "Washington": "Commanders",
+    # A few alternate spellings seen across sources, mapped defensively.
+    "LA Rams": "Rams", "LA Chargers": "Chargers", "NY Giants": "Giants",
+    "NY Jets": "Jets", "Los Angeles Rams": "Rams", "Los Angeles Chargers": "Chargers",
+}
+
+
+def _normalize_dst_names(df: pd.DataFrame) -> pd.DataFrame:
+    """Rename every DST row's `name` from CBS-style city to CBS-style
+    mascot (see NFL_CITY_TO_MASCOT's docstring above). A city not found
+    in the map is left as-is rather than dropped/errored -- better to
+    keep a player matchable by SOME name than silently lose the row."""
+    if df.empty or "position" not in df.columns:
+        return df
+    df = df.copy()
+    is_dst = df["position"] == "DST"
+    df.loc[is_dst, "name"] = df.loc[is_dst, "name"].map(
+        lambda n: NFL_CITY_TO_MASCOT.get(str(n).strip(), n)
+    )
+    return df
+
 
 def blend_projections(df: pd.DataFrame, source_weights: Optional[dict[str, float]] = None) -> pd.DataFrame:
     """Collapse multiple source rows per player (joined on name_key +
@@ -59,6 +106,7 @@ def blend_projections(df: pd.DataFrame, source_weights: Optional[dict[str, float
 
     blended = df.groupby(["name_key", "position"], as_index=False).apply(_agg, include_groups=False)
     blended = blended.reset_index(drop=True)
+    blended = _normalize_dst_names(blended)
     return blended
 
 

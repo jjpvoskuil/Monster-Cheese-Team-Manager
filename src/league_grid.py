@@ -23,6 +23,7 @@ from typing import Optional
 
 import pandas as pd
 
+from src.data_sources.manual_import import normalize_name
 from src.draft_state import Pick
 from src.roster_needs import assign_roster_slots
 
@@ -73,6 +74,21 @@ def build_league_grid(
     starter_labels = _starter_labels(starters)
     columns: list[TeamColumn] = []
 
+    # Fallback lookup keyed by normalized name (lowercase, punctuation and
+    # Jr./Sr./II/III/IV stripped -- src.data_sources.manual_import's same
+    # normalize_name() used to join projection sources together), tried
+    # only when the exact player_name from the draft log doesn't match a
+    # projection row verbatim. Real gap found live 2026-09-02: CBS logs
+    # "Brian Robinson Jr." but at least one projection source has him as
+    # plain "Brian Robinson" -- an exact match on points_by_name's raw
+    # index silently scored him 0 and flagged him "missing" even though
+    # his projection genuinely exists. Built once per call, not per pick.
+    normalized_lookup: dict[str, float] = {}
+    for raw_name, pts in points_by_name.items():
+        key = normalize_name(raw_name)
+        if key and key not in normalized_lookup:
+            normalized_lookup[key] = pts
+
     for team in teams:
         picks = rosters.get(team, [])
         slots, bench = assign_roster_slots(picks, starters)
@@ -84,6 +100,8 @@ def build_league_grid(
             # within this same iteration (never stored/deferred), so the
             # usual late-binding closure pitfall doesn't apply here.
             pts = points_by_name.get(pick.player_name)
+            if pts is None or pd.isna(pts):
+                pts = normalized_lookup.get(normalize_name(pick.player_name))
             if pts is None or pd.isna(pts):
                 missing.append(pick.player_name)
                 return 0.0

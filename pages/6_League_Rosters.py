@@ -42,12 +42,13 @@ import streamlit as st
 from src.data_sources.manual_import import load_many
 from src.draft_state import DraftState
 from src.league_grid import LeagueGrid, build_league_grid
-from src.projections import build_draft_board
+from src.projections import build_draft_board, load_source_weights
 from src.scoring import load_config
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
 DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
+SOURCE_WEIGHTS_FILE = os.path.join(ROOT, "data", "source_weights.json")
 # Same extension allowlist as the Draft Board -- keeps out
 # data/projections/README.md, which isn't a data file.
 DATA_EXTENSIONS = (".csv", ".tsv", ".xlsx", ".xlsm", ".xltx", ".xls")
@@ -90,27 +91,41 @@ def _data_files(data_dir: str) -> list[str]:
 
 
 @st.cache_data
-def get_ranked_players(data_dir: str, _mtimes: tuple) -> pd.DataFrame:
+def get_ranked_players(data_dir: str, mtimes: tuple, weights_mtime: float) -> pd.DataFrame:
+    """NOTE: these must NOT have a leading underscore -- Streamlit's
+    cache_data silently EXCLUDES underscore-prefixed params from the
+    cache key entirely, which was a real bug here (this page never
+    picked up a changed source weight or an edited/re-dropped projection
+    file after its first render) -- see pages/1_Draft_Board.py's
+    get_ranked_players() and src/projections.py's load_source_weights()
+    for the same fix applied there first. Also missing until now: this
+    page never actually read the saved source weights at all, so its
+    point totals could silently disagree with the Draft Board's even
+    with the cache-key bug fixed."""
     paths = _data_files(data_dir)
     if not paths:
         return pd.DataFrame()
     sources = [(p, os.path.splitext(os.path.basename(p))[0]) for p in paths]
     raw = load_many(sources)
-    return build_draft_board(raw, get_config())
+    source_weights = load_source_weights(SOURCE_WEIGHTS_FILE)
+    return build_draft_board(raw, get_config(), source_weights=source_weights)
 
 
 def load_players() -> tuple[pd.DataFrame, bool]:
     """Same real-data-preferred, sample-data-fallback pattern as the Draft
     Board (pages/1_Draft_Board.py) -- keeps every page's point totals
     consistent with each other."""
+    weights_mtime = (
+        os.path.getmtime(SOURCE_WEIGHTS_FILE) if os.path.exists(SOURCE_WEIGHTS_FILE) else 0.0
+    )
     real_paths = _data_files(REAL_DATA_DIR)
     if real_paths:
         mtimes = tuple(os.path.getmtime(p) for p in real_paths)
-        return get_ranked_players(REAL_DATA_DIR, mtimes), False
+        return get_ranked_players(REAL_DATA_DIR, mtimes, weights_mtime), False
     sample_paths = _data_files(SAMPLE_DATA_DIR)
     if sample_paths:
         mtimes = tuple(os.path.getmtime(p) for p in sample_paths)
-        return get_ranked_players(SAMPLE_DATA_DIR, mtimes), True
+        return get_ranked_players(SAMPLE_DATA_DIR, mtimes, weights_mtime), True
     return pd.DataFrame(), False
 
 
