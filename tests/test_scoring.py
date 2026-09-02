@@ -125,11 +125,27 @@ def test_season_scoring_qb_reasonable(engine):
 
 def test_season_scoring_dst_uses_per_game_allowed(engine):
     row = {
+        "position": "DST",
         "def_sacks": 45, "def_int": 15, "def_fumble_rec": 10, "def_td": 3,
         "points_allowed_per_game": 18, "yards_allowed_per_game": 320, "games": 17,
     }
     bd = engine.score_player_season(row, games=17)
     assert bd.defense > 0
+
+
+def test_season_scoring_non_dst_row_ignores_allowed_fields(engine):
+    """Regression test for a real bug (found 2026-09-02): the data loader
+    defaults missing points_allowed_per_game/yards_allowed_per_game to 0.0
+    for every non-DST player (K, QB, RB, WR, TE), and 0 is the BEST tier
+    for those fields (fewest points/yards allowed), not "not applicable".
+    Before the position=="DST" gate, any non-DST row -- even with no
+    def_* stats at all -- got a phantom 425-point shutout-defense bonus
+    added to its season total (15 pts/game points-allowed tier + 10
+    pts/game yards-allowed tier, x17 games), which is exactly what
+    inflated a projected kicker to 564.6 points."""
+    row = {"position": "K", "fg_made": 26, "xp_made": 47, "games": 17}
+    bd = engine.score_player_season(row, games=17)
+    assert bd.defense == 0
 
 
 def test_replacement_level_players_score_near_zero(engine):

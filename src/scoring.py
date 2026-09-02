@@ -311,22 +311,44 @@ class ScoringEngine:
         )
 
         # --- Defense/Special Teams (DST) ---
-        def_s = self.scoring["defense_special_teams"]
-        bd.defense += row.get("def_sacks", 0) * def_s["sack"]
-        bd.defense += row.get("def_int", 0) * def_s["interception"]
-        bd.defense += row.get("def_fumble_rec", 0) * def_s["fumble_recovery"]
-        bd.defense += row.get("def_td", 0) * def_s["defensive_st_td"]
-        bd.defense += row.get("def_blocked_fg", 0) * def_s["blocked_field_goal"]
-        bd.defense += row.get("def_blocked_punt", 0) * def_s["blocked_punt"]
-        bd.defense += row.get("def_blocked_xp", 0) * def_s["blocked_extra_point"]
-        bd.defense += row.get("def_safeties", 0) * def_s["safety"]
-        bd.defense += row.get("def_st_two_pt", 0) * def_s["st_two_point_return"]
-        bd.defense += row.get("def_st_one_pt_safety", 0) * def_s["st_one_point_safety"]
-        pa_pg = row.get("points_allowed_per_game")
-        ya_pg = row.get("yards_allowed_per_game")
-        if pa_pg is not None:
-            bd.defense += _tier_lookup(pa_pg, def_s["points_against_tiers"], extrapolate=False) * g
-        if ya_pg is not None:
-            bd.defense += _tier_lookup(ya_pg, def_s["yards_allowed_tiers"], extrapolate=False) * g
+        # Gated on position == "DST": src/data_sources/manual_import.py
+        # deliberately defaults every missing canonical stat column to 0
+        # (documented there -- correct for counting stats like def_sacks,
+        # where 0 legitimately means "doesn't apply to this player"). But
+        # points_allowed_per_game/yards_allowed_per_game are TIER-LOOKUP
+        # inputs, not counting stats, and 0 is the tier for a shutout
+        # defense -- the single BEST possible score, not "not applicable".
+        # Every non-DST player (K, QB, RB, WR, TE) was getting that column
+        # defaulted to 0.0 and then scored as if they personally pitched a
+        # shutout every game: 15 pts/game (points-allowed tier) + 10
+        # pts/game (yards-allowed tier) = 25 x games_per_season (17) = 425
+        # bogus points added to EVERY offensive/kicking player's season
+        # total. Found 2026-09-02 investigating a kicker (Tyler Bass)
+        # projected at 564.6 pts (139.6 legitimate kicking + 425 phantom
+        # defense) -- ~35 pts/game for a position that realistically
+        # scores ~7-9. Confirmed via the four real projection sources: not
+        # one of them reports points/yards-allowed for a K, so every such
+        # row's 0.0 was purely this loader's fill default, never a real
+        # projection of 0 points/0 yards allowed. Only a real DST row
+        # (whose position really is "DST") should ever score off these
+        # two fields.
+        if row.get("position") == "DST":
+            def_s = self.scoring["defense_special_teams"]
+            bd.defense += row.get("def_sacks", 0) * def_s["sack"]
+            bd.defense += row.get("def_int", 0) * def_s["interception"]
+            bd.defense += row.get("def_fumble_rec", 0) * def_s["fumble_recovery"]
+            bd.defense += row.get("def_td", 0) * def_s["defensive_st_td"]
+            bd.defense += row.get("def_blocked_fg", 0) * def_s["blocked_field_goal"]
+            bd.defense += row.get("def_blocked_punt", 0) * def_s["blocked_punt"]
+            bd.defense += row.get("def_blocked_xp", 0) * def_s["blocked_extra_point"]
+            bd.defense += row.get("def_safeties", 0) * def_s["safety"]
+            bd.defense += row.get("def_st_two_pt", 0) * def_s["st_two_point_return"]
+            bd.defense += row.get("def_st_one_pt_safety", 0) * def_s["st_one_point_safety"]
+            pa_pg = row.get("points_allowed_per_game")
+            ya_pg = row.get("yards_allowed_per_game")
+            if pa_pg is not None:
+                bd.defense += _tier_lookup(pa_pg, def_s["points_against_tiers"], extrapolate=False) * g
+            if ya_pg is not None:
+                bd.defense += _tier_lookup(ya_pg, def_s["yards_allowed_tiers"], extrapolate=False) * g
 
         return bd
