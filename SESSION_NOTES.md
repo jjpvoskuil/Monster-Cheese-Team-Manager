@@ -649,6 +649,28 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
   covers 2022-2025 — re-run `scripts/fetch_draft_history.py` after
   capturing a new raw file once the 2026 draft actually happens, to fold
   it into future-year tendency averages.
+- **The real 2026 draft happened Sunday 2026-08-30 and is fully
+  backfilled** into `data/draft_state.json` (220 real picks from CBS,
+  ground-truth team attribution) — `reverse_last_n_rounds` corrected to
+  0 (plain snake) after empirically checking against it. Two serious
+  scoring bugs found via live use AFTER the draft and fixed — see the
+  2026-09-02 log entries: (1) every non-DST player was getting a phantom
+  +425pt "shutout defense" bonus, and (2) DST rows specifically were
+  ALSO getting an inflated shutout-tier bonus (~+300-400pts/season) for
+  a related-but-separate reason once (1) was fixed. Both are fixed now;
+  re-verify `data/source_weights.json` (gitignored, local-only) is set
+  to real intended values before trusting any single-source-weighted
+  view again — the 2nd bug only bit because the current weights are
+  100% one source (`fantasypoints_2026`) that doesn't populate DST
+  points-allowed/yards-allowed columns at all.
+- Also DST rows across ALL projection sources are now automatically
+  renamed from city ("Denver") to mascot ("Broncos") inside
+  `blend_projections()`, matching CBS's own draft-log naming — see the
+  2026-09-02 log entry for why this was silently breaking every DST
+  lookup in the app.
+- `reports/` (gitignored) is where generated deliverables like the
+  draft-grades Word doc live — not tracked in git, written directly into
+  the connected folder for the user to open/share.
 
 ## Git push access — read this if `git push` 403s
 
@@ -710,6 +732,90 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-09-02 — Draft-grades Word report for the league; found and fixed two real scoring bugs along the way
+User asked for an objective, shareable Word-doc grading of the real
+2026 draft against the whole league. Building it surfaced two separate
+scoring bugs, both now fixed and pushed (pending the user's own `git
+push` — see below):
+
+1. **Every non-DST player was getting a phantom +425pt/season "shutout
+   defense" bonus.** `manual_import.load_table()` defaults any
+   canonical stat column MISSING from a source file to 0 — correct for
+   counting stats, wrong for `points_allowed_per_game`/
+   `yards_allowed_per_game`, where 0 is the BEST possible tier (15+10
+   pts/game × 17 games = 425). `score_player_season()` applied the
+   entire defense-scoring block to every row regardless of position.
+   User caught this live: their kicker, Tyler Bass, was projected
+   564.6pts. Fixed by gating the whole defense block on
+   `row.get("position") == "DST"` (`src/scoring.py`). Tyler Bass →
+   139.6 after the fix.
+2. **DST rows themselves were ALSO scoring ~300-400pts too high**,
+   discovered building this report (every team's top-3 picks by
+   projected points were three defenses). Root cause was different from
+   #1 and more subtle: `blend_projections()`'s weighted average divided
+   each stat column's weighted sum by the player's TOTAL source weight,
+   not the weight of only the sources that actually had a value for
+   that column. This league's current `data/source_weights.json` gives
+   100% weight to `fantasypoints_2026`, which never populates
+   points-allowed/yards-allowed for any DST (NaN) — pandas' `.sum()`
+   silently drops the NaN term from the numerator but the denominator
+   still counted its full weight, so every DST got 0.0/1.0 = 0.0 for
+   both columns, i.e. the same shutout-tier bug as #1 but from a
+   weighting-math error instead of a missing-column default. A top DST
+   was projecting 528pts/season; a realistic number is ~100. Fixed in
+   `src/projections.py`'s `_agg()`: each column now normalizes by the
+   weight of only its non-null contributors, falling back to a plain
+   average of available data if none of them carry weight. New
+   regression test in `tests/test_projections.py`
+   (`test_blend_weighted_average_ignores_sources_missing_that_column`).
+   **This is a general fix, not DST-specific** — any sparsely-populated
+   stat column combined with a concentrated source-weighting could have
+   hit the same bug.
+
+Also fixed while investigating (found via the user's live screenshot of
+League Rosters' "No projection found for" warning): all 4 real
+projection sources name DST rows by CITY ("Denver") while CBS's draft
+room — and therefore every pick this app logs — names them by MASCOT
+("Broncos"), so every DST lookup silently failed. Fixed at the source
+via a new `NFL_CITY_TO_MASCOT` map applied inside `blend_projections()`
+so every consumer gets clean matching names automatically. Also found
+and fixed the same `st.cache_data` underscore-prefix-excluded-from-
+cache-key bug (previously fixed on Draft Board only) on
+`pages/6_League_Rosters.py` and `pages/7_Reports.py`, plus both pages
+never having read `source_weights.json` at all — could silently
+disagree with the Draft Board's numbers. And a suffix-mismatch join gap
+("Brian Robinson Jr." vs "Brian Robinson") fixed via a
+`normalize_name()` fallback lookup in `src/league_grid.py`.
+
+294/294 tests passing after all fixes. Final grading methodology (fully
+documented in the report itself): 50% starting-lineup strength / 20%
+bench depth / 20% draft value (vs. this app's own simulated ADP from
+earlier Monte Carlo mock drafts) / 10% roster-construction (met the
+league's real positional minimums), each 0-100 scaled across the league
+then composited into a letter grade. Final standings: 1. Mississippi
+Swamp Ass (A+) 2. Mojo (B) 3. THE DEMONS (B) 4. **Monster Cheese (B)**
+5. Salty Dogs (B-) 6. Ball Busters (C+) 7. Legion of Doom (C+) 8.
+Buckhorns (C+ — only team with unmet requirements: K 1/2, DEF 0/2) 9.
+Aces High (C) 10. Pimp Daddy (C-). Delivered as
+`reports/Maniac_FL_2026_Draft_Grades.docx` (gitignored — generated
+deliverable, not source).
+
+**Also note**: the user pasted a live GitHub PAT mid-session offering
+it for pushing — declined per hard safety policy (never handle
+credentials on the user's behalf even when explicitly offered), advised
+revoking/regenerating it since it's now in chat history, and pointed to
+`gh auth login`/keychain credential helper as self-service alternatives.
+This session's own `git push` from the cloud clone lost working
+credentials mid-session and never recovered ("could not read Username
+for 'https://github.com': terminal prompts disabled") — every fix this
+session was delivered via `SendUserFile` → `device_commit_files` →
+`device_bash` commit on the user's own Mac clone instead, same pattern
+as the "Local clone access via the device bridge" section above. As of
+this entry the device clone is 6 commits ahead of `origin/main` and
+still needs the user to run one `git push` from their own terminal to
+publish everything (both scoring-bug fixes, the DST name/cache/weights
+fixes, and the `.gitignore` cleanups).
 
 ### 2026-08-29 — Punch list #1: 100-trial Monte Carlo simulation → ADP column + simulated league-strength table
 
