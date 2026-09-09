@@ -1,0 +1,46 @@
+year,week,away_team,home_team,team,roster_group,slot,slot_index,order,player_name,position,nfl_team,matchup_desc,cbs_points
+2026,1,Ball Busters,Monster Cheese,Ball Busters,starter,Quarterbacks,1,1,Jalen Hurts,QB,PHI,PHI vs. WAS | Sun 3:25PM CT,22.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,starter,Quarterbacks,1,1,Dak Prescott,QB,DAL,DAL @ NYG | Sun 7:20PM CT,20.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,starter,Quarterbacks,2,2,Jared Goff,QB,DET,DET vs. NO | Sun 12:00PM CT,21.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,starter,Quarterbacks,2,2,Trevor Lawrence,QB,JAC,JAC vs. CLE | Sun 12:00PM CT,17.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,starter,Running Backs,1,3,Derrick Henry,RB,BAL,BAL @ IND | Sun 12:00PM CT,12.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,starter,Running Backs,1,3,Christian McCaffrey,RB,SF,SF @ LAR | Thurs 7:35PM CT,14.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,starter,Running Backs,2,4,Kyren Williams,RB,LAR,LAR vs. SF | Thurs 7:35PM CT,10.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,starter,Running Backs,2,4,Breece Hall,RB,NYJ,NYJ @ TEN | Sun 12:00PM CT,12.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,starter,Running Backs,3,5,Tony Pollard,RB,TEN,TEN vs. NYJ | Sun 12:00PM CT,9.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,starter,Running Backs,3,5,Kenneth Gainwell,RB,TB,TB @ CIN | Sun 12:00PM CT,8.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,starter,Tight Ends,1,6,Dallas Goedert,TE,PHI,PHI vs. WAS | Sun 3:25PM CT,11.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,starter,Tight Ends,1,6,Sam LaPorta,TE,DET,DET vs. NO | Sun 12:00PM CT,9.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,starter,Flex WR/TEs,1,7,Drake London,WR-TE,ATL,ATL @ PIT | Sun 12:00PM CT,12.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,starter,Flex WR/TEs,1,7,Chris Olave,WR-TE,NO,NO @ DET | Sun 12:00PM CT,12.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,starter,Flex WR/TEs,2,8,Rome Odunze,WR-TE,CHI,CHI @ CAR | Sun 12:00PM CT,9.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,starter,Flex WR/TEs,2,8,CeeDee Lamb,WR-TE,DAL,DAL @ NYG | Sun 7:20PM CT,11.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,starter,Flex WR/TEs,3,9,Chris Godwin,WR-TE,TB,TB @ CIN | Sun 12:00PM CT,8.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,starter,Flex WR/TEs,3,9,Jaylen Waddle,WR-TE,DEN,DEN @ KC | Mon 7:15PM CT,8.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,starter,Kickers,1,10,Jake Bates,K,DET,DET vs. NO | Sun 12:00PM CT,10.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,starter,Kickers,1,10,Trey Smack,K,GB,GB @ MIN | Sun 3:25PM CT,6.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,starter,Defense/STs,1,11,Bears,DST,CHI,CHI @ CAR | Sun 12:00PM CT,7.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,starter,Defense/STs,1,11,Eagles,DST,PHI,PHI vs. WAS | Sun 3:25PM CT,8.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,starter,Flex,1,12,Rhamondre Stevenson,RB,NE,NE @ SEA | Wed 7:20PM CT,9.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,starter,Flex,1,12,Christian Watson,WR-TE,GB,GB @ MIN | Sun 3:25PM CT,7.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,bench,Bench,0,13,Andy Dalton,QB,PHI,PHI vs. WAS,1.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,bench,Bench,0,14,Chuba Hubbard,RB,CAR,CAR vs. CHI,9.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,bench,Bench,0,15,Tank Bigsby,RB,PHI,PHI vs. WAS,5.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,bench,Bench,0,16,Dalton Kincaid,TE,BUF,BUF @ HOU,6.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,bench,Bench,0,17,Marvin Harrison Jr.,WR,ARI,ARI @ LAC,8.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,bench,Bench,0,18,Rashod Bateman,WR,BAL,BAL @ IND,8.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,bench,Bench,0,19,Jayden Reed,WR,GB,GB @ MIN,5.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,bench,Bench,0,20,Tory Horton,WR,SEA,SEA vs. NE,1.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,bench,Bench,0,21,Cairo Santos,K,CHI,CHI @ CAR,8.0
+2026,1,Ball Busters,Monster Cheese,Ball Busters,bench,Bench,0,22,49ers,DST,SF,SF @ LAR,4.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,bench,Bench,0,13,Malik Willis,QB,MIA,MIA @ LV,16.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,bench,Bench,0,14,Aaron Jones,RB,MIN,MIN vs. GB,6.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,bench,Bench,0,15,Rachaad White,RB,WAS,WAS @ PHI,4.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,bench,Bench,0,16,Samaje Perine,RB,CIN,CIN vs. TB,4.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,bench,Bench,0,17,Kaelon Black,RB,SF,SF @ LAR,4.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,bench,Bench,0,18,Jakobi Meyers,WR,JAC,JAC vs. CLE,6.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,bench,Bench,0,19,Josh Downs,WR,IND,IND vs. BAL,6.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,bench,Bench,0,20,Khalil Shakir,WR,BUF,BUF @ HOU,5.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,bench,Bench,0,21,Ryan Flournoy,WR,DAL,DAL @ NYG,1.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,bench,Bench,0,22,Tyler Bass,K,BUF,BUF @ HOU,5.0
+2026,1,Ball Busters,Monster Cheese,Monster Cheese,bench,Bench,0,23,Chiefs,DST,KC,KC vs. DEN,4.0

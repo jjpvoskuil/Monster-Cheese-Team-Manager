@@ -1,0 +1,549 @@
+# Raw capture: CBS "Scoring Preview" page for Monster Cheese's Week 1 matchup
+# https://maniacfl.football.cbssports.com/scoring/preview/1/2
+# Captured: 2026-09-09, via Claude_Browser (logged-in league-manager session)
+# Page's own header: "WEEK 1 (WED, SEP 09 - MON, SEP 14)"
+# Matchup: "BALL BUSTERS @ MONSTER CHEESE" -- Ball Busters is AWAY (left
+# column throughout), Monster Cheese is HOME (right column throughout).
+#
+# LAYOUT (get_page_text, unmodified below the header line):
+#   - One STARTERS section per roster slot, in the exact on-page order:
+#     QUARTERBACKS (2 rows -- QB + the SUPERFLEX auto-QB slot),
+#     RUNNING BACKS (3 rows), TIGHT ENDS (1 row), FLEX WR/TES (3 rows),
+#     KICKERS (1 row), DEFENSE/STS (1 row), FLEX (1 row) -- 12 rows total,
+#     matching config/league_settings.yaml's roster.starters (total 12).
+#   - Each row: away-team player block (Name / "POS • NFL_TEAM" /
+#     game+spread line), then home-team player block (same shape), then a
+#     single 3-number scoring line "AWAY_PTS \t EVEN \t HOME_PTS" (the
+#     "EDGE/SLIGHT/MODERATE" lines after each number are CBS's visual
+#     edge-meter labels, not data -- ignored by the parser).
+#   - RESERVES (bench) section: two "PLAYER NEWS MATCHUP PTS" tables back
+#     to back, away team's bench first then home team's bench. Each bench
+#     row: Name, "POS • NFL_TEAM", a news blurb (ignored), "MATCHUP\tPTS"
+#     on one line (opponent + kickoff time, tab, then the point total).
+# ===== RAW TEXT BELOW =====
+League
+My Team
+Players
+Scores
+Standings
+Advice
+2
+Customize a free private pick'em or survivor pool with your league.
+Monster Cheese
+(0-0-0)
+Scoring Preview
+
+ADD/DROP
+2
+
+TRADES
+3 / 10
+WAIVER #
+WEEK
+WEEK 1 (WED, SEP 09 - MON, SEP 14)
+GAMES
+BALL BUSTERS @ MONSTER CHEESE
+OVERALL
+Ball Busters
+Heather Smith
+	0-0-0	RECORD	0-0-0
+Monster Cheese
+John and Sam Cardinal
+140
+	EVEN
+	132
+
+EDGE
+SLIGHT
+MODERATE
+
+SLIGHT
+EDGE
+MODERATE
+
+ SERIES HISTORY
+VIEW GAME-BY-GAME RESULTS
+Record
+Monster Cheese leads the series 21-13
+
+Winning Streak
+Ball Busters has won the last matchup
+
+Last Meeting
+Ball Busters won 120.00 - 92.00 (2025, Week 12)
+ Projections Powered by SportsLine
+;
+QUARTERBACKS
+
+Jalen Hurts
+
+QB • PHI
+PHI vs. WAS | Sun 3:25PM CT
+PHI -5.5, O/U 44.5
+
+Dak Prescott
+
+QB • DAL
+DAL @ NYG | Sun 7:20PM CT
+DAL -3, O/U 48
+22
+	EVEN
+	20
+
+EDGE
+SLIGHT
+MODERATE
+
+SLIGHT
+EDGE
+MODERATE
+
+
+Jared Goff
+
+QB • DET
+DET vs. NO | Sun 12:00PM CT
+DET -7, O/U 50
+
+Trevor Lawrence
+
+QB • JAC
+JAC vs. CLE | Sun 12:00PM CT
+JAC -8, O/U 40.5
+21
+	EVEN
+	17
+
+EDGE
+SLIGHT
+MODERATE
+
+SLIGHT
+EDGE
+MODERATE
+
+RUNNING BACKS
+
+Derrick Henry
+
+RB • BAL
+BAL @ IND | Sun 12:00PM CT
+BAL -3.5, O/U 47.5
+
+Christian McCaffrey
+
+RB • SF
+SF @ LAR | Thurs 7:35PM CT
+LAR -3.5, O/U 48.5
+12
+	EVEN
+	14
+
+EDGE
+SLIGHT
+MODERATE
+
+SLIGHT
+EDGE
+MODERATE
+
+
+Kyren Williams
+
+RB • LAR
+LAR vs. SF | Thurs 7:35PM CT
+LAR -3.5, O/U 48.5
+
+Breece Hall
+
+RB • NYJ
+NYJ @ TEN | Sun 12:00PM CT
+TEN -1.5, O/U 38.5
+10
+	EVEN
+	12
+
+EDGE
+SLIGHT
+MODERATE
+
+SLIGHT
+EDGE
+MODERATE
+
+
+Tony Pollard
+
+RB • TEN
+TEN vs. NYJ | Sun 12:00PM CT
+TEN -1.5, O/U 38.5
+
+Kenneth Gainwell
+
+RB • TB
+TB @ CIN | Sun 12:00PM CT
+CIN -4, O/U 50.5
+9
+	EVEN
+	8
+
+EDGE
+SLIGHT
+MODERATE
+
+SLIGHT
+EDGE
+MODERATE
+
+TIGHT ENDS
+
+Dallas Goedert
+
+TE • PHI
+PHI vs. WAS | Sun 3:25PM CT
+PHI -5.5, O/U 44.5
+
+Sam LaPorta
+
+TE • DET
+DET vs. NO | Sun 12:00PM CT
+DET -7, O/U 50
+11
+	EVEN
+	9
+
+EDGE
+SLIGHT
+MODERATE
+
+SLIGHT
+EDGE
+MODERATE
+
+FLEX WR/TES
+
+Drake London
+
+WR-TE • ATL
+ATL @ PIT | Sun 12:00PM CT
+PIT -3.5, O/U 42
+
+Chris Olave
+
+WR-TE • NO
+NO @ DET | Sun 12:00PM CT
+DET -7, O/U 50
+12
+	EVEN
+	12
+
+EDGE
+SLIGHT
+MODERATE
+
+SLIGHT
+EDGE
+MODERATE
+
+
+Rome Odunze
+
+WR-TE • CHI
+CHI @ CAR | Sun 12:00PM CT
+CHI -3.5, O/U 47
+
+CeeDee Lamb
+
+WR-TE • DAL
+DAL @ NYG | Sun 7:20PM CT
+DAL -3, O/U 48
+9
+	EVEN
+	11
+
+EDGE
+SLIGHT
+MODERATE
+
+SLIGHT
+EDGE
+MODERATE
+
+
+Chris Godwin
+
+WR-TE • TB
+TB @ CIN | Sun 12:00PM CT
+CIN -4, O/U 50.5
+
+Jaylen Waddle
+
+WR-TE • DEN
+DEN @ KC | Mon 7:15PM CT
+KC -3, O/U 43.5
+8
+	EVEN
+	8
+
+EDGE
+SLIGHT
+MODERATE
+
+SLIGHT
+EDGE
+MODERATE
+
+KICKERS
+
+Jake Bates
+
+K • DET
+DET vs. NO | Sun 12:00PM CT
+DET -7, O/U 50
+
+Trey Smack
+
+K • GB
+GB @ MIN | Sun 3:25PM CT
+MIN -1.5, O/U 46
+10
+	EVEN
+	6
+
+EDGE
+SLIGHT
+MODERATE
+
+SLIGHT
+EDGE
+MODERATE
+
+DEFENSE/STS
+
+Bears
+
+DST • CHI
+CHI @ CAR | Sun 12:00PM CT
+CHI -3.5, O/U 47
+
+Eagles
+
+DST • PHI
+PHI vs. WAS | Sun 3:25PM CT
+PHI -5.5, O/U 44.5
+7
+	EVEN
+	8
+
+EDGE
+SLIGHT
+MODERATE
+
+SLIGHT
+EDGE
+MODERATE
+
+FLEX
+
+Rhamondre Stevenson
+
+RB • NE
+NE @ SEA | Wed 7:20PM CT
+SEA -3, O/U 44.5
+
+Christian Watson
+
+WR-TE • GB
+GB @ MIN | Sun 3:25PM CT
+MIN -1.5, O/U 46
+9
+	EVEN
+	7
+
+EDGE
+SLIGHT
+MODERATE
+
+SLIGHT
+EDGE
+MODERATE
+
+RESERVES
+Ball Busters
+Monster Cheese
+PLAYER	NEWS	MATCHUP	PTS
+
+Andy Dalton
+QB • PHI
+
+Dalton completed 12 of 19 passes for 104 yards with a touchdown and no interceptions ... READ MORE
+
+	PHI vs. WAS
+Sun 3:25PM CT	1
+
+Chuba Hubbard
+RB • CAR
+
+Hubbard (hamstring) returned to practice Tuesday, Joe Person of The Athletic reports. ... READ MORE
+
+	CAR vs. CHI
+Sun 12:00PM CT	9
+
+Tank Bigsby
+RB • PHI
+
+Bigsby played 10 offensive snaps this preseason before being rested for the final ... READ MORE
+
+	PHI vs. WAS
+Sun 3:25PM CT	5
+
+Dalton Kincaid
+TE • BUF
+
+Kincaid was held out of Thursday's exhibition win over the Steelers.
+
+Kincaid's absence ... READ MORE
+
+	BUF @ HOU
+Sun 12:00PM CT	6
+
+Marvin Harrison Jr.
+WR • ARI
+
+Harrison is listed as a starter on the Cardinals ' unofficial depth chart.
+
+This comes ... READ MORE
+
+	ARI @ LAC
+Sun 3:25PM CT	8
+
+Rashod Bateman
+WR • BAL
+
+Bateman is facing three charges stemming from a domestic incident in June, Jamison ... READ MORE
+
+	BAL @ IND
+Sun 12:00PM CT	8
+
+Jayden Reed
+WR • GB
+
+Reed is one of six wide receivers on the Packers ' initial 53-man roster, Wes Hodkiewicz ... READ MORE
+
+	GB @ MIN
+Sun 3:25PM CT	5
+
+Tory Horton
+WR • SEA
+
+The Seahawks list Horton (hamstring) as questionable for Wednesday's season opener ... READ MORE
+
+	SEA vs. NE
+Wed 7:20PM CT	1
+
+Cairo Santos
+K • CHI
+
+Santos connected on field-goal attempts of 45, 26 and 44 yards and missed wide right ... READ MORE
+
+	CHI @ CAR
+Sun 12:00PM CT	8
+
+49ers
+DST • SF
+
+White (groin) was not listed on the 49ers ' injury report Tuesday, Matt Maiocco ... READ MORE
+
+	SF @ LAR
+Thurs 7:35PM CT	4
+PLAYER	NEWS	MATCHUP	PTS
+
+Malik Willis
+QB • MIA
+
+Willis made just one appearance during the Dolphins ' three-game preseason slate. ... READ MORE
+
+	MIA @ LV
+Sun 3:25PM CT	16
+
+Aaron Jones
+RB • MIN
+
+Jones and Jordan Mason are listed as co-starting running backs on the Vikings ' ... READ MORE
+
+	MIN vs. GB
+Sun 3:25PM CT	6
+
+Rachaad White
+RB • WAS
+
+White (hamstring) isn't suited up for Friday's preseason game in Baltimore.
+
+White ... READ MORE
+
+	WAS @ PHI
+Sun 3:25PM CT	4
+
+Samaje Perine
+RB • CIN
+
+Perine is listed as the No. 2 RB behind Chase Brown on the Bengals ' unofficial ... READ MORE
+
+	CIN vs. TB
+Sun 12:00PM CT	4
+
+Kaelon Black
+RB • SF
+
+Black rushed four times for 28 yards and failed to bring in his only target in the ... READ MORE
+
+	SF @ LAR
+Thurs 7:35PM CT	4
+
+Jakobi Meyers
+WR • JAC
+
+Meyers (hand) was spotted practicing Wednesday while wearing a non-contact jersey, ... READ MORE
+
+	JAC vs. CLE
+Sun 12:00PM CT	6
+
+Josh Downs
+WR • IND
+
+Downs (calf) was spotted on the field participating in Tuesday's practice, Jake ... READ MORE
+
+	IND vs. BAL
+Sun 12:00PM CT	6
+
+Khalil Shakir
+WR • BUF
+
+Per Matt Zenitz of CBSSports.com, "there's currently optimism" that Shakir (undisclosed) ... READ MORE
+
+	BUF @ HOU
+Sun 12:00PM CT	5
+
+Ryan Flournoy
+WR • DAL
+
+Flournoy is listed as the Cowboys ' third wide receiver on the depth chart behind ... READ MORE
+
+	DAL @ NYG
+Sun 7:20PM CT	1
+
+Tyler Bass
+K • BUF
+
+Bass went 3-for-4 on field-goal tries and made both his extra-point attempts in ... READ MORE
+
+	BUF @ HOU
+Sun 12:00PM CT	5
+
+Chiefs
+DST • KC
+
+Conner (knee) is not expected to be available for Monday night's contest against ... READ MORE
+
+	KC vs. DEN
+Mon 7:15PM CT	4

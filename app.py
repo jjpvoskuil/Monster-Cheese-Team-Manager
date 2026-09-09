@@ -71,6 +71,7 @@ pages = [
     st.Page("pages/5_Development.py", title="Development", icon="🛠️"),
     st.Page("pages/6_League_Rosters.py", title="League Rosters", icon="🏆"),
     st.Page("pages/7_Reports.py", title="Reports", icon="📥"),
+    st.Page("pages/8_Weekly_Matchup.py", title="Weekly Matchup", icon="🆚"),
 ]
 
 st.navigation(pages).run()

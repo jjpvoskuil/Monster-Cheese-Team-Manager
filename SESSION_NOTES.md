@@ -695,6 +695,35 @@ which is now reference material rather than the active focus.
   Transaction Report pagination untested (only 10 txns exist so far this
   season, all on one page) — re-check if a future capture looks
   truncated. 35 new tests; 329/329 passing.
+- **Weekly Matchup page added (2026-09-09)**: `pages/8_Weekly_Matchup.py`
+  shows Monster Cheese's current-week matchup the way CBS's own "Scoring
+  Preview" page does — by starting-lineup slot, then bench, both teams
+  side by side — with a CBS/FantasyPoints toggle for which site's weekly
+  point projection to display. Deliberately does NOT recompute lineups
+  via `src.roster_needs` like My Roster/League Rosters do: both teams'
+  starters and bench come straight from a raw-captured CBS Scoring
+  Preview page (`src/data_sources/weekly_matchup.py`), since that
+  reflects real in-season lineup decisions (byes, injuries, a manager
+  benching someone) a draft-day-replayed heuristic can't see — explicit
+  league-manager request. `src/data_sources/weekly_projections.py`
+  parses a raw-captured FantasyPoints weekly projections page and joins
+  it onto the CBS-sourced roster by (first-initial + last-name, team)
+  match key (handles CBS/FantasyPoints team-abbreviation differences
+  like BAL/BLT and JAC/JAX, and suffix differences like "Chris Godwin" vs
+  "C. Godwin Jr."). Both sources are login-gated (no plain-HTTP path —
+  see cbs.py/fantasypoints.py precedent), so there's no live-fetch
+  button in the app; `scripts/fetch_weekly_matchup.py` and
+  `scripts/fetch_weekly_projections.py` turn a raw capture into that
+  week's canonical CSV (`data/weekly_matchups/{year}_week{N}.csv`,
+  `data/weekly_projections/fantasypoints_{year}_week{N}.csv`) — ask
+  Claude to capture+refresh each week (new opponent, updated
+  projections). The page has a CSV download button for the assembled
+  matchup table. Week 1 real 2026 data captured and committed (Ball
+  Busters @ Monster Cheese). Cross-validated CBS's own weekly FPTS
+  column against this app's own tiered scoring formula applied to CBS's
+  raw per-week stat projections for several players (Hurts, Goff,
+  Lawrence) — within ~0.3%, so CBS's FPTS is trusted directly rather
+  than re-derived. 28 new tests; 357/357 passing.
 
 ## Git push access — read this if `git push` 403s
 
@@ -770,6 +799,67 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-09-09 — Weekly Matchup page: CBS-sourced lineups, CBS/FantasyPoints projection toggle
+Continuation of the same day's work below (roster tracking / cloud-mirror
+fix) plus the "are projections frozen" research: confirmed both CBS and
+FantasyPoints projections drift over time (not frozen at draft/capture
+time) and that CBS's in-league site exposes genuine per-week (not just
+season-average) player point projections via two pages: `/scoring/
+preview/<week>/<game>` (a specific matchup, both teams, SportsLine
+-powered) and `/stats/stats-main` with its Timeframe selector set to a
+specific week (raw per-player stat categories, same page used for season
+projections). Cross-validated the Scoring Preview page's own FPTS numbers
+against this app's own tiered scoring formula (`src/scoring.py`) applied
+to CBS's raw weekly stat projections for Hurts/Goff/Lawrence — within
+~0.3%, so CBS's own FPTS column is trustworthy to use directly rather
+than re-deriving from raw stats.
+
+Built on that: a new Weekly Matchup page (league-manager request) showing
+Monster Cheese's current-week matchup laid out like CBS's own Scoring
+Preview — starters by slot then bench, both teams — with a toggle
+between CBS's and FantasyPoints' weekly point projections. Explicit
+requirement: lineups (starters AND bench) for BOTH teams come from CBS
+directly, not this app's own `src.roster_needs` slot-assignment
+heuristic (which only knows draft-day + logged transactions, not real
+in-season lineup decisions like bye-week benchings). New modules:
+`src/data_sources/weekly_matchup.py` (parses a raw-captured CBS Scoring
+Preview page — see its docstring for the exact page-layout parsing
+approach, a line-based state machine rather than a giant regex, chosen
+for robustness to incidental whitespace differences) and
+`src/data_sources/weekly_projections.py` (parses a raw-captured
+FantasyPoints Weekly Projections page and provides the name/team
+-matching join key used to attach FantasyPoints' FPTS onto the
+CBS-sourced roster — handles first-name abbreviation ("Josh Allen" vs
+"J. Allen"), team-abbreviation differences between the two sites
+(BAL/BLT, JAC/JAX, ARI/ARZ, CLE/CLV, HOU/HST, LAR/LA), and suffix
+differences ("Chris Godwin" vs "C. Godwin Jr."); DST rows match on team
+alone since FantasyPoints' "name" for a defense is a fake initial glued
+onto a truncated city name, unrelated to CBS's own DST naming).
+
+Both sources are login-gated (same precedent as `cbs.py`/
+`fantasypoints.py` for season projections) so there's no live-fetch
+button in the deployed app — `scripts/fetch_weekly_matchup.py` and
+`scripts/fetch_weekly_projections.py` turn a raw capture into that
+week's canonical CSV; ask Claude to capture+refresh each week (new
+opponent, updated projections, or an entirely different data pull — kept
+flexible per league-manager request rather than locked to exactly these
+two sources/shapes). The page itself has a CSV download button for the
+assembled matchup table (both teams, currently-selected source) — this
+IS a real, working button (unlike the login links, which just open the
+site), since exporting already-loaded data needs no live credentials.
+
+Captured and committed real Week 1 2026 data (Ball Busters @ Monster
+Cheese): `data/weekly_matchups/raw/2026_week1.txt` ->
+`data/weekly_matchups/2026_week1.csv` (45 rows: 24 starters + 21 bench
+across both teams) and `data/weekly_projections/raw/fantasypoints/
+2026_week1_all.txt` -> `data/weekly_projections/fantasypoints_2026_week1
+.csv` (526 players). Of the 45 matchup rows, 44 matched a FantasyPoints
+row on the first try after adding suffix-stripping to the join key (the
+one miss, Andy Dalton, simply isn't in FantasyPoints' weekly list at
+all — a real Ball Busters bench QB, not a parsing bug). 28 new tests
+(parser unit tests against both the real captures and small synthetic
+fixtures, plus AppTest page smoke tests); 357/357 passing.
 
 ### 2026-09-09 — Tracked draft_state.json/source_weights.json so Streamlit Cloud mirrors local
 User pushed the roster-tracking commits, checked the deployed Streamlit
