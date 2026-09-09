@@ -196,6 +196,31 @@ def test_start_recommendation_and_bye_highlight():
         os.remove(_matchup_csv_path(year, week))
 
 
+def test_bench_grid_padded_to_roster_max(synthetic_week):
+    # synthetic_week gives each team exactly 1 bench player -- well under
+    # roster.bench_max (15 in config/league_settings.yaml) -- so the
+    # expander label should advertise the full 15 slots, not just "1",
+    # and the underlying grid should be padded with blank rows to match
+    # (league-manager request, 2026-09-09).
+    config = _load_config()
+    bench_max = config["roster"]["bench_max"]
+    year, week, my_team = synthetic_week
+    at = AppTest.from_file(os.path.join(ROOT, "app.py"))
+    at.run(timeout=60)
+    at = _open_page(at)
+
+    expander_labels = [e.label for e in at.expander]
+    assert len(expander_labels) == 2
+    for label in expander_labels:
+        assert f"1 of {bench_max}" in label
+
+    # Two bench dataframes (one per team), each padded out to bench_max rows.
+    bench_dataframes = [d.value for d in at.dataframe if len(d.value) == bench_max]
+    assert len(bench_dataframes) == 2
+    for bdf in bench_dataframes:
+        assert (bdf["Player"] == "(empty)").sum() == bench_max - 1
+
+
 def test_missing_fantasypoints_data_shows_warning():
     # Deliberately a DIFFERENT week number from the synthetic_week fixture
     # (998, not 999) and no FantasyPoints CSV ever written for it -- using

@@ -61,7 +61,22 @@ half the page width each -- Pos + NFL Team folded into one "Pos/Tm"
 column, "Matchup" reduced from the full "TEAM vs. TEAM | kickoff time"
 to just "vs OPP"/"@ OPP" (_abbreviate_matchup), player names shortened
 to "F. Last" (_abbreviate_player_name), and slot headings shortened to
-their standard short codes (_SLOT_ABBREVIATIONS).
+their standard short codes (_SLOT_ABBREVIATIONS). Each team's section is
+ONLY a header immediately followed by its grid -- no caption in between
+-- so the two side-by-side grids' rows line up; the highlight legend and
+the "N starters missing a projection" note both moved out of that gap
+(the legend to a single shared caption above both columns, "missing"
+to below each team's own grid) after league-manager feedback that a
+caption present in only one column was pushing that grid down relative
+to the other's.
+
+**Bench padding**: the bench grid pads with blank "(empty)" rows up to
+roster.bench_max (config/league_settings.yaml -- 15, i.e. the league's
+27-player roster cap minus the 12 active starters) when a team hasn't
+used its whole roster, rather than just showing a shorter table for
+whichever team has fewer bench players -- also a nice side effect for
+keeping the two side-by-side bench grids the same height. See
+_pad_bench_rows().
 """
 
 from __future__ import annotations
@@ -273,9 +288,54 @@ def _row_style(row: pd.Series, index_to_name: pd.Series, should_start: set, shou
     return [color] * len(row)
 
 
+def _pad_bench_rows(
+    bench_display: pd.DataFrame, full_names: pd.Series, bench_max: int | None,
+) -> tuple[pd.DataFrame, pd.Series]:
+    """Appends blank rows up to `bench_max` total (league-manager request,
+    2026-09-09: roster.bench_max is 15 -- config/league_settings.yaml's
+    roster.roster_total_max (27) minus roster.total_starters (12) -- show
+    those as empty slots when a team hasn't filled its bench all the way,
+    rather than just a shorter table). No-op (beyond the index reset
+    below) if bench_max isn't given or the team's already at/over it
+    (can't happen under the real roster cap, but a synthetic/test roster
+    could exceed it, so this isn't enforced as an error here).
+
+    Always renumbers the returned frame to a plain 0..N-1 RangeIndex
+    (`ignore_index=True`) rather than keeping the real bench rows' CBS
+    -derived index alongside string labels for the padded ones -- a
+    mixed int/str index made Streamlit's Arrow serialization blow up
+    (`pyarrow.lib.ArrowInvalid: Could not convert '__empty_0' ... to
+    int64`), caught by this function's own test. Returns the padded
+    frame together with a `full_names` Series reindexed to match (real
+    names for real rows, None for padded ones) so callers can still
+    style rows by the ORIGINAL full player name via that new positional
+    index -- see _row_style, which looks up `index_to_name.get(row.name)`
+    against whatever's returned here."""
+    names = list(full_names)
+    if bench_max and len(bench_display) < bench_max:
+        pad_n = bench_max - len(bench_display)
+        # Keyed by column NAME, not dtype -- pandas 3's default
+        # infer_string setting makes text columns a "str" extension
+        # dtype rather than plain numpy `object`, so a `dtype == object`
+        # check silently misses them and fills text columns with NaN
+        # instead of the intended blank text. Points is the only numeric
+        # column in this frame; everything else here is text.
+        blank_values = {"Player": "(empty)", "Pos/Tm": "", "Opp": "", "Points": float("nan")}
+        empty_rows = pd.DataFrame({
+            col: [blank_values.get(col, "")] * pad_n
+            for col in bench_display.columns
+        })
+        bench_display = pd.concat([bench_display, empty_rows], ignore_index=True)
+        names = names + [None] * pad_n
+    else:
+        bench_display = bench_display.reset_index(drop=True)
+    return bench_display, pd.Series(names)
+
+
 def _render_team_tables(
     df: pd.DataFrame, team: str, source: str, fp_lookup: dict,
     recommend: bool = False, starters_config: list[dict] | None = None,
+    bench_max: int | None = None,
 ) -> float:
     team_df = df[df["team"] == team].copy()
     team_df["Points"] = _points_column(team_df, source, fp_lookup)
@@ -292,16 +352,14 @@ def _render_team_tables(
     if recommend and starters_config is not None:
         should_start, should_bench = _compute_recommendations(team_df, bye_names, starters_config)
 
+    # Just the header, immediately followed by the starters grid below --
+    # league-manager feedback, 2026-09-09: any caption in between (the
+    # "missing projection" note, the highlight legend) pushed that team's
+    # grid down relative to the other team's when the two are side by
+    # side, since only one side would have that line. The legend now lives
+    # once, above both columns (see the page body below); "missing" moves
+    # to AFTER the grid so it can't offset the grid's own top-alignment.
     st.markdown(f"#### {team} — {starter_total:.1f} pts ({source})")
-    if missing:
-        st.caption(f"{missing} starter(s) have no {source} projection, not counted above")
-    if recommend:
-        st.caption(
-            "🟩 should be in your starting lineup this week · 🟥 bench this player instead"
-            + (" · 🟨 on a bye — cannot start" if bye_names else "")
-        )
-    elif bye_names:
-        st.caption("🟨 on a bye this week")
 
     starters_display = pd.DataFrame({
         "Slot": starters["slot"].map(_abbreviate_slot),
@@ -322,10 +380,13 @@ def _render_team_tables(
         starters_display,
         hide_index=True, use_container_width=True, column_config=_STARTER_COLUMN_CONFIG,
     )
+    if missing:
+        st.caption(f"{missing} starter(s) have no {source} projection, not counted above")
 
     bench_names = set(bench["player_name"])
     bench_flagged = bool((should_start & bench_names) or (bye_names & bench_names))
-    with st.expander(f"Bench ({len(bench)})", expanded=bench_flagged):
+    bench_label = f"Bench ({len(bench)} of {bench_max})" if bench_max else f"Bench ({len(bench)})"
+    with st.expander(bench_label, expanded=bench_flagged):
         bench_display = pd.DataFrame({
             "Player": bench["player_name"].map(_abbreviate_player_name),
             "Pos/Tm": bench["position"] + "·" + bench["nfl_team"],
@@ -335,9 +396,10 @@ def _render_team_tables(
             ],
             "Points": bench["Points"],
         }, index=bench.index)
+        bench_display, bench_index_to_name = _pad_bench_rows(bench_display, bench["player_name"], bench_max)
         if should_start or should_bench or bye_names:
             bench_display = bench_display.style.apply(
-                _row_style, axis=1, index_to_name=bench["player_name"],
+                _row_style, axis=1, index_to_name=bench_index_to_name,
                 should_start=should_start, should_bench=should_bench, bye_names=bye_names,
             )
         st.dataframe(
@@ -423,6 +485,16 @@ st.caption(
 
 st.divider()
 
+# One shared legend line above both columns, not a per-team caption --
+# league-manager feedback, 2026-09-09: a caption only my team's column had
+# (the recommend legend) pushed that grid down relative to the opponent's,
+# breaking the side-by-side row alignment. Shown once here so each
+# team's section below starts with nothing but its header, then its grid.
+st.caption(
+    "🟩 should be in your starting lineup this week · 🟥 bench this player instead "
+    "· 🟨 on a bye — can't legally start (either team's grid, whichever applies)"
+)
+
 # Side by side (league-manager request, 2026-09-09, reverting the earlier
 # full-width-stacked layout) -- the abbreviated columns above (Pos/Tm, Opp,
 # shortened names/slots) are what keep each half-width table from forcing
@@ -432,9 +504,13 @@ with my_col:
     my_total = _render_team_tables(
         df, my_team_display, source, fp_lookup,
         recommend=True, starters_config=config["roster"]["starters"],
+        bench_max=config["roster"]["bench_max"],
     )
 with opp_col:
-    opp_total = _render_team_tables(df, opp_display, source, fp_lookup)
+    opp_total = _render_team_tables(
+        df, opp_display, source, fp_lookup,
+        bench_max=config["roster"]["bench_max"],
+    )
 
 st.divider()
 diff = my_total - opp_total
