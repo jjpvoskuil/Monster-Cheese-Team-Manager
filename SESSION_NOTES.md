@@ -771,6 +771,41 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-09-09 — Tracked draft_state.json/source_weights.json so Streamlit Cloud mirrors local
+User pushed the roster-tracking commits, checked the deployed Streamlit
+Cloud copy, and found My Roster showing only Samaje Perine (the one
+waiver add) with nothing else -- "As drafted" showed nobody at all. Root
+cause wasn't a bug in this session's new code: `data/draft_state.json`
+(the real 220-pick draft) has always been gitignored as "live, local
+-only" state, so the deployed copy never had it, before or after this
+session -- `data/transactions/transactions.csv` (newly tracked this
+session) being real on the deployed copy just made the gap visible for
+the first time. Separately, the user also hit `zsh: command not found:
+streamlit` locally -- unrelated, just needed `source venv/bin/activate`
+first (documented in NEXT_SEASON_SETUP.md §5 already, easy to miss).
+
+User asked for the cloud copy to actually mirror local. Un-gitignored and
+committed the CURRENT `data/draft_state.json` (real backfilled 2026
+draft, now a frozen historical record now that the draft is over -- not
+live-mutating state anymore) and `data/source_weights.json` (per-source
+trust weights, drives every projected point) so both push through
+normally and Streamlit Cloud's roster/points now match local. Left
+`data/live_sync_status.json` and `data/*.bak*` gitignored -- those really
+are ephemeral/live-draft-only, no reason to publish them.
+
+**Flagged, not fully solved**: this creates a real gotcha for next
+season's yearly refresh (see NEXT_SEASON_SETUP.md's new callout, right
+after its file-location table) -- the existing workflow deletes
+`draft_state.json` before every mock/real draft test, which is still
+fine locally, but once a NEW season's real draft is backfilled it now
+needs an explicit `git add`/commit (a new "Step 4.5") or Streamlit Cloud
+will keep showing last season's frozen roster forever. Deliberately
+didn't re-gitignore to avoid recreating today's actual problem every
+season -- didn't build an automated safeguard for the gotcha either
+(e.g. a script that checks the committed draft year against config);
+flagging it in the docs was judged sufficient for now, revisit if it
+actually bites next season.
+
 ### 2026-09-09 — Roster tracking foundation: CBS transaction sync, current/as-drafted toggle
 First slice of in-season team management, planned and built with the user
 in the new session (see the pivot entry directly below). Two decisions

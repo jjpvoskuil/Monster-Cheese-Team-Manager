@@ -26,9 +26,9 @@ GitHub remote: **`https://github.com/jjpvoskuil/Monster-Cheese-Team-Manager`**
 |---|---|
 | `app.py` | Entry point — run this with `streamlit run app.py` |
 | `config/league_settings.yaml` | **Source of truth** for scoring rules, roster requirements, draft order, draft date/time. Edit this, not code, when a league setting changes. |
-| `data/draft_state.json` | The live pick log for the current draft. **Delete before every mock draft test and again right before the real draft** — see §6. Gitignored (local-only, never committed). |
+| `data/draft_state.json` | The pick log for the current draft. **Delete before every mock draft test and again right before the real draft** — see §6. **Tracked in git as of 2026-09-09** (was gitignored) so the deployed Streamlit Cloud copy mirrors your real draft once it's backfilled and frozen — see that dated SESSION_NOTES.md entry. This means the yearly refresh (§4) now needs an explicit `git rm`/re-commit step once a new season's real draft replaces this file, not just a local `rm`. |
 | `data/live_sync_status.json` | Live-sync heartbeat file the Chrome extension writes to. Also gitignored, also reset before every draft. |
-| `data/source_weights.json` | Per-source trust weights set on the Projections page. Gitignored (local-only). |
+| `data/source_weights.json` | Per-source trust weights set on the Projections page. **Tracked in git as of 2026-09-09** (was gitignored) so Streamlit Cloud's point totals match local — commit a fresh copy whenever you change the sliders and want the deployed copy to match. |
 | `data/projections/*.csv` | The actual season projection files the app blends together. **The app loads every CSV/XLSX in this folder** — see the year-rollover warning in §4. |
 | `data/draft/` | Parsed draft-order JSON per season (`fetch_draft_order.py`'s output). Keep every year's file — don't delete old ones. |
 | `data/draft_history/` | Multi-year completed-draft history used for pick-tendency modeling. Keep growing this year over year — add to it, never overwrite. |
@@ -42,6 +42,21 @@ GitHub remote: **`https://github.com/jjpvoskuil/Monster-Cheese-Team-Manager`**
 | `SESSION_NOTES.md` | Full running history of every bug found/fixed and decision made on this project — read this if something here seems out of date. |
 | `docs/draft_insights.md` | Draft-strategy analysis (VOR, positional scarcity) from past work. |
 | `NEXT_SEASON_SETUP.md` | This file. |
+
+> **2026-09-09 change: `data/draft_state.json` and `data/source_weights.json`
+> are now tracked in git**, not gitignored. This is so the deployed
+> Streamlit Cloud copy actually mirrors your real roster/points instead of
+> showing an empty draft (its filesystem never had these files before,
+> since gitignored files never get pushed). Practical effect on this
+> guide's own instructions: every `rm -f data/draft_state.json ...` below
+> (§6, §7) still applies locally for mock-draft testing exactly as before —
+> but once you're done testing and about to move on for real, remember
+> this file is now tracked, so a stray `git checkout .` or `git pull`
+> could silently overwrite your local mock-draft reset with whatever's
+> currently committed. And Step 4 below (new draft order) should get a
+> **Step 4.5**: once the new season's real draft is backfilled and frozen,
+> `git add data/draft_state.json && git commit` it — otherwise Streamlit
+> Cloud keeps showing last season's frozen roster indefinitely.
 
 ---
 
