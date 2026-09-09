@@ -53,6 +53,15 @@ how good their projection looks. See _bye_names()'s docstring: no real
 captured week has actually contained a bye yet (Week 1 has none), so
 the "bye" text match hasn't been cross-validated against a live CBS
 capture -- revisit if a captured week ever shows different wording.
+
+**Layout (league-manager request, 2026-09-09, superseding an earlier
+full-width-stacked layout from the same day)**: both teams' grids side
+by side again, but abbreviated to still avoid horizontal scrolling at
+half the page width each -- Pos + NFL Team folded into one "Pos/Tm"
+column, "Matchup" reduced from the full "TEAM vs. TEAM | kickoff time"
+to just "vs OPP"/"@ OPP" (_abbreviate_matchup), player names shortened
+to "F. Last" (_abbreviate_player_name), and slot headings shortened to
+their standard short codes (_SLOT_ABBREVIATIONS).
 """
 
 from __future__ import annotations
@@ -66,6 +75,26 @@ import streamlit as st
 from src.data_sources.weekly_projections import build_lookup, match_key
 from src.lineup_value import LineupPlayer, optimal_lineup_assignment
 from src.scoring import load_config
+
+# CBS's own slot-heading vocabulary (see src/data_sources/weekly_matchup.py's
+# SLOT_HEADINGS / current_slot construction) -> a short label that fits a
+# narrow side-by-side column. Anything not in this map (shouldn't happen,
+# but a renamed CBS heading shouldn't crash the page) is shown as-is.
+_SLOT_ABBREVIATIONS = {
+    "Quarterbacks": "QB",
+    "Running Backs": "RB",
+    "Tight Ends": "TE",
+    "Flex WR/TEs": "FLEX",
+    "Kickers": "K",
+    "Defense/STs": "DST",
+    "Flex": "FLEX",
+    "Bench": "Bench",
+}
+
+# Matches the "TEAM vs. TEAM" / "TEAM vs TEAM" / "TEAM @ TEAM" prefix of a
+# matchup_desc (both the bench form and the starter form, which appends
+# " | <time>" -- ignored here). See _abbreviate_matchup().
+_MATCHUP_TEAMS_RE = re.compile(r"^([A-Za-z.]+)\s*(vs\.?|@)\s*([A-Za-z.]+)")
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
@@ -122,21 +151,56 @@ def _points_column(df: pd.DataFrame, source: str, fp_lookup: dict) -> pd.Series:
     return keys.map(fp_lookup)  # NaN where FantasyPoints has no row for this player
 
 
-# Explicit narrow widths for the short columns so "Points" (the one column
-# a scroll would most annoyingly hide) always stays on-screen without
-# horizontal scrolling, even on a laptop-width browser window -- paired
-# with rendering each team's table full-width (one team, then the next,
-# not side-by-side st.columns) rather than squeezing two tables into half
-# the page each. See league-manager feedback, 2026-09-09.
+# League-manager feedback, 2026-09-09: wants both teams' grids SIDE BY SIDE
+# (reverting the earlier full-width-stacked layout) but still no horizontal
+# scrolling -- since side-by-side halves the available width per table,
+# that now requires abbreviating content, not just narrowing columns: Pos
+# and NFL Team are folded into one "Pos/Tm" column, Matchup drops the
+# kickoff time and is reduced to just "vs OPP"/"@ OPP" (_abbreviate_matchup),
+# player names shorten to "F. Last" (_abbreviate_player_name), and slot
+# headings shorten to their standard short codes (_SLOT_ABBREVIATIONS). All
+# columns stay "small" so 5 (starters) or 4 (bench) of them comfortably fit
+# half a laptop-width browser window.
 _STARTER_COLUMN_CONFIG = {
-    "Slot": st.column_config.TextColumn(width="medium"),
-    "Player": st.column_config.TextColumn(width="medium"),
-    "Pos": st.column_config.TextColumn(width="small"),
-    "NFL Team": st.column_config.TextColumn(width="small"),
-    "Matchup": st.column_config.TextColumn(width="medium"),
+    "Slot": st.column_config.TextColumn(width="small"),
+    "Player": st.column_config.TextColumn(width="small"),
+    "Pos/Tm": st.column_config.TextColumn(width="small"),
+    "Opp": st.column_config.TextColumn(width="small"),
     "Points": st.column_config.NumberColumn(width="small", format="%.1f"),
 }
 _BENCH_COLUMN_CONFIG = {k: v for k, v in _STARTER_COLUMN_CONFIG.items() if k != "Slot"}
+
+
+def _abbreviate_slot(slot: str) -> str:
+    return _SLOT_ABBREVIATIONS.get(slot, slot)
+
+
+def _abbreviate_player_name(name: str) -> str:
+    """"Patrick Mahomes" -> "P. Mahomes". Leaves single-word names (DST
+    rows use just the team nickname, e.g. "Eagles") unchanged."""
+    parts = str(name).split()
+    if len(parts) < 2:
+        return name
+    return f"{parts[0][0]}. {' '.join(parts[1:])}"
+
+
+def _abbreviate_matchup(desc, nfl_team: str) -> str:
+    """"PHI vs. WAS | Sun 3:25PM CT" (starters) or "PHI vs. WAS" (bench) ->
+    just "vs WAS" (or "@ CAR" for an away game) -- drops the kickoff time
+    entirely and keeps only the OPPONENT half of the matchup (the player's
+    own team, already shown in Pos/Tm, would be redundant here). Falls
+    back to the raw text if it doesn't match the expected "TEAM vs/@ TEAM"
+    shape (e.g. a bye week -- see _bye_names(), which already flags those
+    separately via row highlighting)."""
+    if not isinstance(desc, str) or not desc:
+        return desc
+    m = _MATCHUP_TEAMS_RE.match(desc.strip())
+    if not m:
+        return desc
+    team_a, symbol, team_b = m.group(1), m.group(2), m.group(3)
+    symbol = "@" if symbol.startswith("@") else "vs"
+    opp = team_b if team_a.upper() == str(nfl_team).upper() else team_a
+    return f"{symbol} {opp}"
 
 
 def _team_total(df: pd.DataFrame, team: str, source: str, fp_lookup: dict) -> tuple[float, int]:
@@ -190,8 +254,14 @@ def _compute_recommendations(team_df: pd.DataFrame, bye_names: set, starters_con
     return should_start, should_bench
 
 
-def _row_style(row: pd.Series, should_start: set, should_bench: set, bye_names: set) -> list:
-    name = row["Player"]
+def _row_style(row: pd.Series, index_to_name: pd.Series, should_start: set, should_bench: set, bye_names: set) -> list:
+    # Matched by the ORIGINAL (full) player name via the row's index, not
+    # row["Player"] -- that column now holds the abbreviated display name
+    # ("P. Mahomes"), which wouldn't match should_start/should_bench/
+    # bye_names (all built from full names). index_to_name is the same
+    # index the display frame was built from (never reset), so this
+    # lookup is stable across the rename/abbreviate step.
+    name = index_to_name.get(row.name)
     if name in bye_names:
         color = "background-color: rgba(250, 204, 21, 0.35)"  # amber -- can't start (bye)
     elif name in should_start:
@@ -233,13 +303,20 @@ def _render_team_tables(
     elif bye_names:
         st.caption("🟨 on a bye this week")
 
-    starters_display = starters[["slot", "player_name", "position", "nfl_team", "matchup_desc", "Points"]].rename(
-        columns={"slot": "Slot", "player_name": "Player", "position": "Pos",
-                 "nfl_team": "NFL Team", "matchup_desc": "Matchup"}
-    )
+    starters_display = pd.DataFrame({
+        "Slot": starters["slot"].map(_abbreviate_slot),
+        "Player": starters["player_name"].map(_abbreviate_player_name),
+        "Pos/Tm": starters["position"] + "·" + starters["nfl_team"],
+        "Opp": [
+            _abbreviate_matchup(desc, team)
+            for desc, team in zip(starters["matchup_desc"], starters["nfl_team"])
+        ],
+        "Points": starters["Points"],
+    }, index=starters.index)
     if should_start or should_bench or bye_names:
         starters_display = starters_display.style.apply(
-            _row_style, axis=1, should_start=should_start, should_bench=should_bench, bye_names=bye_names
+            _row_style, axis=1, index_to_name=starters["player_name"],
+            should_start=should_start, should_bench=should_bench, bye_names=bye_names,
         )
     st.dataframe(
         starters_display,
@@ -249,13 +326,19 @@ def _render_team_tables(
     bench_names = set(bench["player_name"])
     bench_flagged = bool((should_start & bench_names) or (bye_names & bench_names))
     with st.expander(f"Bench ({len(bench)})", expanded=bench_flagged):
-        bench_display = bench[["player_name", "position", "nfl_team", "matchup_desc", "Points"]].rename(
-            columns={"player_name": "Player", "position": "Pos",
-                     "nfl_team": "NFL Team", "matchup_desc": "Matchup"}
-        )
+        bench_display = pd.DataFrame({
+            "Player": bench["player_name"].map(_abbreviate_player_name),
+            "Pos/Tm": bench["position"] + "·" + bench["nfl_team"],
+            "Opp": [
+                _abbreviate_matchup(desc, team)
+                for desc, team in zip(bench["matchup_desc"], bench["nfl_team"])
+            ],
+            "Points": bench["Points"],
+        }, index=bench.index)
         if should_start or should_bench or bye_names:
             bench_display = bench_display.style.apply(
-                _row_style, axis=1, should_start=should_start, should_bench=should_bench, bye_names=bye_names
+                _row_style, axis=1, index_to_name=bench["player_name"],
+                should_start=should_start, should_bench=should_bench, bye_names=bye_names,
             )
         st.dataframe(
             bench_display,
@@ -340,16 +423,18 @@ st.caption(
 
 st.divider()
 
-# Each team's table gets the FULL page width, one after the other, rather
-# than two tables squeezed side by side into half the width each -- that
-# side-by-side layout was what forced horizontal scrolling to see the
-# Points column (league-manager feedback, 2026-09-09).
-my_total = _render_team_tables(
-    df, my_team_display, source, fp_lookup,
-    recommend=True, starters_config=config["roster"]["starters"],
-)
-st.divider()
-opp_total = _render_team_tables(df, opp_display, source, fp_lookup)
+# Side by side (league-manager request, 2026-09-09, reverting the earlier
+# full-width-stacked layout) -- the abbreviated columns above (Pos/Tm, Opp,
+# shortened names/slots) are what keep each half-width table from forcing
+# horizontal scroll now that they're back to sharing the page.
+my_col, opp_col = st.columns(2)
+with my_col:
+    my_total = _render_team_tables(
+        df, my_team_display, source, fp_lookup,
+        recommend=True, starters_config=config["roster"]["starters"],
+    )
+with opp_col:
+    opp_total = _render_team_tables(df, opp_display, source, fp_lookup)
 
 st.divider()
 diff = my_total - opp_total
