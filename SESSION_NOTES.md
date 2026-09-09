@@ -676,6 +676,25 @@ which is now reference material rather than the active focus.
 - `reports/` (gitignored) is where generated deliverables like the
   draft-grades Word doc live — not tracked in git, written directly into
   the connected folder for the user to open/share.
+- **Current-roster tracking, synced from CBS transactions (2026-09-09)**:
+  first slice of in-season management. `src/data_sources/transactions.py`
+  parses CBS's Transaction Report (waiver adds/drops/trades) the same
+  two-stage raw-capture-then-parse pattern as `draft_history.py`; CBS
+  stays the system of record (real moves happen there, not in this app —
+  see the dated log entry below for why two-way sync isn't being built).
+  `src/roster_state.py` replays parsed transactions on top of
+  `DraftState.roster_by_team()` to compute each team's CURRENT roster,
+  reusing the existing `Pick` type so `assign_roster_slots()`/
+  `league_grid` work unchanged against either view. My Roster and League
+  Rosters both got a "Current roster" (new default) / "As drafted" toggle.
+  Real 2026 season transactions captured and committed (10 as of this
+  writing): `data/transactions/raw/2026_raw.txt` ->
+  `data/transactions/transactions.csv`, refreshed via
+  `scripts/fetch_transactions.py`. **Known gaps**: no in-app manual-entry
+  fallback yet for the gap between a CBS move and the next capture; CBS
+  Transaction Report pagination untested (only 10 txns exist so far this
+  season, all on one page) — re-check if a future capture looks
+  truncated. 35 new tests; 329/329 passing.
 
 ## Git push access — read this if `git push` 403s
 
@@ -751,6 +770,56 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-09-09 — Roster tracking foundation: CBS transaction sync, current/as-drafted toggle
+First slice of in-season team management, planned and built with the user
+in the new session (see the pivot entry directly below). Two decisions
+made while scoping it, before writing code:
+
+1. **CBS stays the system of record; this is one-directional sync, not
+   two-way.** User initially wanted changes made in the app to push to
+   CBS and vice versa. Pushed back on the write-to-CBS half: automating
+   real transactions (waiver claims, trades, FAAB) against a live site
+   not built for that is a different order of risk than the existing
+   read-only scraping (draft sync, projections) — a misfire does
+   something wrong to the user's actual roster, not just fails to load a
+   page. Recommended and built the one-directional version instead: CBS
+   is where moves actually happen, the app pulls from it to stay current.
+2. **No IR-specific roster status.** Confirmed with the user: this
+   league has no separate IR roster slot (matches `config/
+   league_settings.yaml`'s `roster` section, which never defined one) —
+   a season-ending injury is just a drop. No IR transaction type modeled.
+
+Used the browser pane (logged in as the user, who signed in himself —
+no credential ever touched by Claude, per the retired-PAT policy above)
+to find CBS's actual Transaction Report: URL pattern
+`/transactions/<team_id|all>/<type>/<year>`, e.g.
+`/transactions/all/all_but_lineup/2026`, with Team/Type/Year filter
+dropdowns. Confirmed it's a real dated, league-wide log (not just a
+current-snapshot view) — date, team, player, action ("Added off
+Waivers" / "Dropped" / "Traded from <team>"), effective round, waiver
+cost. Trades show up as one row per side, on the RECEIVING team, naming
+who it came from — no separate "traded away" row for the sending team,
+so `src/roster_state.py` infers the giving side entirely from that
+"Traded from" field. Captured the real 2026 season's data this way (only
+10 transactions exist so far, ~1 week post-draft) and built/tested
+everything against it, not synthetic data — see "Current state" above
+for the full technical summary and file list.
+
+Built and fully tested (329/329) in a cloud-workspace clone of this repo
+(this repo is public, so a plain `git clone` worked without any
+credential handling), since the device bridge's `device_bash` can't run
+this repo's venv/pytest (same limitation the "Local clone access via the
+device bridge" section above already documents for `git clone`/venv
+setup — confirmed it also applies to running tests, not just cloning).
+Finished code transferred to the user's actual Mac clone as a single git
+patch (`git diff` from the cloud clone -> `SendUserFile` ->
+`device_commit_files` -> `git apply` via `device_bash`) and committed
+there (not pushed — per the git workflow above, the user pushes
+themselves). Hit the same stale `.git/*.lock` issue the device-bridge
+section above describes (`index.lock`, then `HEAD.lock` on the actual
+commit) — fixed the same way, `device_request_delete_permission` once,
+then `rm` the lock file(s) and retry.
 
 ### 2026-09-09 — Project pivots to in-season team management; retired the PAT-paste git workflow
 User is starting a new chat to begin the next phase: turning this from a
