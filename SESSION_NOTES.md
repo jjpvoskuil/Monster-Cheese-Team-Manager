@@ -800,6 +800,77 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-09-09 — Waiver Wire page: top pickup recommendations, CBS + FantasyPoints, source toggle
+New `pages/9_Waiver_Wire.py`, per league-manager request: "a page that
+recommends the top 3 players that I could pick up off waivers," with an
+explicit priority order (empty starting slot from a bye is #1; a
+season-long upgrade over a rostered player; open bench-slot depth adds;
+full-27-roster drop-for-upgrade, always naming both players) and a
+requirement that every recommendation say whether it's CBS- or
+FantasyPoints-based. Mid-build the league manager also asked to "pull in
+FantasyPoints projections against CBS's available players and be able
+to toggle between CBS and Fantasypoints projections to see if it affects
+recommendations" — implemented as a `st.radio` (Both/CBS/FantasyPoints)
+that filters the same underlying recommendation list, same UX pattern as
+the Weekly Matchup page's CBS/FantasyPoints toggle.
+
+**New data source**: `src/data_sources/waiver_wire.py` parses CBS's live
+`/stats/stats-main` "Free Agent Recommendations" report (PLAYER STATUS =
+FREE AGENTS) — the actual pool of pickup-able players, which nothing
+else in this app previously knew. Captured 6 raw files (ALL
+OFFENSE/K/DST × Week 1/Rest of Season) into `data/waiver_wire/raw/`,
+parsed by `scripts/fetch_waiver_wire.py` into
+`data/waiver_wire/{year}_week{N}.csv` and
+`data/waiver_wire/{year}_restofseason.csv`. See that module's docstring
+for the row format (uniform across all 3 CBS position tables: first 7
+tab-separated fields fixed, last field is always FPTS) and the capture
+script's docstring for the exact CBS filter-click sequence that reliably
+works (direct deep-link URL navigation to a pre-composed filter
+combination does NOT reliably apply on this SPA — confirmed again this
+session, same finding as `weekly_matchup.py`'s capture notes).
+
+**Design decision — FantasyPoints has no live free-agent capture**:
+rather than deriving a second, independent "who's a free agent"
+answer from `data/projections/fantasypoints_2026.csv` (which would risk
+disagreeing with CBS's own list), the page re-scores CBS's OWN free
+-agent candidates under FantasyPoints' season projections (same
+`ScoringEngine`, same file already used for the Draft Board) by exact
+name match. Both sources rank the identical real candidate pool — only
+the projected value differs — which is what makes the toggle meaningful
+rather than comparing two different populations. Week-specific numbers
+(the bye-gap tier) are CBS-only: no per-week FantasyPoints capture
+exists, and their weekly export abbreviates names ("J. Allen") in a way
+not worth cross-matching for the #1-priority "which slot is empty this
+week" check.
+
+**Bug caught during manual verification** (worth flagging for future
+single-source scoring work): calling `ScoringEngine.score_player_season`
+directly on a `load_table()` row — bypassing `src.projections.
+blend_projections()` — produced `nan` point totals for any player with
+even one blank stat cell (e.g. Darren Waller's blank passing/rushing
+cells in the FantasyPoints file). `load_table()` only fills a canonical
+column that's entirely ABSENT from the source file with 0; an
+individual blank CELL within a present column stays `NaN`, and
+`blend_projections()` has its own explicit NaN-safe weighted-average
+logic (see its long 2026-09-02 comment) that a single-source path never
+gets. Fixed locally in this page's `_scored_season_projections()` with
+an explicit `fillna(0)` on stat columns before scoring — flagging here
+in case a future single-source scoring need elsewhere hits the same trap.
+
+Also fixed while building the bench-depth tier: a position eligible for
+more than one starter slot (e.g. TE is eligible for both the dedicated
+TE slot and `WR_TE_FLEX` in this league) was only checked against
+whichever slot's `count` happened to be seen first, understating real
+demand. Now sums the starter count across every slot a position is
+eligible for before judging a position "thin."
+
+24 new tests (`tests/test_waiver_wire.py`,
+`tests/test_waiver_recommendations.py`,
+`tests/test_waiver_wire_page.py` — the last one runs against the real
+committed data, not synthetic fixtures, since the draft is complete and
+every input this page needs already exists in the repo). Full suite:
+387 passed.
+
 ### 2026-09-09 — Weekly Matchup: layout/totals fixes + start/bench and bye-week highlighting
 Follow-up league-manager feedback on the Weekly Matchup page added earlier
 the same day (see the next entry below for the page's original build).

@@ -1,0 +1,5487 @@
+# Raw capture: CBS "Free Agent Recommendations" page (the /stats/stats-main
+# report), POSITIONS = ALL OFFENSE, PLAYER STATUS = FREE AGENTS,
+# TIMEFRAME = REST OF SEASON (PROJ)
+# https://maniacfl.football.cbssports.com/stats/stats-main
+# Captured: 2026-09-09, via Claude_Browser (logged-in league-manager session)
+#
+# See src/data_sources/waiver_wire.py's module docstring for the full
+# capture procedure and row format.
+#
+# FULL listing (print_rows=9999 query param, reached via direct URL nav
+# before the timeframe-reset quirk documented in scripts/fetch_
+# waiver_wire.py's docstring was discovered) -- 1,759 offensive free
+# agents, every position, sorted descending by rest-of-season FPTS.
+# Substantially larger than the Week 1 capture (which only pulled CBS's
+# default ~100-row first page) since print_rows=9999 bypasses CBS's
+# pagination entirely; kept whole rather than truncated since this is
+# the primary "who's a genuine long-term upgrade" data source.
+# ===== RAW TEXT BELOW =====
+Title: Maniac Football League - CBSSports.com
+URL: https://maniacfl.football.cbssports.com
+Source element: <body>
+---
+League
+My Team
+Players
+Scores
+Standings
+Advice
+2
+Customize a free private pick'em or survivor pool with your league.
+Monster Cheese
+(0-0-0)
+Player Stats
+ 
+ADD/DROP
+2
+ 
+TRADES
+3 / 10
+WAIVER #
+POSITIONS:
+QB
+RB
+TE
+WR-TE
+K
+DST
+ALL OFFENSE
+PLAYER STATUS:
+FREE AGENTS
+ALL PLAYERS
+SCOUT TEAM
+FANTASY TEAM
+SHOW MY TEAM
+ROOKIES ONLY
+MY REPORTS:
+RECENTLY VIEWED REPORTS
+MY SAVED REPORTS
+ADVANCED REPORTS:
+CUSTOM REPORTS
+DEFENSE VS. POS
+RED ZONE STATS
+COMPARE PLAYERS
+STATS
+PROJECTIONS
+BEST AVAILABLE
+Free Agent Recommendations
+TIMEFRAME:
+REST OF SEASON (PROJ)
+CATEGORIES:
+STANDARD
+Projections Powered
+by SportsLine
+FREE AGENTS CBS AVERAGE PROJECTIONS STANDARD CATEGORIES
+	
+UPCOMING
+	
+TRENDS
+	
+PASSING
+	
+RUSHING
+	
+RECEIVING
+	
+FUMBLES
+	
+ACTION	
+AVAIL
+	
+PLAYER
+	
+OPP
+	
+OVP
+	
+BYE
+	
+ROST
+	
+START
+	
+ATT
+	
+COMP
+	
+YDS
+	
+TD
+	
+INT
+	
+ATT
+	
+YDS
+	
+TD
+	
+TAR
+	
+REC
+	
+YDS
+	
+TD
+	
+LOST
+	
+FPTS
+
+ 
+	W (9/10)	Elic Ayomanor WR • TEN	NYJ	17	9	6	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	5.1	2.6	35.8	0.5	0.0	7.51
+
+ 
+	W (9/10)	Calvin Ridley WR • TEN	NYJ	17	9	32	3	0.0	0.0	0.0	0.0	0.0	0.2	1.3	0.1	6.0	3.0	53.3	0.2	0.0	7.01
+
+ 
+	W (9/10)	Darren Waller TE • CAR 	CHI	13	5	11	1	0.0	0.0	0.0	0.0	0.0	0.1	0.6	0.0	4.0	2.8	31.6	0.4	0.0	6.81
+
+ 
+	W (9/10)	Marquise Brown WR • PHI	WAS	26	10	7	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	4.1	2.7	36.8	0.4	0.0	6.81
+
+ 
+	W (9/10)	Jalen Nailor WR • LV	MIA	19	13	25	2	0.0	0.0	0.0	0.0	0.0	0.1	0.4	0.0	5.2	3.0	38.0	0.4	0.0	6.81
+
+ 
+	W (9/10)	David Njoku TE • LAC	ARI	31	7	11	2	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	4.0	2.7	27.2	0.5	0.0	6.51
+
+ 
+	W (9/10)	Chimere Dike WR • TEN	NYJ	17	9	4	1	0.0	0.0	0.0	0.0	0.0	0.6	0.9	0.0	4.2	2.8	27.1	0.5	0.1	6.41
+
+ 
+	W (9/10)	Kayshon Boutte WR • HOU	BUF	8	8	35	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.4	2.1	32.3	0.3	0.0	6.11
+
+ 
+	W (9/10)	Brenton Strange TE • JAC	CLE	14	7	63	11	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	5.2	3.9	43.0	0.3	0.0	6.11
+
+ 
+	W (9/10)	Pat Freiermuth TE • PIT	ATL	3	9	11	2	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.5	2.7	30.2	0.3	0.0	6.11
+
+ 
+	W (9/10)	Jalen McMillan WR • TB 	@CIN	2	10	18	1	0.0	0.0	0.0	0.0	0.0	0.3	1.9	0.0	3.8	2.7	38.0	0.3	0.0	6.11
+
+ 
+	W (9/10)	Mason Taylor TE • NYJ	@TEN	23	13	5	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	5.3	3.6	32.7	0.3	0.0	6.11
+
+ 
+	W (9/10)	Omar Cooper Jr. WR • NYJ	@TEN	29	13	14	1	0.0	0.0	0.0	0.0	0.0	0.1	0.8	0.0	4.6	2.8	36.9	0.3	0.1	6.01
+
+ 
+	W (9/10)	Brock Wright TE • DET	NO	16	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	4.8	3.2	29.0	0.4	0.0	5.81
+
+ 
+	W (9/10)	Devaughn Vele WR • NO	@DET	30	8	6	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	4.0	2.7	35.8	0.2	0.0	5.41
+
+ 
+	W (9/10)	Troy Franklin WR • DEN 	@KC	9	10	10	1	0.0	0.0	0.0	0.0	0.0	0.2	0.6	0.0	5.3	3.3	31.3	0.2	0.0	5.41
+
+ 
+	W (9/17)	Cooper Kupp WR • SEA	NE	12	11	26	2	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	5.1	3.4	39.3	0.2	0.0	5.41
+
+ 
+	W (9/10)	Cade Otton TE • TB	@CIN	32	10	25	3	0.0	0.0	0.0	0.0	0.0	0.0	-0.1	0.0	5.5	3.9	43.0	0.2	0.0	5.41
+
+ 
+	W (9/10)	Mike Gesicki TE • CIN	TB	28	6	4	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	4.0	2.8	32.3	0.2	0.0	5.41
+
+ 
+	W (9/10)	Keenan Allen WR • IND	BAL	23	13	37	2	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	5.5	3.5	37.4	0.2	0.0	5.41
+
+ 
+	W (9/10)	Oronde Gadsden II TE • LAC 	ARI	31	7	14	2	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.4	2.5	36.1	0.2	0.0	5.41
+
+ 
+	W (9/10)	Adonai Mitchell WR • NYJ	@TEN	29	13	15	1	0.0	0.0	0.0	0.0	0.0	0.1	-0.1	0.0	4.9	2.4	34.0	0.2	0.1	5.31
+
+ 
+	W (9/10)	Denzel Boston WR • CLE	@JAC	18	11	50	2	0.0	0.0	0.0	0.0	0.0	0.1	0.5	0.0	6.4	3.9	43.4	0.2	0.1	5.31
+
+ 
+	W (9/10)	Malik Benson WR • LV	MIA	19	13	3	1	0.0	0.0	0.0	0.0	0.0	0.1	0.6	0.0	5.3	3.3	36.8	0.2	0.1	5.31
+
+ 
+	W (9/10)	Germie Bernard WR • PIT	ATL	22	9	8	1	0.0	0.0	0.0	0.0	0.0	0.1	0.7	0.0	4.0	2.5	30.2	0.2	0.1	5.31
+
+ 
+	W (9/10)	Bryce Lance WR • NO	@DET	30	8	7	1	0.0	0.0	0.0	0.0	0.0	0.1	0.6	0.0	5.1	3.1	43.0	0.2	0.1	5.31
+
+ 
+	W (9/17)	Rashid Shaheed WR • SEA	NE	12	11	65	5	0.0	0.0	0.0	0.0	0.0	0.8	5.0	0.0	5.5	3.2	46.6	0.2	0.1	5.31
+
+ 
+	W (9/10)	Colby Parkinson TE • LAR	SF	24	11	6	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.5	2.5	24.7	0.3	0.0	5.11
+
+ 
+	W (9/10)	Theo Johnson TE • NYG 	DAL	11	8	3	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.3	2.1	25.1	0.3	0.0	5.11
+
+ 
+	W (9/10)	Terrance Ferguson TE • LAR 	SF	24	11	25	2	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.5	1.8	30.1	0.3	0.0	5.11
+
+ 
+	W (9/10)	Malik Washington WR • MIA	@LV	21	6	18	1	0.0	0.0	0.0	0.0	0.0	0.8	4.4	0.1	4.2	3.0	21.8	0.2	0.1	4.91
+
+ 
+	W (9/10)	Tyjae Spears RB • TEN	NYJ	32	9	57	3	0.0	0.0	0.0	0.0	0.0	5.3	19.4	0.3	3.4	3.0	20.6	0.0	0.0	4.80
+
+ 
+	W (9/10)	Chigoziem Okonkwo TE • WAS	@PHI	1	7	27	3	0.0	0.0	0.0	0.0	0.0	0.0	0.3	0.0	3.8	2.7	31.9	0.1	0.0	4.70
+
+ 
+	W (9/10)	Antonio Williams WR • WAS	@PHI	4	7	11	1	0.0	0.0	0.0	0.0	0.0	0.1	0.8	0.0	3.7	2.3	32.9	0.1	0.1	4.60
+
+ 
+	W (9/10)	Tyler Higbee TE • LAR	SF	24	11	2	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.6	2.5	28.3	0.2	0.0	4.41
+
+ 
+	W (9/10)	Jaylin Noel WR • HOU 	BUF	8	8	5	1	0.0	0.0	0.0	0.0	0.0	0.4	0.9	0.0	3.2	2.2	25.0	0.2	0.0	4.41
+
+ 
+	W (9/10)	Gunnar Helm TE • TEN	NYJ	25	9	5	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.3	2.7	23.8	0.2	0.0	4.41
+
+ 
+	W (9/10)	Xavier Legette WR • CAR 	CHI	31	5	2	1	0.0	0.0	0.0	0.0	0.0	0.2	0.5	0.0	3.8	2.1	22.4	0.2	0.0	4.41
+
+ 
+	W (9/10)	Xavier Hutchinson WR • HOU	BUF	8	8	2	1	0.0	0.0	0.0	0.0	0.0	0.1	1.1	0.0	4.4	2.4	28.2	0.2	0.0	4.41
+
+ 
+	W (9/10)	Andrei Iosivas WR • CIN	TB	14	6	2	1	0.0	0.0	0.0	0.0	0.0	0.1	0.6	0.0	3.5	2.0	28.1	0.2	0.0	4.41
+
+ 
+	W (9/10)	Jalen Tolbert WR • MIA	@LV	21	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.5	2.0	21.8	0.2	0.0	4.41
+
+ 
+	W (9/10)	Dontayvion Wicks WR • PHI	WAS	26	10	15	1	0.0	0.0	0.0	0.0	0.0	0.1	0.3	0.0	3.9	2.3	26.9	0.2	0.0	4.41
+
+ 
+	W (9/10)	Will Kacmarek TE • MIA	@LV	8	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.3	2.3	20.5	0.2	0.1	4.31
+
+ 
+	W (9/10)	Caleb Douglas WR • MIA	@LV	21	6	28	1	0.0	0.0	0.0	0.0	0.0	0.1	0.6	0.0	3.7	2.3	27.1	0.2	0.1	4.31
+
+ 
+	W (9/10)	Zavion Thomas WR • CHI	@CAR	13	10	5	1	0.0	0.0	0.0	0.0	0.0	0.1	0.8	0.0	3.3	2.1	28.7	0.2	0.1	4.31
+
+ 
+	W (9/10)	Ted Hurst WR • TB	@CIN	2	10	9	1	0.0	0.0	0.0	0.0	0.0	0.1	0.9	0.0	3.4	2.1	29.5	0.2	0.1	4.30
+
+ 
+	W (9/10)	Jahdae Walker WR • CHI	@CAR	13	10	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.4	0.0	3.2	1.9	27.1	0.3	0.0	4.11
+
+ 
+	W (9/10)	Charlie Kolar TE • LAC	ARI	31	7	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.3	1.6	22.4	0.3	0.0	4.11
+
+ 
+	W (9/10)	Isaac TeSlaa WR • DET	NO	5	6	8	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.7	1.6	24.0	0.3	0.0	4.11
+
+ 
+	W (9/10)	Malachi Fields WR • NYG 	DAL	32	8	25	1	0.0	0.0	0.0	0.0	0.0	0.1	0.8	0.0	3.0	1.9	26.6	0.3	0.1	4.01
+
+ 
+	W (9/10)	Kimani Vidal RB • LAC 	ARI	31	7	14	1	0.0	0.0	0.0	0.0	0.0	5.3	22.9	0.2	1.5	1.0	9.8	0.1	0.0	3.90
+
+ 
+	W (9/10)	Ashton Dulin WR • IND	BAL	23	13	1	1	0.0	0.0	0.0	0.0	0.0	0.3	3.6	0.0	2.8	1.4	30.5	0.1	0.0	3.70
+
+ 
+	W (9/10)	Michael Mayer TE • LV	MIA	27	13	2	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	4.0	2.8	23.1	0.1	0.0	3.70
+
+ 
+	W (9/10)	Evan Engram TE • DEN	@KC	4	10	8	1	0.0	0.0	0.0	0.0	0.0	0.1	0.3	0.0	4.9	3.3	25.4	0.1	0.0	3.70
+
+ 
+	W (9/10)	Olamide Zaccheaus WR • ATL	@PIT	27	11	1	1	0.0	0.0	0.0	0.0	0.0	0.2	1.0	0.0	4.0	2.5	22.3	0.1	0.0	3.70
+
+ 
+	W (9/10)	Darnell Washington TE • PIT	ATL	3	9	2	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.8	2.0	22.6	0.1	0.1	3.60
+
+ 
+	W (9/10)	Noah Fant TE • NO	@DET	21	8	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.2	2.6	25.6	0.1	0.2	3.50
+
+ 
+	W (9/17)	George Holani RB • SEA	NE	1	11	8	1	0.0	0.0	0.0	0.0	0.0	8.5	28.1	0.3	0.9	0.8	6.1	0.0	0.3	3.50
+
+ 
+	W (9/10)	Tyquan Thornton WR • KC	DEN	3	5	3	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.8	1.4	28.8	0.2	0.0	3.41
+
+ 
+	W (9/10)	Demarcus Robinson WR • SF	@LAR	28	8	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.3	0.0	3.0	1.8	25.5	0.2	0.0	3.41
+
+ 
+	W (9/10)	Daniel Bellinger TE • TEN	NYJ	25	9	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.1	1.6	20.9	0.2	0.0	3.41
+
+ 
+	W (9/10)	Ben Skowronek WR • PIT 	ATL	22	9	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.8	1.4	22.1	0.2	0.0	3.41
+
+ 
+	W (9/10)	Eli Stowers TE • PHI 	WAS	30	10	5	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.7	1.8	21.7	0.2	0.1	3.31
+
+ 
+	W (9/10)	Roman Wilson WR • PIT	ATL	22	9	2	1	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	2.7	1.6	22.0	0.2	0.1	3.31
+
+ 
+	W (9/17)	Emanuel Wilson RB • SEA	NE	1	11	6	1	0.0	0.0	0.0	0.0	0.0	6.3	24.4	0.2	0.9	0.8	4.9	0.0	0.0	3.20
+
+ 
+	W (9/10)	Isaiah Bond WR • CLE	@JAC	18	11	1	1	0.0	0.0	0.0	0.0	0.0	0.3	1.9	0.0	3.3	1.6	27.2	0.1	0.0	2.70
+
+ 
+	W (9/10)	Devontez Walker WR • BAL 	@IND	25	13	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	1.9	1.3	23.7	0.1	0.0	2.70
+
+ 
+	W (9/10)	Dawson Knox TE • BUF	@HOU	10	7	2	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.5	1.8	21.3	0.1	0.0	2.70
+
+ 
+	W (9/10)	Kendrick Bourne WR • ARI	@LAC	10	14	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.1	0.0	2.6	1.8	24.9	0.1	0.0	2.70
+
+ 
+	W (9/10)	Josh Palmer WR • BUF	@HOU	7	7	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.0	1.8	25.5	0.1	0.0	2.70
+
+ 
+	W (9/10)	Darnell Mooney WR • NYG	DAL	32	8	3	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.6	1.8	27.1	0.1	0.0	2.70
+
+ 
+	W (9/10)	Zachariah Branch WR • ATL	@PIT	27	11	9	1	0.0	0.0	0.0	0.0	0.0	0.1	0.7	0.0	3.1	1.9	27.3	0.1	0.1	2.60
+
+ 
+	W (9/10)	Jalen Brooks WR • ARI	@LAC	10	14	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.9	1.5	23.3	0.1	0.2	2.50
+
+ 
+	W (9/10)	Jaylen Wright RB • MIA	@LV	19	6	9	1	0.0	0.0	0.0	0.0	0.0	6.1	20.1	0.1	0.8	0.4	3.0	0.0	0.1	2.50
+
+ 
+	W (9/10)	Justice Hill RB • BAL	@IND	11	13	17	1	0.0	0.0	0.0	0.0	0.0	3.7	19.2	0.2	1.9	1.5	12.9	0.1	0.0	1.90
+
+ 
+	W (9/10)	Erick All TE • CIN	TB	28	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.5	2.0	18.0	0.1	0.0	1.70
+
+ 
+	W (9/10)	Tez Johnson WR • TB	@CIN	2	10	2	1	0.0	0.0	0.0	0.0	0.0	0.6	2.2	0.0	2.4	1.5	18.7	0.2	0.0	1.41
+
+ 
+	W (9/10)	Josh Oliver TE • MIN	GB	15	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.7	1.3	13.7	0.2	0.0	1.41
+
+ 
+	W (9/10)	Davis Allen TE • LAR 	SF	24	11	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.3	1.6	13.7	0.2	0.0	1.41
+
+ 
+	W (9/10)	Luke McCaffrey WR • WAS	@PHI	4	7	2	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.6	1.1	18.3	0.2	0.0	1.40
+
+ 
+	W (9/10)	Ty Johnson RB • BUF 	@HOU	10	7	4	1	0.0	0.0	0.0	0.0	0.0	3.1	12.9	0.1	1.7	1.3	14.9	0.1	0.0	1.30
+
+ 
+	W (9/10)	Connor Heyward TE • LV	MIA	27	13	1	1	0.0	0.0	0.0	0.0	0.0	0.9	2.5	0.1	1.3	1.0	6.8	0.1	0.0	1.30
+
+ 
+	W (9/10)	Ty Simpson QB • LAR	SF	18	11	6	1	3.6	2.4	25.5	0.2	0.0	0.4	1.8	0.0	0.0	0.0	0.0	0.0	0.0	1.21
+
+ 
+	W (9/10)	Kendre Miller RB • NO 	@DET	9	8	2	1	0.0	0.0	0.0	0.0	0.0	3.5	13.9	0.2	0.5	0.4	2.9	0.0	0.0	1.20
+
+ 
+	W (9/10)	Roschon Johnson RB • CHI	@CAR	25	10	3	1	0.0	0.0	0.0	0.0	0.0	2.0	7.3	0.2	0.2	0.2	1.1	0.0	0.0	1.20
+
+ 
+	W (9/10)	Cade Stover TE • HOU	BUF	2	8	1	1	0.0	0.0	0.0	0.0	0.0	0.6	1.1	0.0	1.2	0.8	6.7	0.1	0.0	0.70
+
+ 
+	W (9/10)	Tylan Wallace WR • CLE	@JAC	18	11	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.6	1.6	17.4	0.1	0.0	0.70
+
+ 
+	W (9/10)	Andrew Beck RB • NYJ	@TEN	14	13	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.5	0.0	0.5	0.3	2.5	0.1	0.0	0.70
+
+ 
+	W (9/10)	Charlie Woerner TE • ATL	@PIT	29	11	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.7	1.4	12.0	0.1	0.0	0.70
+
+ 
+	W (9/10)	John Bates TE • WAS 	@PHI	1	7	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.6	1.1	10.3	0.1	0.0	0.70
+
+ 
+	W (9/10)	Odell Beckham Jr. WR • NYG	DAL	32	8	4	1	0.0	0.0	0.0	0.0	0.0	0.1	0.3	0.0	2.8	1.5	16.6	0.1	0.0	0.70
+
+ 
+	W (9/10)	Payne Durham TE • TB	@CIN	32	10	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.9	0.5	5.5	0.1	0.0	0.70
+
+ 
+	W (9/10)	Tim Patrick WR • NYJ	@TEN	29	13	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.7	0.5	5.2	0.1	0.0	0.70
+
+ 
+	W (9/10)	Colbie Young WR • CIN	TB	14	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	0.9	0.7	9.6	0.1	0.0	0.70
+
+ 
+	W (9/17)	Kyle Williams WR • NE	@SEA	6	11	3	1	0.0	0.0	0.0	0.0	0.0	0.1	0.2	0.0	1.1	0.6	9.6	0.1	0.0	0.70
+
+ 
+	W (9/10)	Jordan Whittington WR • LAR	SF	16	11	1	1	0.0	0.0	0.0	0.0	0.0	0.2	0.8	0.0	2.1	1.6	16.9	0.1	0.0	0.70
+
+ 
+	W (9/10)	Josh Cameron WR • JAC	CLE	11	7	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	0.7	0.6	7.7	0.1	0.0	0.70
+
+ 
+	W (9/10)	Keon Coleman WR • BUF 	@HOU	7	7	5	1	0.0	0.0	0.0	0.0	0.0	0.0	0.1	0.0	1.9	1.1	14.4	0.1	0.0	0.70
+
+ 
+	W (9/17)	Demario Douglas WR • NE	@SEA	6	11	2	1	0.0	0.0	0.0	0.0	0.0	0.4	1.1	0.0	1.9	1.4	15.2	0.1	0.0	0.70
+
+ 
+	W (9/10)	Nate Adkins TE • DEN	@KC	4	10	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.3	0.9	5.7	0.1	0.0	0.70
+
+ 
+	W (9/10)	Tre Harris WR • LAC 	ARI	15	7	8	1	0.0	0.0	0.0	0.0	0.0	0.1	0.6	0.0	2.4	1.6	18.6	0.1	0.0	0.70
+
+ 
+	W (9/10)	Konata Mumpfield WR • LAR	SF	16	11	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	3.2	1.6	13.7	0.1	0.0	0.70
+
+ 
+	W (9/10)	Drew Sample TE • CIN	TB	28	6	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.1	0.0	0.9	0.7	6.0	0.1	0.0	0.70
+
+ 
+	W (9/10)	John Metchie III WR • CAR	CHI	31	5	1	1	0.0	0.0	0.0	0.0	0.0	0.2	-0.3	0.0	0.9	0.6	6.2	0.1	0.0	0.70
+
+ 
+	W (9/17)	Eli Raridon TE • NE	@SEA	20	11	3	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.8	1.3	12.7	0.1	0.0	0.70
+
+ 
+	W (9/10)	Marvin Mims WR • DEN 	@KC	9	10	2	1	0.0	0.0	0.0	0.0	0.0	0.7	3.6	0.0	2.1	1.6	14.6	0.1	0.0	0.70
+
+ 
+	W (9/10)	Thomas Fidone II TE • NYG	DAL	11	8	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.7	0.6	6.2	0.1	0.0	0.70
+
+ 
+	W (9/10)	Andrew Ogletree TE • IND	BAL	5	13	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.7	0.5	4.2	0.1	0.0	0.70
+
+ 
+	W (9/10)	Brashard Smith RB • KC	DEN	2	5	2	1	0.0	0.0	0.0	0.0	0.0	3.3	11.4	0.0	1.6	1.1	7.1	0.1	0.0	0.70
+
+ 
+	W (9/10)	Kevin Coleman Jr. WR • MIA	@LV	21	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	0.8	0.6	7.2	0.1	0.0	0.70
+
+ 
+	W (9/10)	Chris Manhertz TE • NYG	DAL	11	8	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.7	0.5	5.2	0.1	0.0	0.70
+
+ 
+	W (9/10)	Xavier Smith WR • LAR	SF	16	11	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.7	0.0	0.9	0.7	10.5	0.1	0.0	0.70
+
+ 
+	W (9/10)	Brenen Thompson WR • LAC 	ARI	15	7	2	1	0.0	0.0	0.0	0.0	0.0	0.1	0.3	0.0	0.9	0.7	9.6	0.1	0.0	0.70
+
+ 
+	W (9/10)	Ben Sinnott TE • WAS 	@PHI	1	7	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.7	0.6	6.2	0.1	0.0	0.70
+
+ 
+	W (9/10)	KeAndre Lambert-Smith WR • LAC	ARI	15	7	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.1	0.0	1.1	0.7	8.5	0.1	0.0	0.70
+
+ 
+	W (9/10)	Sam Roush TE • CHI	@CAR	19	10	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.8	0.6	7.0	0.1	0.0	0.70
+
+ 
+	W (9/10)	Ja'Tavion Sanders TE • CAR	CHI	13	5	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.9	1.6	12.9	0.1	0.0	0.70
+
+ 
+	W (9/10)	Mitchell Evans TE • CAR	CHI	13	5	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.1	0.0	1.4	1.0	9.6	0.1	0.0	0.70
+
+ 
+	W (9/10)	Jackson Hawes TE • BUF	@HOU	10	7	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.6	0.5	6.4	0.1	0.0	0.70
+
+ 
+	W (9/10)	Jack Endries TE • CIN	TB	28	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.9	0.7	7.3	0.1	0.0	0.70
+
+ 
+	W (9/10)	Jeremy Ruckert TE • NYJ	@TEN	23	13	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.3	1.7	13.9	0.1	0.0	0.70
+
+ 
+	W (9/10)	Treylon Burks WR • WAS	@PHI	4	7	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.0	0.0	2.2	1.1	14.6	0.1	0.0	0.70
+
+ 
+	W (9/10)	Brevyn Spann-Ford TE • DAL	@NYG	6	14	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.9	0.6	6.2	0.1	0.0	0.70
+
+ 
+	W (9/10)	Jake Tonges TE • SF	@LAR	12	8	3	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.9	0.7	5.7	0.1	0.0	0.70
+
+ 
+	W (9/10)	Tommy Tremble TE • CAR	CHI	13	5	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.9	1.4	13.6	0.1	0.0	0.70
+
+ 
+	W (9/10)	Elijah Higgins TE • ARI	@LAC	9	14	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.5	1.2	12.5	0.1	0.0	0.70
+
+ 
+	W (9/10)	Jahan Dotson WR • ATL	@PIT	27	11	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	2.0	1.0	15.7	0.1	0.0	0.70
+
+ 
+	W (9/10)	Matthew Hibner TE • BAL	@IND	22	13	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.6	0.5	5.7	0.1	0.0	0.70
+
+ 
+	W (9/10)	Kyle Juszczyk RB • SF 	@LAR	12	8	1	1	0.0	0.0	0.0	0.0	0.0	0.2	0.1	0.0	1.9	1.5	14.1	0.1	0.0	0.70
+
+ 
+	W (9/10)	Max Klare TE • LAR	SF	24	11	2	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.9	0.7	7.2	0.1	0.0	0.70
+
+ 
+	W (9/10)	Bauer Sharp TE • TB	@CIN	32	10	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.8	0.6	6.9	0.1	0.0	0.70
+
+ 
+	W (9/17)	Montorie Foster Jr. WR • SEA	NE	12	11	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.2	0.0	0.8	0.6	8.7	0.1	0.0	0.70
+
+ 
+	W (9/10)	Kalif Raymond WR • CHI	@CAR	13	10	1	1	0.0	0.0	0.0	0.0	0.0	0.2	1.2	0.0	1.7	1.4	16.8	0.1	0.0	0.70
+
+ 
+	W (9/17)	Mack Hollins WR • NE	@SEA	6	11	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.2	0.0	2.4	1.6	19.4	0.1	0.0	0.70
+
+ 
+	W (9/10)	Kaden Wetjen WR • PIT	ATL	22	9	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	0.8	0.6	7.4	0.1	0.0	0.70
+
+ 
+	W (9/10)	Tanner Koziol TE • JAC	CLE	14	7	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.7	0.6	5.8	0.1	0.0	0.70
+
+ 
+	W (9/10)	Brycen Tremayne WR • CAR	CHI	31	5	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.4	1.0	11.8	0.1	0.0	0.70
+
+ 
+	W (9/10)	Kameron Johnson WR • TB	@CIN	2	10	1	1	0.0	0.0	0.0	0.0	0.0	0.1	1.9	0.0	0.9	0.5	8.6	0.1	0.0	0.70
+
+ 
+	W (9/10)	Adam Trautman TE • DEN	@KC	4	10	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.1	1.6	14.9	0.1	0.0	0.70
+
+ 
+	W (9/10)	Rasheen Ali RB • BAL	@IND	11	13	1	1	0.0	0.0	0.0	0.0	0.0	0.8	2.8	0.0	0.5	0.4	3.1	0.1	0.0	0.70
+
+ 
+	W (9/10)	Foster Moreau TE • HOU	BUF	2	8	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.8	0.6	6.9	0.1	0.0	0.70
+
+ 
+	W (9/10)	Lil'Jordan Humphrey WR • DEN	@KC	9	10	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.2	0.7	6.4	0.1	0.0	0.70
+
+ 
+	W (9/10)	Jelani Woods TE • NYJ	@TEN	23	13	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.5	0.4	3.4	0.1	0.0	0.70
+
+ 
+	W (9/10)	Ryan Miller WR • MIA	@LV	21	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.9	0.5	5.9	0.1	0.0	0.70
+
+ 
+	W (9/10)	Josh Cuevas TE • BAL	@IND	22	13	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.6	0.5	5.7	0.1	0.0	0.70
+
+ 
+	W (9/10)	Austin Hooper TE • ATL	@PIT	29	11	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.8	1.3	15.3	0.1	0.0	0.70
+
+ 
+	W (9/10)	Hunter Long TE • ARI	@LAC	9	14	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.9	0.6	5.0	0.1	0.0	0.70
+
+ 
+	W (9/10)	CJ Daniels WR • LAR	SF	16	11	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.2	0.0	0.9	0.7	9.5	0.1	0.0	0.70
+
+ 
+	W (9/10)	Tutu Atwell WR • LAR	SF	16	11	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.2	0.0	1.2	0.7	12.3	0.1	0.0	0.70
+
+ 
+	W (9/10)	Cole Kmet TE • CHI	@CAR	19	10	2	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.0	1.3	14.4	0.1	0.0	0.70
+
+ 
+	W (9/10)	Nate Boerkircher TE • JAC	CLE	14	7	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.7	1.2	12.7	0.1	0.0	0.70
+
+ 
+	W (9/10)	Pat Bryant WR • DEN	@KC	9	10	7	1	0.0	0.0	0.0	0.0	0.0	0.1	0.1	0.0	2.2	1.5	15.1	0.1	0.0	0.70
+
+ 
+	W (9/10)	Arian Smith WR • NYJ	@TEN	29	13	1	1	0.0	0.0	0.0	0.0	0.0	0.3	1.3	0.0	2.1	1.1	9.6	0.1	0.0	0.70
+
+ 
+	W (9/10)	Tai Felton WR • MIN	GB	20	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	1.5	1.2	14.6	0.1	0.0	0.70
+
+ 
+	W (9/10)	Jack Bech WR • LV	MIA	19	13	3	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.6	1.8	18.2	0.1	0.0	0.70
+
+ 
+	W (9/10)	Jackson Meeks WR • DET	NO	5	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.9	0.7	7.5	0.1	0.0	0.70
+
+ 
+	W (9/10)	Luke Schoonmaker TE • DAL	@NYG	6	14	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.3	0.9	7.9	0.1	0.0	0.70
+
+ 
+	W (9/10)	Demond Claiborne RB • MIN	GB	13	6	7	1	0.0	0.0	0.0	0.0	0.0	1.8	7.1	0.1	0.2	0.1	1.2	0.0	0.0	0.60
+
+ 
+	W (9/10)	Devin Singletary RB • NYG	DAL	24	8	2	1	0.0	0.0	0.0	0.0	0.0	2.0	8.2	0.1	0.1	0.1	0.6	0.0	0.0	0.60
+
+ 
+	W (9/10)	Zonovan Knight RB • ARI 	@LAC	6	14	1	1	0.0	0.0	0.0	0.0	0.0	1.5	5.6	0.1	0.2	0.2	1.2	0.0	0.0	0.60
+
+ 
+	W (9/10)	Anthony Richardson QB • IND	BAL	22	13	2	1	1.3	0.8	8.9	0.1	0.0	0.3	1.1	0.0	0.0	0.3	1.8	0.0	0.0	0.60
+
+ 
+	W (9/10)	Kenny Pickett QB • CAR	CHI	28	5	1	1	1.2	0.8	8.8	0.1	0.0	0.2	1.6	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Tyler Huntley QB • BAL	@IND	19	13	1	1	1.0	0.6	7.9	0.1	0.0	0.3	1.6	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Michael Burton RB • CLE	@JAC	5	11	1	1	0.0	0.0	0.0	0.0	0.0	0.5	0.5	0.1	0.5	0.4	2.2	0.0	0.0	0.60
+
+ 
+	W (9/10)	Tanner McKee QB • PHI	WAS	30	10	1	1	1.1	0.7	8.5	0.1	0.0	0.3	1.0	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Tyrod Taylor QB • GB	@MIN	1	11	1	1	1.1	0.7	7.8	0.1	0.0	0.3	1.0	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Mitch Trubisky QB • TEN 	NYJ	25	9	1	1	1.4	0.7	7.7	0.1	0.0	0.2	0.4	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Justin Fields QB • KC	DEN	12	5	3	1	1.3	0.8	7.4	0.1	0.0	0.3	1.3	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/17)	Corey Kiner RB • NE	@SEA	3	11	1	1	0.0	0.0	0.0	0.0	0.0	4.2	16.4	0.1	1.1	0.8	7.7	0.0	0.0	0.60
+
+ 
+	W (9/10)	Sean Tucker RB • TB 	@CIN	30	10	5	1	0.0	0.0	0.0	0.0	0.0	2.0	9.8	0.1	0.1	0.1	0.4	0.0	0.0	0.60
+
+ 
+	W (9/10)	J.J. McCarthy QB • MIN 	GB	13	6	3	1	1.2	0.7	7.7	0.1	0.0	0.2	1.0	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Ke'Shawn Williams WR • CIN	TB	14	6	1	1	0.0	0.0	0.0	0.0	0.0	0.2	0.8	0.0	0.9	0.7	9.1	0.1	0.1	0.60
+
+ 
+	W (9/10)	Joshua Dobbs QB • DET	NO	5	6	1	1	1.3	0.9	10.7	0.1	0.0	0.3	0.5	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Stetson Bennett QB • LAR	SF	18	11	1	1	1.1	0.7	7.7	0.1	0.0	0.1	0.5	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Nicholas Singleton RB • TEN	NYJ	32	9	12	1	0.0	0.0	0.0	0.0	0.0	1.4	5.8	0.1	0.2	0.1	1.3	0.0	0.0	0.60
+
+ 
+	W (9/10)	Derius Davis WR • LAC	ARI	15	7	1	1	0.0	0.0	0.0	0.0	0.0	0.7	2.2	0.0	0.9	0.7	5.9	0.1	0.1	0.60
+
+ 
+	W (9/10)	Jarrett Stidham QB • DEN	@KC	9	10	1	1	1.4	0.9	7.6	0.1	0.0	0.3	1.0	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Isaiah Williams WR • NYJ	@TEN	29	13	1	1	0.0	0.0	0.0	0.0	0.0	0.3	3.2	0.0	2.1	1.5	13.7	0.1	0.1	0.60
+
+ 
+	W (9/10)	Jameis Winston QB • NYG	DAL	32	8	2	1	1.2	0.8	8.8	0.1	0.0	0.3	1.4	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Eli Heidenreich RB • PIT	ATL	15	9	2	1	0.0	0.0	0.0	0.0	0.0	1.8	7.5	0.1	0.2	0.1	1.2	0.0	0.0	0.60
+
+ 
+	W (9/10)	Mason Rudolph QB • PIT	ATL	17	9	1	1	1.2	0.8	8.0	0.1	0.0	0.2	1.1	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Brady Cook QB • MIA	@LV	14	6	1	0	1.1	0.8	7.8	0.1	0.0	0.3	1.0	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Davis Mills QB • HOU	BUF	10	8	1	1	1.4	0.8	8.4	0.1	0.0	0.3	1.3	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Cooper Rush QB • ATL	@PIT	26	11	1	1	1.3	0.7	8.6	0.1	0.0	0.3	0.3	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Jaylin Lane WR • WAS	@PHI	4	7	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.5	0.0	2.1	1.1	14.8	0.1	0.1	0.60
+
+ 
+	W (9/10)	Elijah Moore WR • PHI	WAS	26	10	1	1	0.0	0.0	0.0	0.0	0.0	0.4	1.9	0.1	0.7	0.4	4.9	0.0	0.0	0.60
+
+ 
+	W (9/10)	Raheim Sanders RB • CLE	@JAC	5	11	1	1	0.0	0.0	0.0	0.0	0.0	1.7	5.8	0.1	0.2	0.1	0.9	0.0	0.0	0.60
+
+ 
+	W (9/10)	Cade Klubnik QB • NYJ	@TEN	24	13	2	1	0.9	0.6	6.4	0.1	0.0	0.1	0.6	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Jacob Saylors RB • DET	NO	18	6	5	1	0.0	0.0	0.0	0.0	0.0	2.3	10.0	0.1	0.8	0.6	6.2	0.0	0.0	0.60
+
+ 
+	W (9/10)	Spencer Rattler QB • NO	@DET	23	8	1	1	1.3	0.8	9.1	0.1	0.0	0.3	1.0	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Quinn Ewers QB • JAC	CLE	4	7	1	1	1.2	0.7	8.3	0.1	0.0	0.3	1.0	0.0	0.0	0.3	-1.8	0.0	0.0	0.60
+
+ 
+	W (9/10)	LaJohntay Wester WR • BAL	@IND	25	13	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.3	0.0	0.6	0.5	7.5	0.1	0.1	0.60
+
+ 
+	W (9/10)	Marlin Klein TE • HOU	BUF	2	8	2	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	2.9	1.9	19.3	0.1	0.1	0.60
+
+ 
+	W (9/10)	KaVontae Turpin WR • DAL	@NYG	24	14	2	1	0.0	0.0	0.0	0.0	0.0	1.1	7.4	0.0	1.9	1.3	18.6	0.1	0.1	0.60
+
+ 
+	W (9/10)	Gardner Minshew QB • ARI	@LAC	3	14	1	1	1.4	0.8	8.7	0.1	0.0	0.2	1.0	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/17)	Drew Lock QB • SEA	NE	8	11	1	1	1.2	0.8	9.0	0.1	0.0	0.3	1.2	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Chris Bell WR • MIA 	@LV	21	6	26	1	0.0	0.0	0.0	0.0	0.0	0.1	0.6	0.0	2.6	1.6	19.4	0.1	0.1	0.60
+
+ 
+	W (9/10)	Cole Payton QB • PHI	WAS	30	10	1	0	0.8	0.6	6.9	0.1	0.0	0.1	0.7	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Sam Howell QB • DAL	@NYG	27	14	1	1	1.5	0.9	9.6	0.1	0.0	0.2	0.9	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Seth McGowan RB • IND	BAL	20	13	8	1	0.0	0.0	0.0	0.0	0.0	1.9	7.6	0.1	0.2	0.1	1.4	0.0	0.0	0.60
+
+ 
+	W (9/10)	Kyle McCord QB • MIA	@LV	14	6	1	1	0.8	0.6	5.8	0.1	0.0	0.1	0.4	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Joe Flacco QB • CIN	TB	31	6	2	1	1.5	1.0	10.4	0.1	0.0	0.2	0.9	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Ollie Gordon II RB • MIA 	@LV	19	6	3	1	0.0	0.0	0.0	0.0	0.0	1.8	4.2	0.1	0.1	0.1	0.2	0.0	0.0	0.60
+
+ 
+	W (9/10)	Isaiah Davis RB • NYJ 	@TEN	14	13	2	1	0.0	0.0	0.0	0.0	0.0	1.9	10.5	0.1	0.6	0.4	4.3	0.0	0.0	0.60
+
+ 
+	W (9/10)	Jalon Daniels QB • TB	@CIN	20	10	1	1	1.0	0.6	7.3	0.1	0.0	0.1	0.7	0.0	0.0	0.0	0.0	0.0	0.0	0.60
+
+ 
+	W (9/10)	Dylan Laube RB • LV	MIA	27	13	1	1	0.0	0.0	0.0	0.0	0.0	3.1	7.7	0.1	0.6	0.4	2.8	0.0	0.3	0.30
+
+ 
+	W (9/10)	Marcus Mariota QB • WAS 	@PHI	11	7	2	1	2.7	1.5	17.3	0.1	0.1	0.1	0.3	0.0	0.0	0.0	0.0	0.0	0.0	0.30
+
+ 
+	W (9/10)	Mac Jones QB • SF	@LAR	15	8	3	1	1.3	0.9	9.3	0.1	0.1	0.3	1.1	0.0	0.0	0.0	0.0	0.0	0.0	0.30
+
+ 
+	W (9/10)	Omar Bayless WR • KC	DEN	3	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kareem Hunt RB • KC 	DEN	2	5	2	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Willie Johnson WR • JAC	CLE	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Marcus Yarns RB • NO	@DET	9	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gary Chambers WR • BUF	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sam Wiglusz WR • LAR	SF	16	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trevon Clark WR • BAL	@IND	25	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Riley Nowakowski TE • PIT	ATL	3	9	1	1	0.0	0.0	0.0	0.0	0.0	0.2	1.1	0.0	0.1	0.1	0.5	0.0	0.0	0.00
+
+ 
+	W (9/10)	Danny Etling QB • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kobe Hudson WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Graham Mertz QB • HOU 	BUF	10	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Jacobson TE • NO	@DET	21	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Anthony Miller WR • BAL	@IND	25	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sam Pinckney WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Chevan Cordeiro QB • SEA	NE	8	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ja'seem Reed WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ahmani Marshall RB • CAR	CHI	17	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Marquez Valdes-Scantling WR • DAL	@NYG	24	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gary Brightwell RB • CIN	TB	22	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bryan Thompson WR • BUF	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nyheim Miller-Hines RB • NO	@DET	9	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ronnie Rivers RB • LAR	SF	21	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dallen Bentley TE • DEN	@KC	4	10	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.9	0.7	5.5	0.0	0.0	0.00
+
+ 
+	W (9/10)	Cephus Johnson III WR • TB	@CIN	2	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	John Wolford QB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Rysen John TE • CHI	@CAR	19	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nolan Givan TE • DET	NO	16	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kennedy Brooks RB • PHI	WAS	28	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kelly Akharaiyi WR • ARI	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Anthony Tyus III RB • CAR	CHI	17	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tahj Washington WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bryce Perkins QB • CAR	CHI	28	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Malik McClain WR • NYJ	@TEN	29	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Noah Gindorff TE • PIT	ATL	3	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Drake Dabney TE • GB	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	James Butler RB • LV	MIA	27	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	JaQuae Jackson WR • LAC	ARI	15	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sandro Platzgummer RB • NYG	DAL	24	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trey Palmer WR • NO	@DET	30	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	John Hall WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kelly Bryant QB • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Anthony Torres TE • LAR 	SF	24	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Patrick Ricard RB • NYG	DAL	24	8	1	1	0.0	0.0	0.0	0.0	0.0	0.3	1.2	0.0	0.4	0.2	1.5	0.0	0.0	0.00
+
+ 
+	W (9/10)	James Morgan QB • ARI	@LAC	3	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dorian Thompson-Robinson QB • PHI	WAS	30	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Thomas Ives WR • CHI	@CAR	13	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Louis Rees-Zammit RB • JAC	CLE	16	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Makai Polk WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Artayvious Lynn TE • DAL	@NYG	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Britain Covey WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ben DiNucci QB • DEN	@KC	9	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Marcus Santos-Silva TE • CLE	@JAC	26	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dalyn Williams QB • CHI	@CAR	7	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jacob Sirmon QB • CLE	@JAC	16	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Taj McGowan RB • JAC	CLE	16	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isaiah McKoy WR • IND	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brandon Lewis WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Thayer Thomas WR • DEN	@KC	9	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kalil Pimpleton WR • NYG	DAL	32	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Carter Bradley QB • JAC 	CLE	4	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Coleman Owen WR • IND 	BAL	23	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Emari Demercado RB • DAL	@NYG	29	14	3	1	0.0	0.0	0.0	0.0	0.0	1.9	14.8	0.0	0.4	0.3	2.4	0.0	0.0	0.00
+
+ 
+	W (9/10)	Bryson Nesbit TE • MIN 	GB	15	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Austin Reed QB • BAL	@IND	19	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nathan Rourke QB • ATL	@PIT	26	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ryan Williams QB • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Nick DeGennaro WR • NE	@SEA	6	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lideatrick Griffin WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Taye Barber WR • TB	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Odieu Hiliare WR • ATL	@PIT	27	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Derek Carr QB • NO 	@DET	23	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jeremiah Franklin TE • MIA	@LV	8	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Leon Johnson III WR • LAC	ARI	15	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Hayden Hurst TE • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaray Jenkins WR • PIT	ATL	22	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dan Chisena WR • CAR 	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Hunter Renfrow WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jonathan Adams Jr. WR • DET	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kenji Bahar QB • BAL	@IND	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jacob Breeland TE • BAL	@IND	22	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brenden Bates TE • CLE 	@JAC	26	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bailey Zappe QB • NYJ	@TEN	24	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cameron Camper WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brandon Peters QB • LAC	ARI	21	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jared Scott TE • IND	BAL	5	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Moliki Matavao TE • NO 	@DET	21	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Stephen Guidry WR • DAL	@NYG	24	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Pratt QB • TB	@CIN	20	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kyle Sloter QB • JAC	CLE	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DJ Uiagalelei QB • LAC	ARI	21	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Devonte Ross WR • LAC	ARI	15	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Petaia TE • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Shaquan Davis WR • PIT	ATL	22	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Daniel Sobkowicz WR • HOU	BUF	8	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Colby Suits QB • NYJ	@TEN	24	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Raheem Mostert RB • LV 	MIA	27	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Deven Thompkins WR • LV	MIA	19	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalen Wayne WR • GB	@MIN	1	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Erik Ezukanma WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nick Muse TE • ATL	@PIT	29	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jack Plummer QB • CAR	CHI	28	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isaiah Searight TE • NYG	DAL	11	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kevin Foelsch TE • PIT	ATL	3	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Grayson Gunter TE • JAC	CLE	14	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Drew Estrada WR • HOU	BUF	8	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Montrell Washington WR • HOU	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chris Brazzell II WR • CAR 	CHI	31	5	2	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Khalan Laborn RB • SF	@LAR	12	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Dom Wood-Anderson TE • SEA	NE	17	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jibri Blount TE • MIA	@LV	8	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	John Kelly RB • CLE	@JAC	5	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dontae Fleming WR • MIN 	GB	20	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Goodson RB • ATL	@PIT	4	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Daewood Davis WR • CAR	CHI	31	5	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Bryant Koback RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Teddy Bridgewater QB • DET 	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Keaontay Ingram RB • KC	DEN	2	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sincere McCormick RB • SF	@LAR	12	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	John Raine TE • ATL	@PIT	29	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Papi White WR • TEN	NYJ	17	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cam Ross WR • DEN	@KC	9	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Cameron Dorner WR • NE	@SEA	6	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Logan Woodside QB • ARI	@LAC	3	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Malcome Kennedy WR • NO	@DET	30	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	David Durden WR • DAL	@NYG	24	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Dyer RB • LV	MIA	27	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Davis Cheek QB • CAR	CHI	28	5	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Deon Cain WR • BUF	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	John Hurst WR • IND	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trey Sermon RB • ATL 	@PIT	4	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	E.J. Perry QB • JAC	CLE	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Travis Toivonen WR • MIN	GB	20	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Moore WR • CIN	TB	14	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jack Velling TE • ATL	@PIT	29	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kazmeir Allen WR • WAS	@PHI	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Thomas Gordon TE • DET	NO	16	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Darion Clark TE • CHI	@CAR	19	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Austin Watkins Jr. WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Quartney Davis WR • IND	BAL	23	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	K.J. Hamler WR • BUF	@HOU	7	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Hal Presley WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Vinny Anthony II WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Simmons WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Henry Litwin WR • CHI	@CAR	13	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	K.J. Costello QB • NO	@DET	23	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Seth Henigan QB • IND	BAL	22	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tavonn Salter WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kyle Allen QB • BUF	@HOU	2	7	1	1	0.9	0.4	5.1	0.0	0.0	0.2	0.1	0.0	0.0	0.0	0.0	0.0	0.0	0.00
+
+ 
+	W (9/10)	Tim Jones WR • JAC	CLE	11	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ben Sims TE • MIA 	@LV	8	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Luke Musgrave TE • GB 	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Max Duggan QB • LAC	ARI	21	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Robert Henry Jr. RB • WAS	@PHI	23	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Landon Parker WR • IND	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nick Easley WR • BUF	@HOU	7	7	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Javon Baker WR • SF	@LAR	28	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Montrell Johnson Jr. RB • CAR	CHI	17	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Seth Williams WR • LV	MIA	19	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Graham Adomitis TE • IND	BAL	5	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	A.J. Henning WR • MIA	@LV	21	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brevin Easton WR • JAC	CLE	11	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nate Noel RB • IND	BAL	20	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Desmond Ridder QB • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chase Harrell TE • SF	@LAR	12	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Andrew Peasley QB • NYJ	@TEN	24	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DeVonte Dedmon WR • MIA	@LV	21	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josiah Deguara TE • NYG	DAL	11	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jamal Pettigrew TE • LAR	SF	24	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mike White QB • CAR	CHI	28	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Reggie White Jr. WR • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Giles Jackson WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Riley Leonard QB • IND	BAL	22	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Adam Randall RB • BAL 	@IND	11	13	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brandin Cooks WR • BUF	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Khalil Dinkins TE • SF	@LAR	12	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jhamon Ausbon WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jeff Wilson RB • MIA	@LV	19	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DeAndre Thompkins WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DJ Giddens RB • IND	BAL	20	13	3	1	0.0	0.0	0.0	0.0	0.0	1.9	7.2	0.0	0.1	0.1	0.6	0.0	0.0	0.00
+
+ 
+	W (9/10)	Avery Davis WR • DET	NO	5	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Phillip Dorsett WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Avery Williams RB • NYJ	@TEN	14	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	T.J. Luther WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dan Villari TE • LAR	SF	24	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Devin Neal RB • NO 	@DET	9	8	2	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Max Hurleman RB • PIT	ATL	15	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Shawn Poindexter WR • SF	@LAR	28	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Andy Isabella WR • SF 	@LAR	28	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jeff Weimer WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Snead WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Reynolds WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Levi Lewis QB • SEA	NE	8	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Blake Proehl WR • MIN	GB	20	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bryce Ford-Wheaton WR • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Neil Pau'u WR • BUF	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Naz Bohannon TE • JAC	CLE	14	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nick Chubb RB • HOU	BUF	26	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Eric Rivers WR • TB	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sean Ryan WR • BAL	@IND	25	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Phillip Brooks WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Khadarel Hodge WR • SF	@LAR	28	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Rodney Anderson RB • CIN	TB	22	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Irvin Charles WR • SEA 	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kurtis Rourke QB • SF 	@LAR	15	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chris Finke WR • CHI	@CAR	13	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Thomas Sperbeck WR • TB	@CIN	2	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isaac Zico WR • ARI	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kaden Davis WR • CHI	@CAR	13	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Kyle Dixon WR • NE	@SEA	6	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zavier Scott RB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Juwan Green WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cody Chrest WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalen Morton QB • IND	BAL	22	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dare Ogunbowale RB • LV	MIA	27	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jashaun Corbin RB • DAL	@NYG	29	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tommy Mellott WR • NO	@DET	30	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Eli Pancol WR • IND	BAL	23	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jake Hausmann TE • WAS	@PHI	1	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Rico Bussey WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Damien Alford WR • NO 	@DET	30	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trayveon Williams RB • DET	NO	18	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jamal Haynes RB • CIN	TB	22	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Seydou Traore TE • MIA	@LV	8	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.8	0.6	5.5	0.0	0.0	0.00
+
+ 
+	W (9/10)	Danny Gray WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mason Stokke RB • CAR	CHI	17	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Garett Maag WR • MIN	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Joshua Cephus WR • JAC	CLE	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Riley Sharp TE • BAL	@IND	22	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cole Kelley QB • WAS	@PHI	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Hassan Hall RB • ARI	@LAC	6	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Luke Wysong WR • MIN 	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ian Thomas TE • LV	MIA	27	13	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.7	0.7	5.8	0.0	0.0	0.00
+
+ 
+	W (9/10)	Stone Smartt TE • NO	@DET	21	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Eric Dungey QB • CIN	TB	31	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brayden Willis TE • SF	@LAR	12	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Stephen Gosnell WR • BUF	@HOU	7	7	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trevion Thompson WR • TEN	NYJ	17	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Pierre Strong Jr. RB • GB	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaylen Johnson WR • LAC	ARI	15	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Golden Tate WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jarveon Howard RB • BUF	@HOU	10	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Messiah Swinson TE • GB	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Amari Cooper WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyrell Shavers WR • BUF 	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Winston Wright Jr. WR • CLE	@JAC	18	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Damien Caffrey TE • CHI	@CAR	19	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	EJ Smith RB • KC 	DEN	2	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	John FitzPatrick TE • GB 	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Darius Lassiter WR • JAC	CLE	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Camerun Peoples RB • CAR	CHI	17	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cornell Powell WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Jaren Hall QB • SEA	NE	8	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isi Sofele RB • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Jaelon Darden WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jeremiah Hall TE • NYG	DAL	11	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Julius Chestnut RB • TEN	NYJ	32	9	1	1	0.0	0.0	0.0	0.0	0.0	0.9	3.5	0.0	0.0	0.0	0.1	0.0	0.0	0.00
+
+ 
+	W (9/10)	Trent Sherfield WR • BUF	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Caullin Lacy WR • NYJ 	@TEN	29	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	ZaQuandre White RB • MIA	@LV	19	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nelson Agholor WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Devin Ross WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isaiah Washington WR • BAL	@IND	25	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Steven Stilianos TE • DET	NO	16	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Cameron Latu TE • NE	@SEA	20	11	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.3	0.3	2.8	0.0	0.0	0.00
+
+ 
+	W (9/10)	Markese Stepp RB • NYJ	@TEN	14	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Emeka Emezie WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Savion Williams WR • GB 	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Deshaun Fenwick RB • GB	@MIN	7	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trent Taylor WR • SF	@LAR	28	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Antonio Brown WR • TB	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Joshua Kelley RB • TEN	NYJ	32	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Khalil McClain WR • MIA	@LV	21	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Hassan Haskins RB • NE	@SEA	3	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zack Annexstad QB • TB	@CIN	20	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Alex Wesley WR • CHI	@CAR	13	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Kelly WR • HOU	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Grant DuBose WR • BUF 	@HOU	7	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mitchell Tinsley WR • HOU	BUF	8	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Marcedes Lewis TE • DEN	@KC	4	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dayton Wade WR • BAL	@IND	25	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Hendon Hooker QB • TEN	NYJ	25	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gunner Olszewski WR • NYG 	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Pat Conroy TE • LV	MIA	27	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Frank Gore Jr. RB • BUF	@HOU	10	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gus Edwards RB • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Aidan Robbins RB • CLE	@JAC	5	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Samori Toure WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nick Stevens QB • DEN	@KC	9	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Connor Wedington WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Emanuel Hall WR • WAS	@PHI	4	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gavin Hardison QB • MIA	@LV	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Noah Thomas WR • CIN	TB	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Connor Hulstein TE • NYJ 	@TEN	23	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kejon Owens RB • MIN 	GB	13	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Casey Bauman QB • LAC	ARI	21	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Ellis RB • CIN	TB	22	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	JJ Howland TE • TB	@CIN	32	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tahj Brooks RB • CIN	TB	22	6	1	1	0.0	0.0	0.0	0.0	0.0	1.5	5.0	0.0	0.1	0.1	0.7	0.0	0.0	0.00
+
+ 
+	W (9/10)	Reggie Virgil WR • ARI	@LAC	10	14	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	0.8	0.6	8.1	0.0	0.0	0.00
+
+ 
+	W (9/10)	Stephen Carlson TE • CHI	@CAR	19	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Tommy DeVito QB • NE	@SEA	6	11	1	1	1.1	0.8	8.3	0.0	0.0	0.3	1.1	0.0	0.0	0.0	0.0	0.0	0.0	0.00
+
+ 
+	W (9/10)	Nsimba Webster WR • CHI	@CAR	13	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Geor'quarius Spivey TE • KC	DEN	18	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Barika Kpeenu RB • TB	@CIN	30	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Justin Tukes TE • PHI	WAS	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jenson Stoshak WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Patrick Taylor RB • SF 	@LAR	12	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kalif Jackson TE • MIA	@LV	8	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Austin Allen TE • GB	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dennis Houston WR • TB 	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jon'Vea Johnson WR • CHI	@CAR	13	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Xavier Restrepo WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kenneth Harper RB • NYG	DAL	24	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ben Bryant QB • NYJ	@TEN	24	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nick Williams WR • DEN	@KC	9	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	K.J. Osborn WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bernhard Seikovits TE • ARI	@LAC	9	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Alec Ingold RB • LAC	ARI	31	7	1	1	0.0	0.0	0.0	0.0	0.0	0.5	1.4	0.0	0.4	0.3	2.7	0.0	0.0	0.00
+
+ 
+	W (9/17)	Ricky Person Jr. RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brevin Jordan TE • HOU 	BUF	2	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nate Sudfeld QB • SF	@LAR	15	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Pearson WR • TB	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Hamze El-Zayat WR • NYJ	@TEN	29	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jonathan Duhart WR • DET	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Peyton Hendershot TE • KC	DEN	18	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Taylor Elgersma QB • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cyrus Allen WR • KC 	DEN	3	5	19	1	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	0.7	0.6	6.9	0.0	0.0	0.00
+
+ 
+	W (9/10)	Trey Benson RB • ARI 	@LAC	6	14	2	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Connor Bazelak QB • TB	@CIN	20	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ke'Shawn Vaughn RB • SF	@LAR	12	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nay'Quan Wright RB • IND	BAL	20	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Keith Towbridge TE • WAS	@PHI	1	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DeAndre Hopkins WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lucas Scott RB • BAL	@IND	11	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Felix Harper QB • CLE	@JAC	16	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dedrick Mills RB • DET	NO	18	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zach Pascal WR • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Antoine Green WR • DET	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Robert Tonyan TE • PIT	ATL	3	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Waters RB • LAR	SF	21	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	B.J. Baylor RB • ATL	@PIT	4	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trent Pennix RB • IND	BAL	20	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cam Johnson WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Amar Johnson RB • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ronnie Brown RB • TB	@CIN	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Myles Montgomery RB • NE 	@SEA	3	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DJ Turner WR • HOU 	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	CJ Donaldson RB • NO	@DET	9	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ty Fryfogle WR • KC	DEN	3	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ameer Abdullah RB • JAC	CLE	16	7	1	1	0.0	0.0	0.0	0.0	0.0	0.9	3.7	0.0	0.5	0.4	2.9	0.0	0.0	0.00
+
+ 
+	W (9/10)	Dez Fitzpatrick WR • LAC 	ARI	15	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mark Vital TE • KC	DEN	18	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brady Boyd WR • JAC	CLE	11	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Scott Orndoff TE • PHI	WAS	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dane Key WR • DEN	@KC	9	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Daniel Jackson WR • HOU	BUF	8	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Devon Ramsay RB • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Detrich Clark WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gerrit Prince TE • KC	DEN	18	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Matt Corral QB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	LaQuvionte Gonzalez WR • LAR	SF	16	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kalel Mullings RB • TEN	NYJ	32	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Mims RB • PHI	WAS	28	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jerjuan Newton WR • DEN	@KC	9	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ontaria Wilson WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Shaq Roland WR • CHI	@CAR	13	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Thyrick Pitts WR • GB	@MIN	1	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Andrew Armstrong WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ben Yurosek TE • MIN 	GB	15	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tanner McLachlan TE • SF 	@LAR	12	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyree Jackson TE • WAS	@PHI	1	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Daniel Arias WR • ARI	@LAC	10	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Tamorrion Terry WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Brock Lampe RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dillon Johnson RB • CAR	CHI	17	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ife Adeyi WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kamryn Pettway RB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jamoi Mayes WR • CIN	TB	14	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	De'Quan Hampton WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Aaron Anderson WR • CLE 	@JAC	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Hayden Hatten WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jamaal Williams RB • NO	@DET	9	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Austin Stogner TE • ATL	@PIT	29	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Demetris Robertson WR • SEA	NE	12	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mitch Van Vooren TE • DAL	@NYG	6	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Cody White WR • SEA	NE	12	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nick Eubanks TE • IND	BAL	5	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tucker Fisk TE • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Clayton Tune QB • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Camren McDonald TE • LAR	SF	24	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Hunter Luepke RB • DAL	@NYG	29	14	1	1	0.0	0.0	0.0	0.0	0.0	1.1	5.6	0.0	0.6	0.5	4.0	0.0	0.0	0.00
+
+ 
+	W (9/10)	Trevor Siemian QB • ATL	@PIT	26	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Deion Hankins RB • CHI	@CAR	25	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jose Barbon WR • DAL	@NYG	24	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cortez Braham Jr. WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tanner Morgan QB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tru Edwards WR • LAR	SF	16	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jermar Jefferson RB • MIN 	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Branden Mack WR • DEN	@KC	9	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Thomas Hennigan WR • MIN	GB	20	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jacob Harris TE • TB	@CIN	32	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dominic Lovett WR • DET	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Aleva Hifo WR • ARI	@LAC	10	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Felton Davis WR • KC	DEN	3	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nate Wieting TE • NYG	DAL	11	8	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Drew Allar QB • PIT	ATL	17	9	3	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	A.J. Rose RB • LAR	SF	21	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Aaron Dykes RB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dai'Jean Dixon WR • NO	@DET	30	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	C.J. Conrad TE • NYG	DAL	11	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	John Jackson III WR • CHI	@CAR	13	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Tyler Gaffney RB • NE	@SEA	3	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ryan Becker TE • ATL	@PIT	29	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DT Sheffield WR • NYJ 	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Christian Sims TE • LAR	SF	24	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Phillip Sims QB • SEA	NE	8	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Donte Sylencieux WR • BAL	@IND	25	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Le'Veon Moss RB • MIA	@LV	19	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DeAndre Carter WR • CLE	@JAC	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Adrian Martinez QB • SF	@LAR	15	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Blayne Taylor WR • IND	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Malik Williams WR • BUF	@HOU	7	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mathew Sexton WR • MIA	@LV	21	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	George Aston RB • NYG	DAL	24	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Travis Dye RB • NYJ	@TEN	14	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaquarii Roberson WR • LAR	SF	16	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Antonio Gibson RB • NE	@SEA	3	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dalevon Campbell WR • LAC 	ARI	15	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Jake Bobo WR • SEA 	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jody Fortson TE • KC	DEN	18	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Stanley Morgan WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Darnell Holland RB • NO	@DET	9	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jerome Kapp WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Will Pauling WR • SF	@LAR	28	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kekoa Crawford WR • KC	DEN	3	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	R.J. Starkey WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Matt Landers WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mike Harley WR • MIA	@LV	21	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	River Cracraft WR • WAS 	@PHI	4	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Samson Nacua WR • NO	@DET	30	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Hayden Large TE • CHI 	@CAR	19	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaylen Jones WR • LAC	ARI	15	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gee Scott Jr. TE • NYJ 	@TEN	23	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Leddie Brown RB • LAC	ARI	31	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gerrid Doaks RB • HOU	BUF	26	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	British Brooks RB • HOU 	BUF	26	8	1	1	0.0	0.0	0.0	0.0	0.0	1.7	8.8	0.0	0.0	0.0	0.2	0.0	0.0	0.00
+
+ 
+	W (9/10)	Bryant Mitchell WR • TB	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Thomas Odukoya TE • NE	@SEA	20	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Patrick Gurd TE • LV	MIA	27	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brett Rypien QB • HOU	BUF	10	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cade McDonald WR • CLE	@JAC	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalen Moreno-Cropper WR • NO	@DET	30	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Bly WR • NYG	DAL	32	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Dereus WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jha'Quan Jackson WR • TB	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Anthony Norris TE • DEN	@KC	4	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Courtney Jackson WR • TEN	NYJ	17	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kyle Trask QB • CAR	CHI	28	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Aron Cruickshank WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jamie Newman QB • PHI	WAS	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Malachi Carter WR • CIN	TB	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Xazavian Valladay RB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lance Mason TE • PIT	ATL	3	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	B.J. Catalon RB • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Max Brosmer QB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nathaniel Peat RB • DAL	@NYG	29	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Matt Sokol TE • PIT	ATL	3	9	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Rivaldo Fairweather TE • ARI	@LAC	9	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Taylor Grimes WR • DEN	@KC	9	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Scotty Washington TE • BAL	@IND	22	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Donovan Edwards RB • MIA	@LV	19	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Boyd WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Johnnie Dixon WR • DAL	@NYG	24	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Taylor Morin WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mecole Hardman WR • BUF	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Durham Smythe TE • BAL	@IND	22	13	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.8	0.5	4.7	0.0	0.0	0.00
+
+ 
+	W (9/10)	TJ Pledger RB • ARI	@LAC	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Rashad Rochelle WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Albert Okwuegbunam TE • LV	MIA	27	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Greg Bell RB • PIT	ATL	15	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Kevin Kassis WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	CJ Verdell RB • IND	BAL	20	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Devin Duvernay WR • ARI	@LAC	10	14	1	1	0.0	0.0	0.0	0.0	0.0	1.0	4.9	0.0	1.1	0.6	5.5	0.0	0.0	0.00
+
+ 
+	W (9/10)	Ryan Aplin QB • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ajou Ajou WR • IND	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Justin Lockhart WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Octavian Smith Jr. WR • BAL	@IND	25	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Noah Gray TE • KC	DEN	18	5	1	1	0.0	0.0	0.0	0.0	0.0	0.0	-0.1	0.0	1.2	0.8	7.0	0.0	0.0	0.00
+
+ 
+	W (9/10)	Parris Campbell WR • DAL	@NYG	24	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Demetric Felton RB • WAS	@PHI	23	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Shaun Beyer TE • GB	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brittain Brown RB • CHI 	@CAR	25	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Elijah Dotson RB • ATL	@PIT	4	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ty Chandler RB • NO 	@DET	9	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Adam Choice RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isaiah Spiller RB • LV	MIA	27	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chris Collier RB • LV 	MIA	27	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Titus Swen RB • IND	BAL	20	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyrion Davis-Price RB • GB	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Teagan Quitoriano TE • ARI	@LAC	9	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kyle Sheets WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sone Ntoh RB • BAL	@IND	11	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bryce Oliver WR • TEN 	NYJ	17	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	TJ Sheffield WR • TEN	NYJ	17	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DaRon Brown WR • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Keelan Marion WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Juwann Winfree WR • HOU	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Shermari Jones RB • CIN	TB	22	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	John Rhys Plumlee WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	LaVance Taylor RB • KC	DEN	2	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Elijah Tau-Tolliver RB • BAL	@IND	11	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Praise Olatoke WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Hakeem Butler TE • DEN	@KC	4	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Matt Colburn RB • JAC	CLE	16	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Milton Williams WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Xavier Gipson WR • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Wiley RB • TB	@CIN	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Pete Guerriero RB • PIT	ATL	15	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nikko Remigio WR • KC	DEN	3	5	1	1	0.0	0.0	0.0	0.0	0.0	0.1	1.2	0.0	0.7	0.6	7.9	0.0	0.0	0.00
+
+ 
+	W (9/10)	Dylan Drummond WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Matthew Caldwell QB • LAR 	SF	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Andre Miller WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kenzel Doe WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Louis Hansen TE • HOU	BUF	2	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	D'Wayne Eskridge WR • MIA	@LV	21	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Allen Lazard WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Luke Floriea WR • CLE	@JAC	18	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nick Guggemos TE • BUF	@HOU	10	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Neville TE • DAL	@NYG	6	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jason Bean QB • IND	BAL	22	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ethan Conner TE • MIA	@LV	8	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sterling Shepard WR • HOU	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	James Proche WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Caden Prieskorn TE • CAR	CHI	13	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Xavier Loyd WR • KC	DEN	3	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Shawn Bowman TE • ARI	@LAC	9	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Ty Scott WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalen Jackson RB • JAC	CLE	16	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Joseph Ngata WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaylon Moore WR • JAC	CLE	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Kobe Lewis RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dillon Gabriel QB • CLE 	@JAC	16	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Xavier White WR • IND	BAL	23	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tim Brown TE • TB	@CIN	32	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ethan Garbers QB • CAR	CHI	28	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Quez Watkins WR • PHI	WAS	26	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jake Fromm QB • DET	NO	5	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ronald Awatt RB • SF	@LAR	12	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	D'Ernest Johnson RB • TEN	NYJ	32	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Noah Brown WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ahmarean Brown WR • BUF	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zaire Mitchell-Paden TE • HOU	BUF	2	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Young Jr. WR • HOU	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Keleki Latu TE • BUF	@HOU	10	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Cameron Scarlett RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bobo Beathard WR • ARI	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Steven Sims WR • ARI	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Love QB • CAR	CHI	28	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chris Oladokun QB • KC 	DEN	12	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Russell Wilson QB • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Abram Smith RB • MIN	GB	13	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Taysom Hill QB,TE • NO	@DET	21	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jermaine Burton WR • CIN	TB	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jeff Caldwell WR • KC 	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zach Davidson TE • NYG	DAL	11	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mike Strachan WR • WAS	@PHI	4	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brayden Lenius TE • ATL	@PIT	29	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Raylen Sharpe WR • IND	BAL	23	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ben Patterson WR • CLE	@JAC	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jamison Crowder WR • WAS	@PHI	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ja'Corey Brooks WR • WAS	@PHI	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Holton Ahlers QB • SEA	NE	8	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Reese WR • PHI	WAS	26	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Malik Knowles WR • SF	@LAR	28	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Manny Wilkins QB • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalen Royals WR • KC	DEN	3	5	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	0.7	0.6	5.9	0.0	0.0	0.00
+
+ 
+	W (9/10)	Jeret Smith WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Corey Rucker WR • LV 	MIA	19	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cortrelle Simpson WR • TB	@CIN	2	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Trigg TE • DAL	@NYG	6	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	ShunDerrick Powell RB • KC	DEN	2	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Braxton Burmeister WR • LAR	SF	16	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Julian Hill TE • NE 	@SEA	20	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sy Barnett WR • NO	@DET	30	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Elijah Cooks WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Harper WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Savon Scarver WR • CHI	@CAR	13	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	David Sills WR • TB 	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kylen Granson TE • TEN	NYJ	25	9	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.0	0.6	5.2	0.0	0.0	0.00
+
+ 
+	W (9/17)	Deneric Prince RB • NE	@SEA	3	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Key'Shawn Smith WR • KC	DEN	3	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cary Angeline TE • PHI	WAS	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Erik Krommenhoek TE • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Luke Benson TE • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaxon Janke WR • HOU	BUF	8	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jakob Johnson RB • HOU	BUF	26	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Reid Sinnett QB • CIN	TB	31	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Nick Vannett TE • SEA	NE	17	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Briscoe WR • MIN	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dontay Demus Jr. WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalin Conyers TE • MIA	@LV	8	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Monaray Baldwin WR • MIA	@LV	21	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Justin Shorter TE • LV 	MIA	27	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	C.J. Uzomah TE • PHI	WAS	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chris Blair WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kyle Philips WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mason Tipton WR • NO 	@DET	30	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Zach D'Orazio WR • NE	@SEA	6	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalen Williams WR • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Antonio Nunn WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Alfonzo Graham RB • PIT	ATL	15	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Terry Wright WR • MIA	@LV	21	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Scooter Harrington TE • CHI	@CAR	19	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Jaylen Smith WR • SEA	NE	12	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bug Howard WR • TB	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Thomas Greaney TE • CLE	@JAC	26	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Kahmann WR • IND	BAL	23	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Deontez Alexander WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Carlos Washington Jr. RB • MIA	@LV	19	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Julian Hicks WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jared Wiley TE • KC	DEN	18	5	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.7	0.6	4.8	0.0	0.0	0.00
+
+ 
+	W (9/10)	Irv Smith TE • HOU 	BUF	2	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Johnny Johnson III WR • HOU	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dante Miller RB • NYG 	DAL	24	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Curtis Samuel WR • BUF	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Brady Russell RB • SEA	NE	1	11	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.00
+
+ 
+	W (9/10)	Royce Freeman RB • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ainias Smith WR • CAR 	CHI	31	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lachlan Pitts TE • CHI	@CAR	19	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Shedrick Jackson WR • LV	MIA	19	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Carl Tucker TE • MIA	@LV	8	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Calvin Tyler Jr. RB • CIN	TB	22	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jackson Acker RB • BUF	@HOU	10	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Devonte Robinson WR • GB	@MIN	1	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalen Reagor WR • MIA	@LV	21	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Austin Fort TE • TEN	NYJ	25	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dimitri Stanley WR • GB	@MIN	1	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jacolby George WR • CAR	CHI	31	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Wortham WR • JAC	CLE	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Levi Wentz WR • PIT	ATL	22	9	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Elijah Sarratt WR • BAL	@IND	25	13	3	1	0.0	0.0	0.0	0.0	0.0	0.1	0.3	0.0	0.3	0.2	3.8	0.0	0.0	0.00
+
+ 
+	W (9/10)	Owen Wright RB • HOU	BUF	26	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tre'Shaun Harrison WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DJ Herman RB • MIA	@LV	19	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.00
+
+ 
+	W (9/10)	Brandon Allen QB • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Rakim Jarrett WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sean McKeon TE • IND 	BAL	5	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chase Curtis TE • NYJ 	@TEN	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	T.J. Rahming WR • MIA	@LV	21	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Travell Harris WR • CLE	@JAC	18	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brandon Bridge QB • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Oliver Martin WR • JAC	CLE	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Alex Gray TE • ATL	@PIT	29	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ja'Quinden Jackson RB • PHI 	WAS	28	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Ed Lee WR • NE	@SEA	6	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dalton Schoen WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brandon Aiyuk WR • SF 	@LAR	28	8	4	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Harvey Binford WR • IND	BAL	23	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Donovan Peoples-Jones WR • NO	@DET	30	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Athan Kaliakmanis QB • WAS	@PHI	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chad Kanoff QB • TB	@CIN	20	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brian Lewerke QB • NYG	DAL	32	8	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalon Calhoun WR • DET	NO	5	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Calvin Jackson Jr. WR • MIA	@LV	21	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Pharaoh Brown TE • IND	BAL	5	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jeremy Gallon WR • LV	MIA	19	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Akins TE • JAC	CLE	14	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	CJ Marable RB • NE	@SEA	3	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sam Pitz TE • BAL	@IND	22	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mataeo Durant RB • PIT	ATL	15	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cody Schrader RB • DEN	@KC	8	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cole Herdman TE • TEN	NYJ	25	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	JaMycal Hasty RB • NE	@SEA	3	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyson Bagent QB • CHI	@CAR	7	10	1	1	1.3	0.8	9.9	0.0	0.0	0.3	0.9	0.0	0.0	0.0	0.0	0.0	0.0	0.00
+
+ 
+	W (9/10)	Ben Beise TE • TB	@CIN	32	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Charles Holland WR • CIN	TB	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kolbe Katsis WR • DEN	@KC	9	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaydon Blue RB • PHI	WAS	28	10	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bruce Anderson RB • IND	BAL	20	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jake Browning QB • TB	@CIN	20	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dillon Bell WR • MIN	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kye Robichaux RB • DET 	NO	18	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	John Mitchell WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Micah Simon WR • CAR	CHI	31	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ellis Merriweather RB • GB	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brandon Johnson WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Marcus Green WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Daijun Edwards RB • PIT	ATL	15	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Tyrone Broden WR • SEA 	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Maurice Alexander WR • CHI	@CAR	13	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	John Michael Gyllenborg TE • KC 	DEN	18	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Clayton Thorson QB • NYG	DAL	32	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	RJ Maryland TE • GB 	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Alex McGough QB • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Beaux Collins WR • ATL 	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Miles Kitselman TE • DET 	NO	16	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dont'e Thornton Jr. WR • LV 	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Hudson WR • LAR	SF	16	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cole McDonald QB • ARI	@LAC	3	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trabis Ward RB • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Hokit RB • ARI	@LAC	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Quentin Moore TE • WAS 	@PHI	1	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Will Levis QB • TEN	NYJ	25	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Romello Brinson WR • DAL	@NYG	24	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Johnathon Johnson WR • WAS	@PHI	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lew Nichols RB • PIT	ATL	15	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isaac Guerendo RB • SF 	@LAR	12	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kay'ron Lynch-Adams RB • CAR	CHI	17	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Steve Ishmael WR • IND	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Garrett Walston TE • SF	@LAR	12	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalen Wydermyer TE • IND	BAL	5	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kadarius Calloway RB • TB 	@CIN	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dameon Pierce RB • PHI	WAS	28	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Devin Gray WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Geoff Swaim TE • CLE	@JAC	26	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Shae Wyatt WR • SF	@LAR	28	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Deonte Harty WR • BAL 	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Miles Davis RB • CAR	CHI	17	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Colson Yankoff TE • WAS	@PHI	1	7	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.1	1.3	0.0	0.0	0.00
+
+ 
+	W (9/10)	Ramon Jefferson RB • TB	@CIN	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	JoJo Ward WR • ARI	@LAC	10	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jared Wayne WR • HOU	BUF	8	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Whop Philyor WR • MIN	GB	20	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Garrett Nussmeier QB • KC	DEN	12	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Russell Gage WR • SF	@LAR	28	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Miles Boykin WR • CHI	@CAR	13	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Max Tomczak WR • BUF	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Jake Herslow WR • SEA	NE	12	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Collin Klein QB • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Malick Meiga WR • CAR 	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Marcus Riley WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	TaMerik Williams RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dareke Young WR • LV	MIA	19	13	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.4	0.2	3.0	0.0	0.0	0.00
+
+ 
+	W (9/10)	Darius Slayton WR • NYG	DAL	32	8	3	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tre' McKitty TE • WAS	@PHI	1	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Amba Etta-Tawo WR • HOU	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Skylar Thompson QB • BAL 	@IND	19	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Jalen Hurd WR • NE	@SEA	6	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jake Dolegala QB • MIA	@LV	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	J. Michael Sturdivant WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jahmal Banks WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Elijhah Badger WR • KC	DEN	3	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jake Roh TE • ATL	@PIT	29	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Darius Anderson RB • HOU	BUF	26	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Daje Johnson WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isaiah Wooden WR • CLE	@JAC	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Philip Rivers QB • IND	BAL	22	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	John Copenhaver TE • JAC	CLE	14	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gavin Holmes WR • TEN	NYJ	17	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DJ Thomas-Jones TE • PIT	ATL	3	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Patrick Murtagh TE • DEN	@KC	4	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Carson Towt TE • IND 	BAL	5	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	DK Kaufman RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tiyon Evans RB • CAR	CHI	17	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dylan Leonard TE • DEN	@KC	4	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Siaosi Mariner WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	John Stephens Jr. TE • DAL	@NYG	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Thaddeus Moss TE • CIN	TB	28	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bryson Green WR • ARI	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Roderick Daniels Jr. WR • NO	@DET	30	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zach Heins TE • LAC	ARI	31	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Alvin Kamara RB • NO 	@DET	9	8	37	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Max Bredeson TE • MIN	GB	15	6	1	1	0.0	0.0	0.0	0.0	0.0	0.2	1.0	0.0	0.1	0.1	0.5	0.0	0.0	0.00
+
+ 
+	W (9/10)	Jaden Smith WR • DAL	@NYG	24	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Aca'Cedric Ware RB • TB	@CIN	30	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Skyler Bell WR • BUF	@HOU	7	7	4	1	0.0	0.0	0.0	0.0	0.0	0.1	0.3	0.0	0.7	0.5	7.4	0.0	0.0	0.00
+
+ 
+	W (9/10)	Jonathon Rumph WR • NYJ	@TEN	29	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brenden Rice WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kris Leach TE • DEN	@KC	4	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Silas Bolden WR • HOU	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Miles Sanders RB • DAL	@NYG	29	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Terrill Davis WR • MIN	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isaac Rex TE • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tip Reiman TE • ARI 	@LAC	9	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jacoby Jones WR • WAS 	@PHI	4	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zion Bowens WR • WAS	@PHI	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kelvin Harmon WR • DAL	@NYG	24	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mason Pline TE • KC	DEN	18	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Keilahn Harris WR • PIT	ATL	22	9	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zach Ojile RB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Anthony Gould WR • IND	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kawaan Baker WR • GB	@MIN	1	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jamari Thrash WR • CLE 	@JAC	18	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tre Turner WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chris Pierce Jr. TE • CAR	CHI	13	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	CJ Dippre TE • TB	@CIN	32	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DJ Rogers TE • DAL 	@NYG	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	DeShon Williams TE • SEA	NE	17	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Carter Runyon TE • LV 	MIA	27	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dymere Miller WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Matthews WR • CAR	CHI	31	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DeVonte Christopher WR • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Damon Hazelton WR • HOU	BUF	8	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lucas Krull TE • DEN	@KC	4	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nick Nash WR • WAS	@PHI	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Milton Wright WR • LAC	ARI	15	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chris Tyree WR • NO	@DET	30	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dee Hart RB • FA	BYE	---	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jeremiah Haydel WR • LAR	SF	16	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Montel Harris RB • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	D.J. Montgomery WR • IND 	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Valentine Holmes RB • NYJ	@TEN	14	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sean Clifford QB • CIN	TB	31	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Williams-Lambert WR • CHI	@CAR	13	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chase Edmonds RB • WAS	@PHI	23	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Omari Evans WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Oscar Delp TE • NO 	@DET	21	8	2	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.8	0.6	6.5	0.0	0.0	0.00
+
+ 
+	W (9/10)	Adam Thielen WR • PIT 	ATL	22	9	2	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	JaVonta Payton WR • ARI	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kyron Hudson WR • CHI 	@CAR	13	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Audric Estime RB • NO	@DET	9	8	1	1	0.0	0.0	0.0	0.0	0.0	1.8	7.4	0.0	0.2	0.2	1.4	0.0	0.0	0.00
+
+ 
+	W (9/10)	DeVontres Dukes WR • DEN	@KC	9	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chase Litton QB • JAC	CLE	4	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jadon Janke WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Jam Miller RB • NE 	@SEA	3	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Latreal Jones WR • TB	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jeshaun Jones WR • MIN 	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Christion Jones WR • MIA	@LV	21	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	C.J. Beathard QB • DET	NO	5	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Troy Hairston II RB • CLE	@JAC	5	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Wayne Taulapapa RB • SEA	NE	1	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nate Carter RB • KC	DEN	2	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Drew Anderson QB • ARI	@LAC	3	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Jake Burt TE • NE	@SEA	20	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Justin Marshall WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nolan Henderson QB • BAL	@IND	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Austin Ekeler RB • WAS	@PHI	23	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ko Kieft TE • TB	@CIN	32	10	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.6	0.5	5.0	0.0	0.0	0.00
+
+ 
+	W (9/10)	Sam Ehlinger QB • DEN	@KC	9	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Kattus TE • CIN	TB	28	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Roman Hemby RB • LV	MIA	27	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Adam Prentice RB • DEN	@KC	8	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Allen Robinson WR • DET	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Johnson QB • CIN	TB	31	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Velus Jones Jr. RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ja'Lynn Polk WR • NO 	@DET	30	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Gallup WR • WAS	@PHI	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lujuan Winningham WR • JAC	CLE	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	James Mitchell TE • DAL	@NYG	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Salvon Ahmed RB • CHI	@CAR	25	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kevin Shaa WR • CHI	@CAR	13	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaelen Gill WR • CLE	@JAC	18	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jake Briningstool TE • KC	DEN	18	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Layne Pryor TE • HOU	BUF	2	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Marcus Major RB • BAL	@IND	11	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Austin Ramesh RB • ARI	@LAC	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Khalil Herbert RB • SF	@LAR	12	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DaMarkus Lodge WR • CIN	TB	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mario Williams WR • LAR 	SF	16	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Harrison Wallace III WR • ARI	@LAC	10	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sincere Brown WR • LAC 	ARI	15	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gage Larvadain WR • CLE	@JAC	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Johnny Mundt TE • PHI	WAS	30	10	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.8	0.4	4.8	0.0	0.0	0.00
+
+ 
+	W (9/17)	C.J. Johnson WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mac Hippenhammer WR • CIN	TB	14	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Noah Cain RB • CIN	TB	22	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jarquez Hunter RB • MIA	@LV	19	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Christian Wade RB • BUF	@HOU	10	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Austin Willis WR • DET	NO	5	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DeWayne McBride RB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Aaron Bailey WR • BAL	@IND	25	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Damon Bankston RB • NYG	DAL	24	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Austin Trammell WR • JAC	CLE	11	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Greg Dortch WR • DET	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tre Walker WR • BUF	@HOU	7	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Elijah Collins RB • CIN	TB	22	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jay Rome TE • PIT	ATL	3	9	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kole Taylor TE • CIN	TB	28	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Matt Lauter TE • MIN	GB	15	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Benny LeMay RB • CLE	@JAC	5	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Rashon Ceaser WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ronnie Bell WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tre Watson TE • MIA	@LV	8	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jeremy McNichols RB • WAS 	@PHI	23	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Drew Belcher TE • WAS	@PHI	1	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kendrick Law WR • DET 	NO	5	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Vann WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Haynes King QB • CAR 	CHI	28	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Maximilian Mang TE • NYG	DAL	11	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Charlie Taumoepeau TE • DET	NO	16	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Quintez Cephus WR • BUF	@HOU	7	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Behren Morton QB • NE	@SEA	6	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Xavier Guillory WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Anthony Smith WR • DAL	@NYG	24	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Taylor Heinicke QB • LAC	ARI	21	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jonathan Brady WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nate Stanley QB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Scott WR • LAR	SF	16	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	J.C. Copeland RB • NYJ	@TEN	14	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Chris Smith RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Carson Steele RB • PHI	WAS	28	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Johnny King WR • PHI	WAS	26	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trayvon Rudolph WR • MIN	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Pro Wells TE • CIN	TB	28	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Max Borghi RB • PIT	ATL	15	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Darius Cooper WR • PHI	WAS	26	10	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.1	0.0	0.7	0.6	7.3	0.0	0.0	0.00
+
+ 
+	W (9/10)	Joel Wilson TE • TEN	NYJ	25	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Reggie Brown WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mason Kinsey WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Rushawn Baker RB • NE	@SEA	3	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Osirus Mitchell WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Alec Holler TE • DAL	@NYG	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Evan Svoboda TE • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Easop Winston WR • NYJ	@TEN	29	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Master Teague III RB • PIT	ATL	15	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Joe Royer TE • CLE 	@JAC	26	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dontario Drummond WR • DAL	@NYG	24	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Montana Lemonious-Craig WR • PIT 	ATL	22	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Armanti Foreman WR • MIN	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cedrick Wilson Jr. WR • DET 	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Deion Burks WR • IND	BAL	23	13	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.2	0.0	0.8	0.6	8.3	0.0	0.0	0.00
+
+ 
+	W (9/10)	Liam Clifford WR • LAC	ARI	15	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Keenen Brown TE • HOU	BUF	2	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Ricky White III WR • SEA	NE	12	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Patrick Herbert TE • LAC	ARI	31	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zakhari Franklin WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chris Hilton Jr. WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lawrence Cager TE • WAS	@PHI	1	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tim DeMorat QB • WAS	@PHI	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Robbie Chosen WR • WAS	@PHI	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Corey Crooms Jr. WR • DAL	@NYG	24	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	John Lovett RB • PIT	ATL	15	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jack Stoll TE • CLE 	@JAC	26	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cody Hardy TE • NO	@DET	21	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jamal Agnew WR • ATL 	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sam Scott RB • NYJ 	@TEN	14	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DeAndre Torrey RB • PHI	WAS	28	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	C.J. Ham RB • MIN 	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Treyton Welch TE • NO	@DET	21	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Reggie Roberson Jr. WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Briley Moore-McKinney TE • TEN	NYJ	25	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Blake Watson RB • TEN	NYJ	32	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Toa Taua RB • CLE	@JAC	5	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Braydon Johnson WR • BUF	@HOU	7	7	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jake Haener QB • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Demario Richard RB • ATL	@PIT	4	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sean Modster WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brandon Hayes WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chandler Brayboy WR • JAC	CLE	11	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brett Gabbert QB • MIA	@LV	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Will Shipley RB • PHI	WAS	28	10	1	1	0.0	0.0	0.0	0.0	0.0	1.6	6.9	0.0	0.4	0.3	2.5	0.0	0.0	0.00
+
+ 
+	W (9/10)	Dustin Crum QB • KC	DEN	12	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Moore TE • IND	BAL	5	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DeAngelo Hardy WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Leonard Taylor TE • JAC	CLE	14	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaren Kanak TE • TEN 	NYJ	25	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dominique Dafney TE • CAR	CHI	13	5	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Carson Wentz QB • MIN 	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Jacob Warren TE • NE	@SEA	20	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lincoln Victor WR • DEN	@KC	9	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dallin Holker TE • NO	@DET	21	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Joseph Scates WR • JAC	CLE	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Terique Owens WR • SF	@LAR	28	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tanner Taula TE • TB	@CIN	32	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	AJ Dillon RB • CAR	CHI	17	5	3	1	0.0	0.0	0.0	0.0	0.0	1.8	9.8	0.0	0.2	0.2	1.5	0.0	0.0	0.00
+
+ 
+	W (9/10)	Kendric Pryor WR • CIN	TB	14	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Stevo Klotz TE • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kameron Brown WR • TB	@CIN	2	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	J'Mari Taylor RB • JAC	CLE	16	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kole Wilson WR • CLE	@JAC	18	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ty Pezza TE • BAL	@IND	22	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ben Johnson TE • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dean Connors RB • LAR	SF	21	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Warren Jackson WR • LAR	SF	16	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Christopher Ezeala RB • BAL	@IND	11	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jermaine Terry II TE • CLE	@JAC	26	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bailey Gaither WR • BAL	@IND	25	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Devante Davis WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DeeJay Dallas RB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Damion Jeanpiere WR • CAR	CHI	31	5	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jeff Foreman WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Travis Koontz TE • LV	MIA	27	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Murray TE • CHI	@CAR	19	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Justyn Ross WR • KC	DEN	3	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Harrison Bryant TE • SEA 	NE	17	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Anthony Hankerson RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tank Dell WR • HOU 	BUF	8	8	21	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Anderson Castle RB • IND	BAL	20	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Keric Wheatfall WR • PHI	WAS	26	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ulysses Bentley IV RB • IND	BAL	20	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Israel Abanikanda RB • DAL	@NYG	29	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Slade Bolden WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trishton Jackson WR • ARI	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaheim Bell TE • PIT	ATL	3	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tayvion Robinson WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ayir Asante WR • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	TJ Harden RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Griffin Hebert TE • PHI	WAS	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Matthew Henry WR • TB	@CIN	2	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Darece Roberson Jr. WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Casey Washington WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Will Mallory TE • IND 	BAL	5	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dean Patterson WR • TB	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ryan McDaniel WR • JAC	CLE	11	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Mabry TE • CAR 	CHI	13	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Keith Kirkwood WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tay Martin WR • DET	NO	5	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Rashod Owens WR • CIN	TB	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Changa Hodge WR • ARI	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Drew Biber TE • CLE	@JAC	26	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Tanner Arkin TE • NE	@SEA	20	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Heinrich Haarberg TE • CAR	CHI	13	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kevin Harris RB • JAC	CLE	16	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyshaun James WR • ATL	@PIT	27	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaaron Hayek WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Eli Stove WR • LAC	ARI	15	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jontre Kirklin WR • SF	@LAR	28	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Duece Watts WR • PIT	ATL	22	9	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Tyler Davis TE • NE	@SEA	20	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Donald Parham Jr. TE • PIT	ATL	3	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Keshunn Abram WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Theo Wease Jr. WR • LAC	ARI	15	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chase Roberts WR • LV 	MIA	19	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Otis Anderson RB • LAR	SF	21	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	CJ Williams WR • JAC	CLE	11	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Davis WR • MIA	@LV	21	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Travis Vokolek TE • ARI	@LAC	9	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Myles Gaskin RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jadon Haselwood WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chase Garbers QB • LV	MIA	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalen Virgil WR • BUF 	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	JJ Galbreath TE • IND	BAL	5	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Christian Trahan TE • CIN	TB	28	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Skyy Moore WR • GB 	@MIN	1	11	1	1	0.0	0.0	0.0	0.0	0.0	0.3	1.1	0.0	0.6	0.3	5.4	0.0	0.0	0.00
+
+ 
+	W (9/10)	Jalen McCleskey WR • NO	@DET	30	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	John Paddock QB • ATL	@PIT	26	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaleel McLaughlin RB • CLE	@JAC	5	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Will Dissly TE • LAC 	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kearis Jackson WR • HOU	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	De'Mornay Pierson-El WR • DEN	@KC	9	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Qadir Ismail TE • CHI	@CAR	19	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mike Boone RB • MIA	@LV	19	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Payton Thorne QB • CIN	TB	31	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Barion Brown WR • NO	@DET	30	8	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	0.8	0.6	8.6	0.0	0.0	0.00
+
+ 
+	W (9/17)	Xavier Turner RB • SEA	NE	1	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brock Rechsteiner WR • NO 	@DET	30	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Xavier Johnson WR • CIN	TB	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Devin Leary QB • BAL	@IND	19	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nick Brossette RB • DET	NO	18	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Diontae Johnson WR • CLE	@JAC	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Darius Clark RB • CAR	CHI	17	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Anthony Ratliff-Williams WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Derek Wright WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kyle Markway TE • LAR	SF	24	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ja'Mori Maclin WR • BUF	@HOU	7	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lincoln Pare RB • IND	BAL	20	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Davon Booth RB • IND	BAL	20	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chris Coleman WR • MIA	@LV	21	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bub Means WR • CLE 	@JAC	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Patrick Carr RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kevin Marks Jr. RB • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Joe Fagnano QB • BAL	@IND	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Luke Deal TE • DET 	NO	16	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Justin Rigg TE • TEN	NYJ	25	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Tre Nixon WR • NE	@SEA	6	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ian Wheeler RB • BUF	@HOU	10	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	De'Montre Tuggle RB • CHI	@CAR	25	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Joe Milton III QB • DAL	@NYG	27	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Reggie Gilliam RB • NE	@SEA	3	11	1	1	0.0	0.0	0.0	0.0	0.0	0.2	0.4	0.0	0.2	0.2	2.0	0.0	0.0	0.00
+
+ 
+	W (9/17)	La'Michael Pettway TE • NE	@SEA	20	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Watkins WR • SF	@LAR	28	8	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.2	0.0	0.9	0.7	8.5	0.0	0.0	0.00
+
+ 
+	W (9/10)	Cash Jones RB • ATL	@PIT	4	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Anthony Johnson WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brenden Knox RB • KC	DEN	2	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Badie RB • DEN	@KC	8	10	1	1	0.0	0.0	0.0	0.0	0.0	0.7	2.7	0.0	0.9	0.5	3.4	0.0	0.0	0.00
+
+ 
+	W (9/10)	Hunter Dekkers QB • NO	@DET	23	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Elijah Young RB • BUF	@HOU	10	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jawon Chisholm RB • PIT	ATL	15	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Diego Pavia QB • BAL	@IND	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Marcus Rosemy-Jacksaint WR • PHI	WAS	26	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Karan Higdon RB • HOU	BUF	26	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Treyvhon Saunders WR • HOU	BUF	8	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Equanimeous St. Brown WR • SF	@LAR	28	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jared Smart WR • ARI	@LAC	10	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Arthur Williams WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Anthony Schwartz WR • MIA	@LV	21	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Taylen Green QB • CLE	@JAC	16	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jerrion Ealy RB • KC	DEN	2	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Malik Cunningham WR • DET	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jameson Geers TE • ARI 	@LAC	9	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jonathan Mingo WR • DAL	@NYG	24	14	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.2	0.0	1.4	0.7	8.8	0.0	0.0	0.00
+
+ 
+	W (9/10)	Chip Trayanum RB • NYJ 	@TEN	14	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	J.J. Taylor RB • HOU	BUF	26	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zay Jones WR • HOU	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalin Hyatt WR • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lucky Jackson WR • DET	NO	5	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Eli Wolf TE • WAS	@PHI	1	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kyrese Rowan WR • DEN 	@KC	9	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bryce Pierre TE • CAR	CHI	13	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Darius Hagans RB • PIT	ATL	15	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Temuchin Hodges TE • PIT	ATL	3	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chris Myarick TE • LV	MIA	27	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jake Phillips TE • PIT	ATL	3	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Jacardia Wright RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Baylor Cupp TE • ARI	@LAC	9	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyreik McAllister RB • LV	MIA	27	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Alexander Mattison RB • MIA	@LV	19	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gunnar Oakes TE • DET	NO	16	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Carsen Ryan TE • CLE	@JAC	26	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyren Montgomery WR • TEN	NYJ	17	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dylan Soehner TE • NO	@DET	21	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Feleipe Franks TE • CAR	CHI	13	5	1	1	0.0	0.0	0.0	0.0	0.0	0.2	0.4	0.0	0.1	0.0	0.4	0.0	0.0	0.00
+
+ 
+	W (9/10)	Jalen White RB • GB	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dae'Quan Wright TE • CLE	@JAC	26	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mikey Daniel RB • CAR	CHI	17	5	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Derrick Deese Jr. TE • DET	NO	16	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Emmanuel Henderson Jr. WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Riley Lees WR • CIN	TB	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jabari Small RB • DET	NO	18	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tanner Mordecai QB • SF	@LAR	15	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jimmy Horn Jr. WR • CAR	CHI	31	5	1	1	0.0	0.0	0.0	0.0	0.0	0.6	5.8	0.0	0.9	0.6	6.6	0.0	0.0	0.00
+
+ 
+	W (9/10)	DJ Williams RB • TB 	@CIN	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trevon Grimes WR • PHI	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Cam Sutton TE • SEA	NE	17	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Daniel Crawford TE • GB	@MIN	7	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Antwane Wells Jr. WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Blake Whiteheart TE • CLE	@JAC	26	11	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.7	0.4	2.6	0.0	0.0	0.00
+
+ 
+	W (9/10)	Zack Kuntz TE • DAL	@NYG	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Greg Desrosiers Jr. RB • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trebor Pena WR • JAC	CLE	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ben VanSumeren RB • KC	DEN	2	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Stevie Scott III RB • ARI	@LAC	6	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Seth Green TE • NO	@DET	21	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Austin Jones RB • WAS	@PHI	23	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Craig Reynolds RB • WAS	@PHI	23	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nick Fitzgerald QB • TB	@CIN	20	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ty James WR • MIN	GB	20	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sione Vaki RB • DET	NO	18	6	2	1	0.0	0.0	0.0	0.0	0.0	0.0	0.1	0.0	0.1	0.1	1.1	0.0	0.0	0.00
+
+ 
+	W (9/10)	Quintin Morris TE • JAC	CLE	14	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chris Evans RB • CIN	TB	22	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Keilan Robinson RB • NYJ 	@TEN	14	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaydn Ott RB • KC	DEN	2	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Lan Larison RB • NE	@SEA	3	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mante Morrow WR • LAC	ARI	15	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jacob Clark QB • LV	MIA	29	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Braxton Westfield WR • IND	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mason Fairchild TE • NO	@DET	21	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Johnson WR • PHI	WAS	26	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Elijah Mitchell RB • PHI 	WAS	28	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Johnny Wilson WR • PHI 	WAS	26	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Traeshon Holden WR • DAL	@NYG	24	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Malik Turner WR • SF	@LAR	28	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tre Mosley WR • CIN	TB	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Eric Gray RB • NYG	DAL	24	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Andre Baccellia WR • ARI 	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Jazz Ferguson WR • SEA	NE	12	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jamal Custis WR • PIT	ATL	22	9	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sam Hartman QB • WAS	@PHI	11	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Garrett Greene WR • TB	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Robert Burns RB • ATL	@PIT	4	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nikola Kalinic TE • CHI 	@CAR	19	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jesse Matthews WR • ATL	@PIT	27	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	David Martin-Robinson TE • TEN	NYJ	25	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Caleb Scott WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kaleb Johnson RB • GB	@MIN	7	11	13	1	0.0	0.0	0.0	0.0	0.0	2.0	5.3	0.0	0.0	0.0	0.2	0.0	0.0	0.00
+
+ 
+	W (9/17)	Jimmy Kibble WR • NE 	@SEA	6	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Conklin TE • DET	NO	16	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cheyenne O'Grady TE • CIN	TB	28	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	T.J. Vasher WR • DAL	@NYG	24	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Clint Ratkovich RB • ATL	@PIT	4	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Quali Conley RB • CIN	TB	22	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Charles Scarff TE • BAL	@IND	22	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cody Fajardo QB • LV	MIA	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Justin Johnson TE • ARI	@LAC	9	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Corey Taylor II RB • CLE	@JAC	5	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Micah Bernard RB • NE	@SEA	3	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jadakis Bonds WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kentrel Bullock RB • CIN	TB	22	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Collin Johnson WR • LV	MIA	19	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jason Brownlee WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ross Dwelley TE • CAR	CHI	13	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Talolo Limu-Jones WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Malachi Corley WR • CLE	@JAC	18	11	1	1	0.0	0.0	0.0	0.0	0.0	1.0	8.7	0.0	0.6	0.4	3.0	0.0	0.0	0.00
+
+ 
+	W (9/10)	Tyler Hoosman RB • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Noah Whittington RB • HOU	BUF	26	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Xavier Weaver WR • ARI 	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brian Walker TE • BAL	@IND	22	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kenny Fletcher Jr. TE • IND 	BAL	5	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jarrett Guarantano QB • DEN	@KC	9	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brelan Chancellor WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kedon Slovis QB • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Easton Stick QB • TB	@CIN	20	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Billy Brown TE • IND	BAL	5	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	David Moore WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Grant Calcaterra TE • PHI 	WAS	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isaiah Winstead WR • PIT	ATL	22	9	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	A.J. Richardson WR • ARI	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Marshall Lang TE • MIN	GB	15	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Roc Taylor WR • CAR	CHI	31	5	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Tyjon Lindsey WR • SEA	NE	12	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaden Bradley WR • WAS	@PHI	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Joseph Manjack IV WR • DEN	@KC	9	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Lockett WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tayon Fleet-Davis RB • KC	DEN	2	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Davonte Allen WR • BUF	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Will Sheppard WR • GB	@MIN	1	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lance McCutcheon WR • TEN	NYJ	17	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Austin Aune QB • ATL	@PIT	26	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kene Nwangwu RB • NYJ	@TEN	14	13	1	1	0.0	0.0	0.0	0.0	0.0	1.9	8.1	0.0	0.0	0.0	0.3	0.0	0.0	0.00
+
+ 
+	W (9/10)	Joshua Simon TE • ATL	@PIT	29	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Shemar Bridges WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Camden Brown WR • DAL	@NYG	24	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brandon Powell WR • MIN	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Charles McClelland RB • TEN	NYJ	32	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Malik Heath WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Robert Woods WR • PIT 	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ihmir Smith-Marsette WR • ARI	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lincoln Sefcik TE • NYJ	@TEN	23	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kobe Prentice WR • NYG	DAL	32	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Malik Henry WR • NO	@DET	30	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Justin Watson WR • HOU	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Deuce Vaughn RB • HOU	BUF	26	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dante Pettis WR • BUF	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sam James WR • LAR	SF	16	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Khalil Tate WR • PHI	WAS	26	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Xavier Malone WR • ATL	@PIT	27	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Luke Altmyer QB • DET	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dalton Keene TE • HOU	BUF	2	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Keytaon Thompson WR • DET	NO	5	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Robbie Ouzts RB • SEA 	NE	1	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Shane Buechele QB • BUF	@HOU	2	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Johnson WR • DET	NO	5	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Michael Ezeike TE • SEA	NE	17	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jack Sorenson WR • CIN	TB	14	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lorenzo Lingard RB • NYG	DAL	24	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Derrick Johnson WR • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaivon Heiligh WR • CIN	TB	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Joaquin Davis WR • PIT	ATL	22	9	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cyrus Holder WR • CHI	@CAR	13	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Woodrum QB • WAS	@PHI	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Hayden Rucci TE • SF	@LAR	12	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalen Sample WR • WAS	@PHI	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jack Colletto RB • PIT	ATL	15	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lake McRee TE • PIT	ATL	3	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Reece Horn WR • CIN	TB	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Reggie Davis WR • DAL	@NYG	24	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mo Alie-Cox TE • IND	BAL	5	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dax Milne WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Carson Strong QB • ARI	@LAC	3	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cam Miller QB • MIA	@LV	14	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Corey Sutton WR • DET	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Marquez Callaway WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Robert Lewis WR • MIN	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gerald Everett TE • CHI	@CAR	19	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	JP Richardson WR • CHI	@CAR	13	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	McCallan Castles TE • GB 	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brandon Smith WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Babicz TE • GB	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Pitsenberger RB • HOU 	BUF	26	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kelvin McKnight WR • DEN	@KC	9	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Javon McKinley WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jamaal Pritchett WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zack Moss RB • CIN 	TB	22	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Terrance Cobb RB • LV	MIA	27	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Raheem Blackshear RB • DET 	NO	18	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trevon Bradford WR • LAC	ARI	15	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	John Jiles WR • NE	@SEA	6	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Deon Jackson RB • DET	NO	18	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Hudson WR • DAL	@NYG	24	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mike Weber RB • NYG	DAL	24	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	E.J. Jenkins TE • PHI	WAS	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Devon Garrison TE • SEA	NE	17	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Quincy Skinner Jr. WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cordarrelle Patterson RB • PIT	ATL	15	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brennan Eagles WR • DAL	@NYG	24	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Garrett Groshek RB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isaiah Weston WR • CLE	@JAC	18	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sam Schnee RB • TEN	NYJ	32	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Miller Moss QB • CHI	@CAR	7	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	J.T. Barrett QB • PIT	ATL	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jayden Higgins WR • HOU 	BUF	8	8	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Carson Williams TE • LV	MIA	27	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ramel Keyton WR • TEN	NYJ	17	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	EJ Horton Jr. WR • IND	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Rohan Jones TE • LAR	SF	24	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaden Shirden RB • CAR	CHI	17	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brandon Johnson RB • PIT	ATL	15	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lawrence Keys III WR • DET 	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Kenny McIntosh RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cole Turner TE • MIA 	@LV	8	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Tejhaun Palmer WR • NE	@SEA	6	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chris Moore WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Joey Aguilar QB • JAC	CLE	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jacob De Jesus WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Myles Price WR • MIN	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dalen Cambre WR • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dohnte Meyers WR • CIN	TB	14	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Case Cookus QB • LAR	SF	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mark Redman TE • GB	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jalen Walthall WR • NYJ 	@TEN	29	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mike Williams WR • LAC 	ARI	15	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Anthony Firkser TE • DET 	NO	16	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tarik Black WR • DET	NO	5	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Devin Carter WR • CAR	CHI	31	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Darrynton Evans RB • BUF	@HOU	10	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Charleston Rambo WR • PHI	WAS	26	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kody Case WR • IND	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Laviska Shenault Jr. WR • BUF	@HOU	7	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jared Baker RB • ARI	@LAC	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Imatorbhebhe WR • JAC	CLE	11	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zamir White RB • NO	@DET	9	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Justin Jones RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Malik Flowers WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jack Westover TE • WAS	@PHI	1	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tanner Conner TE • NYG	DAL	11	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dillon Mitchell WR • MIN	GB	20	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Clyde Edwards-Helaire RB • KC	DEN	2	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tre Harbison III RB • CLE	@JAC	5	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dresser Winn QB • LAR	SF	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jeff Driskel QB • WAS	@PHI	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Peter LeBlanc WR • CHI	@CAR	13	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jawhar Jordan RB • HOU	BUF	26	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Jarboe WR • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dontae McMillan RB • BAL	@IND	11	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tim Boyle QB • TEN	NYJ	25	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Landon Lenoir WR • CHI	@CAR	13	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Quentin Skinner WR • BUF	@HOU	7	7	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Marcus Sanders Jr. WR • MIN	GB	20	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jerome Washington TE • ARI	@LAC	9	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sam Brown Jr. WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Rakeem Boyd RB • DET	NO	18	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Johnny Lumpkin TE • GB	@MIN	7	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Danny Davis WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Matt Johnson QB • CIN	TB	31	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kristian Wilkerson WR • ATL	@PIT	27	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Desmond Reid RB • BUF	@HOU	10	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Junior Bergen WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Terrace Marshall Jr. WR • MIA	@LV	21	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Harrell WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Damien Martinez RB • GB	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Jeremiah Webb WR • NE 	@SEA	6	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tanner Knue WR • TB	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	James Blackman QB • MIA	@LV	14	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cam Grandy TE • MIN	GB	15	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kade Warner WR • TB	@CIN	2	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyreek Hill WR • MIA 	@LV	21	6	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tre Stewart RB • ARI	@LAC	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dylan Cantrell WR • WAS	@PHI	4	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Simi Fehoko WR • ARI	@LAC	10	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Artavis Scott WR • HOU	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cedric Tillman WR • NO	@DET	30	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kyle Shurmur QB • WAS	@PHI	11	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brennan Presley WR • LAR	SF	16	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Toriano Clinton RB • IND	BAL	20	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	James Conner RB • ARI 	@LAC	6	14	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Rocky Lombardi QB • CIN	TB	31	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nick Sharga RB • LV	MIA	27	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	BJ Emmons RB • HOU	BUF	26	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Braxton Berrios WR • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mike Rigerman TE • BAL	@IND	22	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Justin Hall WR • MIN	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tom Kennedy WR • DET	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Moritz Boehringer TE • CIN	TB	28	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Taysir Mack WR • SF	@LAR	28	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Luke Farrell TE • SF	@LAR	12	8	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.5	0.3	2.7	0.0	0.0	0.00
+
+ 
+	W (9/10)	Sage Surratt WR • ARI	@LAC	10	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cornelius Johnson WR • BAL	@IND	25	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nico Evans RB • PHI	WAS	28	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ray-Ray McCloud WR • CHI 	@CAR	13	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Moochie Dixon WR • NO	@DET	30	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kalija Lipscomb WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	J.J. Jones WR • JAC	CLE	11	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Cade Brewer TE • SEA	NE	17	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Whyle TE • GB	@MIN	7	11	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.7	0.5	4.5	0.0	0.0	0.00
+
+ 
+	W (9/17)	Ben Wooldridge QB • NE	@SEA	6	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Woods II WR • DEN 	@KC	9	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Steven Montez QB • DET	NO	5	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Carter RB • TEN 	NYJ	32	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Taryn Christion QB • PIT	ATL	17	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jacob Copeland WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Devin Culp TE • TB	@CIN	32	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kyron Drones QB • GB	@MIN	1	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Luis Perez QB • LAC	ARI	21	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kendall Milton RB • CIN	TB	22	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Izaiah Gathings TE • KC	DEN	18	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jimmy Garoppolo QB • LAR	SF	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ricky Pearsall WR • SF 	@LAR	28	8	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lawrance Toafili RB • NYJ	@TEN	14	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jerand Bradley WR • LAC	ARI	15	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Emani Bailey RB • CAR	CHI	17	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	E.J. Williams Jr. WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kaden Prather WR • GB	@MIN	1	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	JuJu Smith-Schuster WR • NYG 	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ray Davis RB • BUF	@HOU	10	7	22	1	0.0	0.0	0.0	0.0	0.0	2.2	9.4	0.0	0.1	0.1	0.9	0.0	0.0	0.00
+
+ 
+	W (9/10)	Thomas Yassmin TE • GB 	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kai Locksley WR • MIA	@LV	21	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Darrin Hall RB • PIT	ATL	15	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Alize Mack TE • TEN	NYJ	25	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Eric Saubert TE • SEA	NE	17	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Ra'Shaun Henry WR • SEA	NE	12	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Oscar Cardenas TE • ARI	@LAC	9	14	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Calvin Austin III WR • NYG 	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Lewis Bond WR • HOU	BUF	8	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Christian Kirk WR • SF 	@LAR	28	8	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chase Cota WR • CLE	@JAC	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	JJ Laap WR • LAR	SF	16	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Cole Fotheringham TE • NE	@SEA	20	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Derrick Dillon WR • CLE	@JAC	18	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jerreth Sterns WR • LAR	SF	16	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Anthony Gordon QB • KC	DEN	12	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isaiah Neyor WR • GB	@MIN	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jakobie Keeney-James WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Joel Honigford TE • ARI	@LAC	9	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tanner Hudson TE • CIN	TB	28	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Manasseh Bailey WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jonnu Smith TE • GB	@MIN	7	11	1	1	0.0	0.0	0.0	0.0	0.0	0.5	2.9	0.0	0.5	0.4	3.4	0.0	0.0	0.00
+
+ 
+	W (9/10)	Da'Quan Felton WR • NYJ	@TEN	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaden Nixon RB • GB	@MIN	7	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Will Howard QB • PIT	ATL	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Case Keenum QB • CHI	@CAR	7	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Austin Proehl WR • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ketron Jackson Jr. WR • LV	MIA	19	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Elijah Arroyo TE • SEA	NE	17	11	2	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	1.1	0.6	6.5	0.0	0.0	0.00
+
+ 
+	W (9/17)	Terrell Jennings RB • NE 	@SEA	3	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Armani Rogers TE • BUF	@HOU	10	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Luke Grimm WR • LAC 	ARI	15	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Johnson WR • DAL	@NYG	24	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Charlie Jones WR • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nick Westbrook-Ikhine WR • IND	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Malik Taylor WR • DET	NO	5	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kehinde Oginni TE • ATL	@PIT	29	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	D'Eriq King QB • CAR	CHI	28	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trenton Irwin WR • SF	@LAR	28	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Davon Grayson WR • KC	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Omari Kelly WR • CHI	@CAR	13	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Donaven McCulley WR • MIA	@LV	21	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jonathan Ward RB • BAL	@IND	11	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Alex Tecza RB • PIT	ATL	15	9	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isaiah Bowser RB • BUF	@HOU	10	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Scott Miller WR • CHI	@CAR	13	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zach Wilson QB • NO	@DET	23	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Aaron Shampklin RB • MIA	@LV	19	6	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dominic Richardson RB • NYJ 	@TEN	14	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jequez Ezzard WR • WAS	@PHI	4	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Shane Zylstra TE • NE	@SEA	20	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Al-Jay Henderson RB • NYJ	@TEN	14	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Jalen Milroe QB • SEA	NE	8	11	2	0	0.7	0.4	5.1	0.0	0.0	0.3	0.8	0.0	0.0	0.0	0.0	0.0	0.0	0.00
+
+ 
+	W (9/10)	Johnny Pascuzzi TE • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jerome Ford RB • WAS 	@PHI	23	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	T.J. Simmons WR • TB	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Evan Hull RB • ARI	@LAC	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Le'Meke Brockington WR • ATL 	@PIT	27	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kyre Duplessis WR • DEN	@KC	9	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dorian Singer WR • JAC	CLE	11	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	D'Onta Foreman RB • CLE	@JAC	5	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Shaleak Knotts WR • MIN	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jack Strand QB • ATL	@PIT	26	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Laquon Treadwell WR • IND	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Wesley Grimes WR • SF	@LAR	28	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	MyCole Pruitt TE • PIT	ATL	3	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Michael Bandy WR • DEN	@KC	9	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Travis Jonsen WR • TB	@CIN	2	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Neal Johnson TE • NYJ	@TEN	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trevor Etienne RB • CAR 	CHI	17	5	2	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jack Coan QB • IND	BAL	22	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Princeton Fant TE • DAL 	@NYG	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Luke Lachey TE • GB 	@MIN	7	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nate McCollum WR • ARI	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mikah Holder WR • WAS	@PHI	4	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Byrd RB • PIT	ATL	15	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Phil Lutz WR • NE	@SEA	6	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Curtis Hodges TE • CAR	CHI	13	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Van Jefferson WR • WAS	@PHI	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bruno Labelle TE • ARI	@LAC	9	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ralph Webb RB • PIT	ATL	15	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Chamon Metayer TE • CAR	CHI	13	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Joe Mixon RB • HOU 	BUF	26	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sahmir Hagans WR • IND	BAL	23	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mark Gronowski QB • HOU	BUF	10	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Brian Cobbs WR • ARI	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kenny Yeboah TE • ARI 	@LAC	9	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Connor Davis TE • CLE	@JAC	26	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Kairee Robinson RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Colin Granger TE • CAR	CHI	13	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Drew Plitt QB • CIN	TB	31	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kevin Austin Jr. WR • NO	@DET	30	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Cam Akers RB • SEA	NE	1	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Taimi Tutogi RB • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	LeQuint Allen RB • JAC 	CLE	16	7	2	1	0.0	0.0	0.0	0.0	0.0	3.2	11.5	0.0	0.5	0.5	2.7	0.0	0.0	0.00
+
+ 
+	W (9/17)	Marcus Simms WR • SEA	NE	12	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Devron Harper WR • MIN	GB	20	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Andrew Vollert TE • IND	BAL	5	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Braylon Sanders WR • WAS	@PHI	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Coleman Bennett RB • MIA	@LV	19	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dylan Parham TE • DEN	@KC	4	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Moose Muhammad III WR • CAR	CHI	31	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Christian Scotland-Williamson TE • PIT	ATL	3	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Roydell Williams RB • DET	NO	18	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	N'Keal Harry TE • SEA	NE	17	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zach Horton TE • DET	NO	16	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dax Raymond TE • PIT	ATL	3	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Travis Homer RB • PIT	ATL	15	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gavin Bartholomew TE • MIN	GB	15	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Will Grier QB • CAR 	CHI	28	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Hunter Thedford TE • CLE	@JAC	26	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Efton Chism III WR • NE	@SEA	6	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Colton Dowell WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mark Thompson RB • LV	MIA	27	13	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Vaughns WR • PIT	ATL	22	9	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Alex Bachman WR • LAR	SF	16	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jordan Ta'amu-Perifanos QB • MIN	GB	13	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Emory Jones QB • ATL	@PIT	26	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dallas Daniels WR • DEN	@KC	9	10	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Andrew Parchment WR • CAR	CHI	31	5	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jase McClellan RB • TB	@CIN	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Josh Williams RB • TB	@CIN	30	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Nick Kallerup TE • SEA	NE	17	11	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Je'Quan Burton WR • MIA	@LV	21	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Isaiah Hodgins WR • NYG	DAL	32	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Nick Mullens QB • JAC	CLE	4	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Kisean Johnson WR • GB	@MIN	1	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	David Bell WR • CLE	@JAC	18	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Dy'Shawn Mobley RB • CIN	TB	22	6	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Emmanuel Butler WR • NO	@DET	30	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Devon Williams WR • BAL	@IND	25	13	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Ryan Willis QB • CHI	@CAR	7	10	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Javian Hawkins RB • LAR	SF	21	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Phil Mafah RB • DAL	@NYG	29	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Giovanni Ricci TE • DET	NO	16	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Demeer Blankumsee WR • NE	@SEA	6	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Aidan O'Connell QB • LV	MIA	29	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gabe Davis WR • BUF	@HOU	7	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Bryce Love RB • WAS	@PHI	23	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jaret Patterson RB • LAC	ARI	31	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tracy Moore WR • FA	BYE	---	0	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	DJ Chark WR • ATL	@PIT	27	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Cole Burgess WR • PIT 	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Zach Ertz TE • WAS 	@PHI	1	7	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jimmy Holiday WR • KC 	DEN	3	5	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trey Knox TE • MIN	GB	15	6	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Khalfani Muhammad RB • ARI	@LAC	6	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Trey Lance QB • LAC	ARI	21	7	1	1	1.3	0.9	10.1	0.0	0.0	0.3	1.3	0.0	0.0	0.0	0.0	0.0	0.0	0.00
+
+ 
+	W (9/10)	Eli Wilson RB • CLE	@JAC	5	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Stephon Robinson Jr. WR • ARI	@LAC	10	14	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Drake Stoops WR • LAR	SF	16	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Gabriel Benyard WR • CAR	CHI	31	5	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Hank Beatty WR • TEN	NYJ	17	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	A.T. Perry WR • PIT	ATL	22	9	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Mac Dalena WR • BUF	@HOU	7	7	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Tyler Adams WR • IND	BAL	23	13	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Grant Finley RB • NYG	DAL	24	8	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	David Wallis WR • NE	@SEA	6	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Caleb Lohner TE • DEN 	@KC	4	10	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Matt Seybert TE • LAC	ARI	31	7	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	DaVaris Daniels WR • NE	@SEA	6	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Sal Cannella TE • CLE	@JAC	26	11	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/17)	Shane Watts RB • NE	@SEA	3	11	1	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Justin Joly TE • MIA	@LV	8	6	1	1	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.8	0.6	5.5	0.0	0.0	0.00
+
+ 
+	W (9/10)	Griffin Neal QB • NO	@DET	23	8	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0.00
+
+ 
+	W (9/10)	Jacob Cowing WR • SF 	@LAR	28	8	1	1	0.0	0.0	0.0	0.0	0.0	0.1	0.7	0.0	0.9	0.7	9.3	0.0	0.1	-0.10
+
+ 
+	W (9/10)	Dyami Brown WR • WAS	@PHI	4	7	1	1	0.0	0.0	0.0	0.0	0.0	0.4	2.4	0.0	1.2	0.7	8.9	0.0	0.1	-0.10
+PAGES: 1 2 3 4 5 6 7 ... 18 All
+REPORT UPDATED AS OF 9/9/26 3:08 PM EST
+by Taboola
+Sponsored Links
+RECOMMENDED
+Ditch Toast. Get Square.
+Square
+Otolaryngologists Say Chronic Tinnitus Is Linked to a Common Habit
+Neblow
+Ask A Pro: "How Long Does $2.5M Last in Retirement?"
+SmartAsset
+Men Over 50: Why This New Formula Is Getting Attention
+Health Guide
+The "Friday to Sunday" Formula: One Small Dissolvable Tablet
+Health Guide
+Switch To Webroot Before It's Too Late
+Webroot
+Buy Now
+Dump Your Antivirus - Upgrade to Webroot Now
+Webroot
+Buy Now
+"I Thought After Dark Was for Him. I Was Wrong." (me 30 mins later)
+LUV.health
+Ask a Pro: "Can I Convert $500K to Roth and Avoid the 35% Bracket?"
+SmartAsset
+Seniors Above 55 Years Of Age Can Now Fly Business Class For The Price of Economy
+Smart Travel Tips
+TRANSACTION DETAILS
+PENDING ADD/DROPS
+2
+WAIVER ORDER 3 OF 10
+More
+Pick'em Games
+Fantasy Sports
+Free Sports TV
+Best Betting Apps
+Best Prediction Apps
+March Madness
+Mobile Apps
+Company
+About Us
+Careers
+About Paramount
+Paramount+
+CBS TV
+Regulation
+Terms Of Use
+Privacy Policy
+Minors' Privacy Policy
+Your Privacy Choices
+Closed Captioning
+California Notice
+Contact Us
+Help
+Customer Care
+Social Media
+YouTube
+TikTok
+Instagram
+Facebook
+X
+Threads
+Flipboard
+Account
+Manage My Account
+Newsletters
+My Teams
+Forgot Password
+
+© 2004-2025 CBS Interactive. ALL RIGHTS RESERVED.
+
+CBS Sports is a registered trademark of CBS Broadcasting Inc. Commissioner is a registered service mark of CBS Interactive Inc. Scout Fantasy is a registered service mark of CBS 247 Inc.
+
+The content on this site is for entertainment purposes only and CBS Sports makes no representation or warranty as to the accuracy of the information given or the outcome of any game or event. There is no gambling offered on this site. This site contains commercial content and CBS Sports may be compensated for the links provided on this site.
+
+Images by Getty Images and Imagn
+
+Tab Context:
+- Executed on tabId: seed
+- Available tabs:
+  • tabId seed: "Maniac Football League - CBSSports.com" (https://maniacfl.football.cbssports.com)

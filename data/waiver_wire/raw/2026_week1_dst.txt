@@ -1,0 +1,42 @@
+# Raw capture: CBS "Free Agent Recommendations" page (the /stats/stats-main
+# report), POSITIONS = DST, PLAYER STATUS = FREE AGENTS,
+# TIMEFRAME = WEEK 1 (PROJ)
+# https://maniacfl.football.cbssports.com/stats/stats-main
+# Captured: 2026-09-09, via Claude_Browser (logged-in league-manager session)
+#
+# See src/data_sources/waiver_wire.py's module docstring for the full
+# capture procedure and row format.
+#
+# COMPLETE listing -- only 14 defenses show up as free agents at all
+# (the other 18 NFL defenses are rostered somewhere across this 10-team
+# league), all with a nonzero Week 1 FPTS projection; no pagination/
+# truncation needed.
+# ===== RAW TEXT BELOW =====
+Title: Maniac Football League - CBSSports.com
+URL: https://maniacfl.football.cbssports.com
+Source element: <body>
+---
+POSITIONS: DST (selected)
+PLAYER STATUS: FREE AGENTS (selected)
+TIMEFRAME: WEEK 1 (PROJ)
+CATEGORIES: STANDARD
+FREE AGENT DEFENSE/STS CBS AVERAGE PROJECTIONS STANDARD CATEGORIES
+
+ACTION	AVAIL	PLAYER	OPP	OVP	BYE	ROST	START	SACK	FUM	INT	DWN	TD	STY	AVG	TOTAL	AVG	TOTAL	FPTS
+
+W (9/10)	Titans DST • TEN 	NYJ	26	9	12	9	4.2	0.8	0.7	0.6	0.2	0.0	304.00	304	25.70	25.7	8.40
+W (9/10)	Dolphins DST • MIA	@LV	32	6	7	4	4.1	0.6	0.8	0.5	0.2	0.1	256.00	256	22.30	22.3	8.30
+W (9/10)	Cardinals DST • ARI	@LAC	28	14	4	3	3.6	0.7	0.7	0.7	0.1	0.1	358.00	358	31.40	31.4	7.20
+W (9/10)	Bengals DST • CIN	TB	18	6	9	3	2.7	0.6	1.0	0.7	0.2	0.0	365.00	365	23.00	23	7.10
+W (9/10)	Falcons DST • ATL 	@PIT	13	11	35	23	3.8	0.6	0.6	0.6	0.1	0.1	275.00	275	25.80	25.8	7.00
+W (9/10)	Raiders DST • LV	MIA	23	13	9	6	2.4	0.7	0.9	0.6	0.2	0.0	268.00	268	22.10	22.1	6.80
+W (9/10)	Buccaneers DST • TB	@CIN	30	10	12	4	2.3	0.7	0.9	0.6	0.2	0.0	326.00	326	28.10	28.1	6.70
+W (9/10)	Colts DST • IND 	BAL	19	13	9	3	2.4	0.8	0.6	0.7	0.2	0.0	344.00	344	25.80	25.8	6.40
+W (9/10)	Giants DST • NYG 	DAL	6	8	17	7	1.9	0.8	0.7	0.7	0.2	0.1	397.00	397	27.50	27.5	6.30
+W (9/10)	Bills DST • BUF	@HOU	14	7	35	17	2.1	0.6	0.8	0.8	0.2	0.0	317.00	317	24.40	24.4	6.10
+W (9/10)	Saints DST • NO 	@DET	5	8	24	10	2.9	0.6	0.6	0.6	0.1	0.1	352.00	352	32.30	32.3	6.10
+W (9/10)	Jets DST • NYJ	@TEN	25	13	7	5	2.5	0.7	0.4	0.6	0.2	0.1	273.00	273	27.90	27.9	6.10
+W (9/10)	Commanders DST • WAS	@PHI	4	7	5	2	2.7	0.4	0.3	0.7	0.1	0.0	353.00	353	26.80	26.8	4.70
+W (9/10)	Panthers DST • CAR	CHI	3	5	6	2	1.9	0.4	0.6	0.7	0.1	0.0	364.00	364	26.10	26.1	4.50
+
+REPORT UPDATED AS OF 9/9/26 3:17 PM EST

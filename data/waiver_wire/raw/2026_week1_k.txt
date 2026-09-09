@@ -1,0 +1,45 @@
+# Raw capture: CBS "Free Agent Recommendations" page (the /stats/stats-main
+# report), POSITIONS = K, PLAYER STATUS = FREE AGENTS,
+# TIMEFRAME = WEEK 1 (PROJ)
+# https://maniacfl.football.cbssports.com/stats/stats-main
+# Captured: 2026-09-09, via Claude_Browser (logged-in league-manager session)
+#
+# See src/data_sources/waiver_wire.py's module docstring for the full
+# capture procedure and row format.
+#
+# TRUNCATED to the 15 kickers with a nonzero Week 1 FPTS projection
+# (Joey Slye 9.80 down through Dominic Zvada 1.60) -- CBS's own
+# "PAGES: 1 2 All" footer showed one more page after this, all
+# inactive/practice-squad/emergency kickers projected at exactly 0.0
+# FPTS for this single week, not worth capturing.
+# ===== RAW TEXT BELOW =====
+Title: Maniac Football League - CBSSports.com
+URL: https://maniacfl.football.cbssports.com
+Source element: <body>
+---
+POSITIONS: K (selected)
+PLAYER STATUS: FREE AGENTS (selected)
+TIMEFRAME: WEEK 1 (PROJ)
+CATEGORIES: STANDARD
+FREE AGENT KICKERS CBS AVERAGE PROJECTIONS STANDARD CATEGORIES
+
+ACTION	AVAIL	PLAYER	OPP	OVP	BYE	ROST	START	EXPERT	FG(TOTAL)	ATT	FG(1-19)	ATT	FG(20-29)	ATT	FG(30-39)	ATT	FG(40-49)	ATT	FG(50+)	ATT	XP	ATT	FPTS
+
+W (9/10)	Joey Slye K • TEN	NYJ	32	9	12	8	N/R	2.4	2.9	0.0	0.0	0.6	0.6	0.7	0.7	0.6	0.8	0.5	0.7	2.7	2.8	9.80
+W (9/10)	Chris Boswell K • PIT	ATL	24	9	28	19	16	1.9	2.1	0.0	0.0	0.4	0.4	0.5	0.6	0.6	0.6	0.3	0.4	2.5	2.5	8.20
+W (9/10)	Blake Grupe K • NYJ 	@TEN	28	13	18	13	N/R	1.7	2.2	0.0	0.0	0.5	0.5	0.6	0.7	0.4	0.6	0.3	0.4	2.8	2.8	7.90
+W (9/10)	Jake Elliott K • PHI	WAS	20	10	14	6	19	1.7	2.2	0.0	0.0	0.4	0.4	0.6	0.6	0.6	0.7	0.2	0.5	2.8	2.9	7.80
+W (9/10)	Spencer Shrader K • IND 	BAL	27	13	50	42	18	1.7	2.0	0.0	0.0	0.5	0.5	0.6	0.7	0.4	0.5	0.1	0.3	2.4	2.4	7.50
+W (9/10)	Matt Gay K • LV	MIA	10	13	6	2	N/R	1.6	2.2	0.0	0.0	0.4	0.4	0.4	0.5	0.5	0.6	0.3	0.7	2.5	2.5	7.30
+W (9/10)	Riley Patterson K • MIA	@LV	23	6	2	1	N/R	1.6	1.8	0.0	0.0	0.4	0.4	0.5	0.6	0.5	0.6	0.2	0.3	2.3	2.4	7.00
+W (9/10)	Daniel Carlson K • NO	@DET	14	8	6	2	21	1.7	2.0	0.0	0.0	0.4	0.4	0.5	0.5	0.4	0.6	0.3	0.5	2.0	2.1	7.00
+W (9/10)	Chad Ryland K • ARI	@LAC	18	14	4	1	24	1.6	2.1	0.0	0.0	0.4	0.4	0.5	0.6	0.5	0.7	0.3	0.4	2.0	2.1	6.70
+W (9/10)	Ryan Fitzgerald K • CAR	CHI	9	5	2	1	23	1.6	1.9	0.0	0.0	0.4	0.4	0.5	0.6	0.5	0.6	0.1	0.3	2.1	2.3	6.70
+W (9/10)	Nick Folk K • ATL	@PIT	17	11	15	6	N/R	1.5	1.7	0.0	0.0	0.4	0.4	0.4	0.5	0.4	0.5	0.3	0.4	1.9	2.0	6.30
+W (9/10)	Andre Szmyt K • CLE	@JAC	2	11	2	1	N/R	1.3	1.4	0.0	0.0	0.3	0.3	0.5	0.5	0.3	0.3	0.2	0.3	1.8	1.9	5.60
+W (9/10)	Drew Stevens K • WAS	@PHI	7	7	3	1	N/R	1.3	1.5	0.0	0.0	0.4	0.4	0.4	0.5	0.4	0.5	0.1	0.2	1.6	1.8	5.30
+W (9/10)	Ben Sauls K • NYG 	DAL	29	8	1	1	N/R	1.2	1.6	0.0	0.0	0.4	0.4	0.4	0.5	0.3	0.5	0.1	0.2	1.6	2.0	4.80
+W (9/10)	Dominic Zvada K • NYG	DAL	29	8	5	3	N/R	0.4	0.5	0.0	0.0	0.1	0.1	0.1	0.2	0.1	0.2	0.0	0.1	0.6	0.8	1.60
+
+PAGES: 1 2 All
+REPORT UPDATED AS OF 9/9/26 3:12 PM EST

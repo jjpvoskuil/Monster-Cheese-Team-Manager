@@ -1,0 +1,130 @@
+year,timeframe,name,position,nfl_team,opp,bye_week,rost_pct,fpts
+2026,week1,Joey Slye,K,TEN,NYJ,9,12.0,9.8
+2026,week1,Titans,DST,TEN,NYJ,9,12.0,8.4
+2026,week1,Dolphins,DST,MIA,@LV,6,7.0,8.3
+2026,week1,Chris Boswell,K,PIT,ATL,9,28.0,8.2
+2026,week1,Blake Grupe,K,NYJ,@TEN,13,18.0,7.9
+2026,week1,Jake Elliott,K,PHI,WAS,10,14.0,7.8
+2026,week1,Elic Ayomanor,WR,TEN,NYJ,9,6.0,7.51
+2026,week1,Spencer Shrader,K,IND,BAL,13,50.0,7.5
+2026,week1,Matt Gay,K,LV,MIA,13,6.0,7.3
+2026,week1,Cardinals,DST,ARI,@LAC,14,4.0,7.2
+2026,week1,Bengals,DST,CIN,TB,6,9.0,7.1
+2026,week1,Calvin Ridley,WR,TEN,NYJ,9,32.0,7.01
+2026,week1,Riley Patterson,K,MIA,@LV,6,2.0,7.0
+2026,week1,Falcons,DST,ATL,@PIT,11,35.0,7.0
+2026,week1,Daniel Carlson,K,NO,@DET,8,6.0,7.0
+2026,week1,Darren Waller,TE,CAR,CHI,5,11.0,6.81
+2026,week1,Jalen Nailor,WR,LV,MIA,13,25.0,6.81
+2026,week1,Marquise Brown,WR,PHI,WAS,10,7.0,6.81
+2026,week1,Raiders,DST,LV,MIA,13,9.0,6.8
+2026,week1,Ryan Fitzgerald,K,CAR,CHI,5,2.0,6.7
+2026,week1,Chad Ryland,K,ARI,@LAC,14,4.0,6.7
+2026,week1,Buccaneers,DST,TB,@CIN,10,12.0,6.7
+2026,week1,David Njoku,TE,LAC,ARI,7,11.0,6.51
+2026,week1,Chimere Dike,WR,TEN,NYJ,9,4.0,6.41
+2026,week1,Colts,DST,IND,BAL,13,9.0,6.4
+2026,week1,Nick Folk,K,ATL,@PIT,11,15.0,6.3
+2026,week1,Giants,DST,NYG,DAL,8,17.0,6.3
+2026,week1,Kayshon Boutte,WR,HOU,BUF,8,35.0,6.11
+2026,week1,Jalen McMillan,WR,TB,@CIN,10,18.0,6.11
+2026,week1,Pat Freiermuth,TE,PIT,ATL,9,11.0,6.11
+2026,week1,Brenton Strange,TE,JAC,CLE,7,63.0,6.11
+2026,week1,Mason Taylor,TE,NYJ,@TEN,13,5.0,6.11
+2026,week1,Bills,DST,BUF,@HOU,7,35.0,6.1
+2026,week1,Saints,DST,NO,@DET,8,24.0,6.1
+2026,week1,Jets,DST,NYJ,@TEN,13,7.0,6.1
+2026,week1,Omar Cooper Jr.,WR,NYJ,@TEN,13,14.0,6.01
+2026,week1,Brock Wright,TE,DET,NO,6,1.0,5.81
+2026,week1,Andre Szmyt,K,CLE,@JAC,11,2.0,5.6
+2026,week1,Oronde Gadsden II,TE,LAC,ARI,7,14.0,5.41
+2026,week1,Devaughn Vele,WR,NO,@DET,8,6.0,5.41
+2026,week1,Cooper Kupp,WR,SEA,NE,11,26.0,5.41
+2026,week1,Troy Franklin,WR,DEN,@KC,10,10.0,5.41
+2026,week1,Cade Otton,TE,TB,@CIN,10,25.0,5.41
+2026,week1,Keenan Allen,WR,IND,BAL,13,37.0,5.41
+2026,week1,Mike Gesicki,TE,CIN,TB,6,4.0,5.41
+2026,week1,Germie Bernard,WR,PIT,ATL,9,8.0,5.31
+2026,week1,Malik Benson,WR,LV,MIA,13,3.0,5.31
+2026,week1,Denzel Boston,WR,CLE,@JAC,11,50.0,5.31
+2026,week1,Bryce Lance,WR,NO,@DET,8,7.0,5.31
+2026,week1,Rashid Shaheed,WR,SEA,NE,11,65.0,5.31
+2026,week1,Adonai Mitchell,WR,NYJ,@TEN,13,15.0,5.31
+2026,week1,Drew Stevens,K,WAS,@PHI,7,3.0,5.3
+2026,week1,Theo Johnson,TE,NYG,DAL,8,3.0,5.11
+2026,week1,Terrance Ferguson,TE,LAR,SF,11,25.0,5.11
+2026,week1,Colby Parkinson,TE,LAR,SF,11,6.0,5.11
+2026,week1,Malik Washington,WR,MIA,@LV,6,18.0,4.91
+2026,week1,Ben Sauls,K,NYG,DAL,8,1.0,4.8
+2026,week1,Tyjae Spears,RB,TEN,NYJ,9,57.0,4.8
+2026,week1,Chigoziem Okonkwo,TE,WAS,@PHI,7,27.0,4.7
+2026,week1,Commanders,DST,WAS,@PHI,7,5.0,4.7
+2026,week1,Antonio Williams,WR,WAS,@PHI,7,11.0,4.6
+2026,week1,Panthers,DST,CAR,CHI,5,6.0,4.5
+2026,week1,Gunnar Helm,TE,TEN,NYJ,9,5.0,4.41
+2026,week1,Dontayvion Wicks,WR,PHI,WAS,10,15.0,4.41
+2026,week1,Andrei Iosivas,WR,CIN,TB,6,2.0,4.41
+2026,week1,Xavier Legette,WR,CAR,CHI,5,2.0,4.41
+2026,week1,Jaylin Noel,WR,HOU,BUF,8,5.0,4.41
+2026,week1,Jalen Tolbert,WR,MIA,@LV,6,1.0,4.41
+2026,week1,Xavier Hutchinson,WR,HOU,BUF,8,2.0,4.41
+2026,week1,Tyler Higbee,TE,LAR,SF,11,2.0,4.41
+2026,week1,Will Kacmarek,TE,MIA,@LV,6,1.0,4.31
+2026,week1,Caleb Douglas,WR,MIA,@LV,6,28.0,4.31
+2026,week1,Zavion Thomas,WR,CHI,@CAR,10,5.0,4.31
+2026,week1,Ted Hurst,WR,TB,@CIN,10,9.0,4.3
+2026,week1,Charlie Kolar,TE,LAC,ARI,7,1.0,4.11
+2026,week1,Isaac TeSlaa,WR,DET,NO,6,8.0,4.11
+2026,week1,Jahdae Walker,WR,CHI,@CAR,10,1.0,4.11
+2026,week1,Malachi Fields,WR,NYG,DAL,8,25.0,4.01
+2026,week1,Kimani Vidal,RB,LAC,ARI,7,14.0,3.9
+2026,week1,Evan Engram,TE,DEN,@KC,10,8.0,3.7
+2026,week1,Michael Mayer,TE,LV,MIA,13,2.0,3.7
+2026,week1,Ashton Dulin,WR,IND,BAL,13,1.0,3.7
+2026,week1,Olamide Zaccheaus,WR,ATL,@PIT,11,1.0,3.7
+2026,week1,Darnell Washington,TE,PIT,ATL,9,2.0,3.6
+2026,week1,George Holani,RB,SEA,NE,11,8.0,3.5
+2026,week1,Noah Fant,TE,NO,@DET,8,1.0,3.5
+2026,week1,Daniel Bellinger,TE,TEN,NYJ,9,1.0,3.41
+2026,week1,Tyquan Thornton,WR,KC,DEN,5,3.0,3.41
+2026,week1,Demarcus Robinson,WR,SF,@LAR,8,1.0,3.41
+2026,week1,Ben Skowronek,WR,PIT,ATL,9,1.0,3.41
+2026,week1,Eli Stowers,TE,PHI,WAS,10,5.0,3.31
+2026,week1,Roman Wilson,WR,PIT,ATL,9,2.0,3.31
+2026,week1,Emanuel Wilson,RB,SEA,NE,11,6.0,3.2
+2026,week1,Josh Palmer,WR,BUF,@HOU,7,1.0,2.7
+2026,week1,Dawson Knox,TE,BUF,@HOU,7,2.0,2.7
+2026,week1,Devontez Walker,WR,BAL,@IND,13,1.0,2.7
+2026,week1,Darnell Mooney,WR,NYG,DAL,8,3.0,2.7
+2026,week1,Kendrick Bourne,WR,ARI,@LAC,14,1.0,2.7
+2026,week1,Isaiah Bond,WR,CLE,@JAC,11,1.0,2.7
+2026,week1,Zachariah Branch,WR,ATL,@PIT,11,9.0,2.6
+2026,week1,Jalen Brooks,WR,ARI,@LAC,14,1.0,2.5
+2026,week1,Jaylen Wright,RB,MIA,@LV,6,9.0,2.5
+2026,week1,Justice Hill,RB,BAL,@IND,13,17.0,1.9
+2026,week1,Erick All,TE,CIN,TB,6,1.0,1.7
+2026,week1,Dominic Zvada,K,NYG,DAL,8,5.0,1.6
+2026,week1,Tez Johnson,WR,TB,@CIN,10,2.0,1.41
+2026,week1,Josh Oliver,TE,MIN,GB,6,1.0,1.41
+2026,week1,Davis Allen,TE,LAR,SF,11,1.0,1.41
+2026,week1,Luke McCaffrey,WR,WAS,@PHI,7,2.0,1.4
+2026,week1,Ty Johnson,RB,BUF,@HOU,7,4.0,1.3
+2026,week1,Connor Heyward,TE,LV,MIA,13,1.0,1.3
+2026,week1,Ty Simpson,QB,LAR,SF,11,6.0,1.21
+2026,week1,Kendre Miller,RB,NO,@DET,8,2.0,1.2
+2026,week1,Roschon Johnson,RB,CHI,@CAR,10,3.0,1.2
+2026,week1,Andrew Beck,RB,NYJ,@TEN,13,1.0,0.7
+2026,week1,John Bates,TE,WAS,@PHI,7,1.0,0.7
+2026,week1,Ryan Miller,WR,MIA,@LV,6,1.0,0.7
+2026,week1,Luke Schoonmaker,TE,DAL,@NYG,14,1.0,0.7
+2026,week1,Tanner Koziol,TE,JAC,CLE,7,1.0,0.7
+2026,week1,Tommy Tremble,TE,CAR,CHI,5,1.0,0.7
+2026,week1,Max Klare,TE,LAR,SF,11,2.0,0.7
+2026,week1,Foster Moreau,TE,HOU,BUF,8,1.0,0.7
+2026,week1,Kyle Juszczyk,RB,SF,@LAR,8,1.0,0.7
+2026,week1,Jack Bech,WR,LV,MIA,13,3.0,0.7
+2026,week1,Sam Roush,TE,CHI,@CAR,10,1.0,0.7
+2026,week1,Arian Smith,WR,NYJ,@TEN,13,1.0,0.7
+2026,week1,Drew Sample,TE,CIN,TB,6,1.0,0.7
+2026,week1,Andrew Ogletree,TE,IND,BAL,13,1.0,0.7
+2026,week1,Tre Harris,WR,LAC,ARI,7,8.0,0.7
