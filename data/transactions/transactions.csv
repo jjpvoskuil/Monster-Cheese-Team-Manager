@@ -1,0 +1,11 @@
+year,date,team,txn_type,player_name,position,positions,nfl_team,from_team,effective_round,cost,action_text
+2026,2026-08-31T18:37:00,Ball Busters,drop,Adam Randall,RB,RB,BAL,,1,0.0,Dropped
+2026,2026-09-02T11:58:00,Buckhorns,trade_in,Packers,DST,DST,GB,THE DEMONS,1,3.0,Traded from THE DEMONS
+2026,2026-09-02T11:58:00,THE DEMONS,trade_in,Fernando Mendoza,QB,QB,LV,Buckhorns,1,3.0,Traded from Buckhorns
+2026,2026-09-03T03:25:00,Aces High,waiver_add,Tre Tucker,WR,WR,LV,,1,10.0,Added off Waivers
+2026,2026-09-03T03:25:00,THE DEMONS,waiver_add,Christopher Brooks,RB,RB,GB,,1,10.0,Added off Waivers
+2026,2026-09-03T03:25:00,Legion of Doom,waiver_add,Jerry Jeudy,WR,WR,CLE,,1,10.0,Added off Waivers
+2026,2026-09-03T03:25:00,Mojo,waiver_add,Jordyn Tyson,WR,WR,NO,,1,10.0,Added off Waivers
+2026,2026-09-03T03:25:00,Salty Dogs,waiver_add,Tyrone Tracy Jr.,RB,RB,NYG,,1,10.0,Added off Waivers
+2026,2026-09-03T03:25:00,Monster Cheese,waiver_add,Samaje Perine,RB,RB,CIN,,1,10.0,Added off Waivers
+2026,2026-09-03T03:25:00,Ball Busters,waiver_add,Andy Dalton,QB,QB,PHI,,1,10.0,Added off Waivers

@@ -1,19 +1,29 @@
 """
-My Roster — Monster Cheese's drafted players, organized by starting
--lineup slot (config/league_settings.yaml -> roster.starters), filling in
-live as picks are logged. Reads the same data/draft_state.json every
-other page does, so a pick logged from the Draft Board's clickable grid,
-its Suggested Pick shortlist, or an active CBS live sync all show up here
+My Roster — Monster Cheese's players, organized by starting-lineup slot
+(config/league_settings.yaml -> roster.starters), filling in live as
+picks are logged. Reads the same data/draft_state.json every other page
+does, so a pick logged from the Draft Board's clickable grid, its
+Suggested Pick shortlist, or an active CBS live sync all show up here
 immediately on the next rerun/refresh -- no separate wiring needed.
+
+**Current roster / As drafted toggle (2026-09-09)**: defaults to
+"Current roster" -- the draft-day snapshot replayed forward through
+every waiver add/drop/trade captured from CBS's Transaction Report (see
+src/roster_state.py and src/data_sources/transactions.py) -- so this
+page reflects what's actually on the roster today, not just draft day.
+"As drafted" shows the original, unmodified draft-day snapshot
+(draft_state.my_roster()) for comparison/reference. Rows added by a
+post-draft transaction show `Rd 0` (never a real draft round) as the
+signal they weren't drafted -- see the caption below the toggle.
 
 Slot assignment (src.roster_needs.assign_roster_slots) is a heuristic,
 same spirit as the opponent-needs inference it's built from: dedicated
 slots (QB/RB/TE/K/DST) are filled first, then the broader flex slots
-(WR_TE_FLEX/SUPERFLEX/FLEX), earliest-drafted player first among each
-slot's eligible positions. It's "if the draft stopped right now, this is
-how the lineup would fill in" -- not a claim about your actual intended
-starters, which is exactly the same caveat src/roster_needs.py documents
-for reading opponents.
+(WR_TE_FLEX/SUPERFLEX/FLEX), earliest-drafted (or earliest-added)
+player first among each slot's eligible positions. It's "if nothing else
+changed, this is how the lineup would fill in" -- not a claim about your
+actual intended starters, which is exactly the same caveat
+src/roster_needs.py documents for reading opponents.
 """
 
 from __future__ import annotations
@@ -23,13 +33,16 @@ import os
 import pandas as pd
 import streamlit as st
 
+from src.data_sources.transactions import load_transactions
 from src.draft_state import DraftState
 from src.roster_needs import assign_roster_slots
+from src.roster_state import current_roster_for_team
 from src.scoring import load_config
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
 DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
+TRANSACTIONS_CSV = os.path.join(ROOT, "data", "transactions", "transactions.csv")
 
 
 @st.cache_resource
@@ -70,13 +83,42 @@ def render_my_roster() -> None:
 
     st.title(f"📋 My Roster — {config['league']['team_name']}")
 
-    my_picks = draft_state.my_roster()
+    my_team = config["league"]["team_name"]
+    view = st.radio(
+        "Roster view", ["Current roster", "As drafted"], horizontal=True,
+        help=(
+            "Current roster reflects waiver adds/drops/trades captured from "
+            "CBS's Transaction Report on top of the draft-day snapshot. "
+            "As drafted shows the original, unmodified draft-day roster."
+        ),
+    )
+
+    if view == "Current roster":
+        transactions = load_transactions(TRANSACTIONS_CSV)
+        roster_result = current_roster_for_team(draft_state, transactions, my_team)
+        my_picks = roster_result.rosters[my_team]
+        if roster_result.warnings:
+            with st.expander(f"⚠️ {len(roster_result.warnings)} transaction warning(s)"):
+                for w in roster_result.warnings:
+                    st.caption(w)
+        if transactions.empty:
+            st.caption(
+                "No transactions captured yet (data/transactions/transactions.csv is "
+                "empty or missing) — showing the draft-day roster until "
+                "`scripts/fetch_transactions.py` has real data to work from."
+            )
+    else:
+        my_picks = draft_state.my_roster()
+
     starters = config["roster"]["starters"]
     slots, bench = assign_roster_slots(my_picks, starters)
 
     roster_cfg = config["roster"]
+    drafted_count = sum(1 for p in my_picks if p.round != 0)
+    added_count = len(my_picks) - drafted_count
+    added_note = f" (+{added_count} added since)" if added_count else ""
     st.caption(
-        f"{len(my_picks)} player(s) drafted · {roster_cfg['total_starters']} starting slots · "
+        f"{len(my_picks)} player(s){added_note} · {roster_cfg['total_starters']} starting slots · "
         f"roster limit {roster_cfg['roster_total_min']}-{roster_cfg['roster_total_max']}"
     )
     if not my_picks:
@@ -94,6 +136,11 @@ def render_my_roster() -> None:
     # the generic "SUPERFLEX" name while still being clearly a flex slot.
     SLOT_DISPLAY_NAMES = {"SUPERFLEX": "QB (Flex)"}
 
+    def _rd_display(pick) -> str:
+        # round=0 is src.roster_state's marker for "added by transaction,
+        # not drafted" (see this page's module docstring).
+        return "Txn" if pick.round == 0 else str(pick.round)
+
     rows = []
     for slot in starters:
         filled = slots.get(slot["slot"], [None] * slot["count"])
@@ -106,7 +153,7 @@ def render_my_roster() -> None:
                     "Player": pick.player_name,
                     "Pos": pick.position,
                     "NFL Team": pick.nfl_team,
-                    "Rd": pick.round,
+                    "Rd": _rd_display(pick),
                     "Pick": pick.overall_pick,
                 })
             else:
@@ -166,7 +213,7 @@ def render_my_roster() -> None:
                 if pick is not None:
                     req_rows.append({
                         "Requirement": label, "Player": pick.player_name, "Pos": pick.position,
-                        "Rd": pick.round, "Pick": pick.overall_pick,
+                        "Rd": _rd_display(pick), "Pick": pick.overall_pick,
                     })
                 else:
                     req_rows.append({
@@ -208,7 +255,7 @@ def render_my_roster() -> None:
             [
                 {
                     "Player": p.player_name, "Pos": p.position, "NFL Team": p.nfl_team,
-                    "Rd": p.round, "Pick": p.overall_pick,
+                    "Rd": _rd_display(p), "Pick": p.overall_pick,
                 }
                 for p in sorted(bench, key=lambda p: p.overall_pick)
             ]

@@ -29,6 +29,13 @@ there. All the row/point-building logic lives in src.league_grid (unit
 -tested there) -- this file only turns that into an HTML table, since
 Streamlit's native st.dataframe can't merge a "Team Name" header across
 each team's Player+Proj Pts column pair the way the mockup wants.
+
+**Current roster / As drafted toggle (2026-09-09)**: same toggle as
+pages/4_My_Roster.py -- "Current roster" (default) layers every team's
+waiver adds/drops/trades (src.roster_state, sourced from CBS's
+Transaction Report via src.data_sources.transactions) on top of the
+draft-day snapshot; "As drafted" shows the original snapshot unchanged.
+Applies to every team's column in the grid, not just Monster Cheese's.
 """
 
 from __future__ import annotations
@@ -40,15 +47,18 @@ import pandas as pd
 import streamlit as st
 
 from src.data_sources.manual_import import load_many
+from src.data_sources.transactions import load_transactions
 from src.draft_state import DraftState
 from src.league_grid import LeagueGrid, build_league_grid
 from src.projections import build_draft_board, load_source_weights
+from src.roster_state import current_roster_by_team
 from src.scoring import load_config
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
 DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
 SOURCE_WEIGHTS_FILE = os.path.join(ROOT, "data", "source_weights.json")
+TRANSACTIONS_CSV = os.path.join(ROOT, "data", "transactions", "transactions.csv")
 # Same extension allowlist as the Draft Board -- keeps out
 # data/projections/README.md, which isn't a data file.
 DATA_EXTENSIONS = (".csv", ".tsv", ".xlsx", ".xlsm", ".xltx", ".xls")
@@ -237,11 +247,20 @@ def render_league_rosters() -> None:
 
     st.title("🏆 League Rosters")
     st.caption(
-        "Every team's drafted roster, side by side, updating live as picks are "
-        "logged. Use this to spot other teams' needs (and gaps you might be able "
-        "to exploit) and to see how your own roster stacks up on projected "
-        "points. Scroll right for the rest of the league — Roster Position stays "
-        "pinned on the left."
+        "Every team's roster, side by side, updating live as picks are logged "
+        "and as post-draft moves are captured. Use this to spot other teams' "
+        "needs (and gaps you might be able to exploit) and to see how your own "
+        "roster stacks up on projected points. Scroll right for the rest of the "
+        "league — Roster Position stays pinned on the left."
+    )
+
+    view = st.radio(
+        "Roster view", ["Current roster", "As drafted"], horizontal=True,
+        help=(
+            "Current roster reflects waiver adds/drops/trades captured from "
+            "CBS's Transaction Report on top of each team's draft-day snapshot. "
+            "As drafted shows the original, unmodified draft-day rosters."
+        ),
     )
 
     if players_df.empty:
@@ -267,7 +286,21 @@ def render_league_rosters() -> None:
         )
 
     points_by_name = players_df.set_index("name")["score_total"]
-    rosters = draft_state.roster_by_team()
+
+    roster_warnings: list[str] = []
+    if view == "Current roster":
+        transactions = load_transactions(TRANSACTIONS_CSV)
+        roster_result = current_roster_by_team(draft_state, transactions)
+        rosters = roster_result.rosters
+        roster_warnings = roster_result.warnings
+        if transactions.empty:
+            st.caption(
+                "No transactions captured yet (data/transactions/transactions.csv is "
+                "empty or missing) — showing draft-day rosters until "
+                "`scripts/fetch_transactions.py` has real data to work from."
+            )
+    else:
+        rosters = draft_state.roster_by_team()
 
     grid = build_league_grid(rosters, teams, starters, points_by_name)
 
@@ -285,6 +318,11 @@ def render_league_rosters() -> None:
             " — scored as 0 pts above (name mismatch between the draft log and "
             "projections data, or an undrafted-in-projections player)."
         )
+
+    if roster_warnings:
+        with st.expander(f"⚠️ {len(roster_warnings)} transaction warning(s)"):
+            for w in roster_warnings:
+                st.caption(w)
 
     st.divider()
     st.page_link("pages/1_Draft_Board.py", label="← Back to Draft Board", icon="🏈")
