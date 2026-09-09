@@ -73,6 +73,7 @@ pages = [
     st.Page("pages/7_Reports.py", title="Reports", icon="📥"),
     st.Page("pages/8_Weekly_Matchup.py", title="Weekly Matchup", icon="🆚"),
     st.Page("pages/9_Waiver_Wire.py", title="Waiver Wire", icon="🧢"),
+    st.Page("pages/10_Trade_Finder.py", title="Trade Finder", icon="🔄"),
 ]
 
 st.navigation(pages).run()

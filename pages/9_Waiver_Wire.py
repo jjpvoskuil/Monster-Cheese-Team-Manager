@@ -63,13 +63,12 @@ import re
 import pandas as pd
 import streamlit as st
 
-from src.data_sources.manual_import import CANONICAL_COLUMNS, load_table
 from src.data_sources.transactions import load_transactions
 from src.draft_state import DraftState
-from src.projections import _normalize_dst_names
 from src.roster_needs import assign_roster_slots
 from src.roster_state import current_roster_by_team, current_roster_for_team
-from src.scoring import ScoringEngine, load_config
+from src.scoring import load_config
+from src.season_scoring import load_scored_season_source
 from src.waiver_recommendations import (
     CATEGORY_LABELS,
     FreeAgent,
@@ -115,36 +114,12 @@ def _load_csv(path: str, _mtime: float) -> pd.DataFrame:
 
 @st.cache_data
 def _scored_season_projections(path: str, source: str, _mtime: float) -> pd.DataFrame:
-    """Every player in a single-source season projection file
-    (data/projections/{source}_2026.csv), scored under this league's
-    real rules by this app's own ScoringEngine -- NOT the blended
-    multi-source src.projections.build_draft_board() ranking used
-    elsewhere, since a same-SOURCE comparison is what makes the
-    CBS-vs-FantasyPoints labeling on this page mean anything (see this
-    module's docstring)."""
-    config = get_config()
-    df = load_table(path, source)
-    df = _normalize_dst_names(df)
-    df = df.copy()
-    # load_table() only fills a canonical stat column that's ENTIRELY
-    # missing from the source file with 0 -- an individual blank CELL
-    # within a present column (e.g. a TE's pass_yards cell) stays NaN.
-    # src.projections.blend_projections() explicitly guards against this
-    # (see its own long comment on a 2026-09-02 bug from exactly this),
-    # but that guard only runs for the multi-source blended pipeline this
-    # page deliberately bypasses (single-source, so there's nothing to
-    # blend) -- fillna(0) here directly instead, or a NaN stat silently
-    # NaNs out ScoreBreakdown.total for any player with even one blank
-    # cell (confirmed live: Darren Waller's blank passing/rushing cells
-    # produced "nan" pts before this fix).
-    stat_columns = [c for c in CANONICAL_COLUMNS if c not in ("name", "position", "nfl_team", "games")]
-    df[stat_columns] = df[stat_columns].fillna(0)
-    df["games"] = df["games"].fillna(config.get("estimation_assumptions", {}).get("games_per_season", 17))
-    engine = ScoringEngine(config)
-    df["score_total"] = df.apply(
-        lambda row: engine.score_player_season(row.to_dict(), games=row.get("games")).total, axis=1
-    )
-    return df[["name", "position", "nfl_team", "score_total"]]
+    """Every player in a single-source season projection file, scored
+    under this league's real rules -- see src.season_scoring (shared
+    with pages/10_Trade_Finder.py) for the NaN-safety fix this relies on
+    and why a single named source, not the blended Draft Board ranking,
+    is what this page needs."""
+    return load_scored_season_source(path, source, get_config())[["name", "position", "nfl_team", "score_total"]]
 
 
 def _week_matchup_signals(year: int, week: int, my_team: str) -> tuple[dict, dict, set, set]:

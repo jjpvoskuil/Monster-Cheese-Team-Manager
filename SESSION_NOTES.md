@@ -800,6 +800,80 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-09-09 — Trade Finder page: multi-player trade recommendations, dual CBS/FantasyPoints lens
+New `pages/10_Trade_Finder.py` + `src/trade_recommendations.py`, per
+league-manager request: "create a page that recommends trades with other
+teams," with no limit on players per side other than an explicit 3-per
+-side cap, asymmetric trades allowed (e.g. 2-for-3), and — the core
+design constraint — trades must be in "the best perceived interest of
+both teams," with the explicit worry that "situations where Fantasypoints
+values a player higher than CBS might make the trade seem better than it
+actual is for the team using CBS projections."
+
+**Design — two lenses, on purpose**: my own needs/surplus/gain are judged
+by FantasyPoints VOR (the source trusted for this analysis, matching
+"we want to see value only based on Fantasypoints projections"); the
+OTHER team's needs/surplus/gain are judged by CBS VOR ("most other teams
+will use CBS"). A trade is only proposed when BOTH sides clear a
+positive-gain bar under their OWN trusted source — this is the direct
+guard against the exact risk the league manager called out. Every
+proposal also surfaces what CBS would say I gained, so a trade that only
+looks good under FantasyPoints is flagged with a warning rather than
+hidden.
+
+**Need/surplus**: reuses the same per-position VOR framework as the
+Draft Board (`src.projections.compute_position_demand`/`score_and_rank`),
+not raw points, so a thin position's premium is already baked in. Per
+team per position: rank rostered players eligible for that position by
+VOR descending; the top N (N = combined starter-slot count across every
+slot that position is eligible for, e.g. TE counts toward both the
+dedicated TE slot and `WR_TE_FLEX`) are "starters," the rest are
+"surplus"; "need" = numerically short of N, OR a starter below
+replacement (VOR < 0) even when the position is numerically full.
+Matching: for my team vs. each other team, look for a position I have
+surplus at that they need (what I'd give) and a position they have
+surplus at that I need (what I'd get); no complementary pair means no
+trade basis with that team at all, not a forced one. One proposal per
+other team, sized 1-to-3 players per side, picked to maximize my
+FantasyPoints VOR gain among every combination where both sides' gain
+bars clear.
+
+**Shared refactor**: extracted `src/season_scoring.py` (single-source
+CBS/FantasyPoints scoring, with the NaN-safety fix noted in the Waiver
+Wire entry below applied once, centrally) out of Waiver Wire's inline
+scoring helper so Trade Finder could reuse it rather than re-solving the
+same bug; `pages/9_Waiver_Wire.py` was refactored to call the shared
+helper too (`tests/test_waiver_wire_page.py` reconfirmed 4/4 passing
+unchanged after the refactor). Also extracted `combined_slot_count()`
+(the "sum a position's required count across every eligible slot" logic)
+as a standalone function in `src/trade_recommendations.py`, matching the
+identical fix already made in `src/waiver_recommendations.py`'s
+bench-depth tier.
+
+**Data**: every current roster across all 10 teams
+(`src.roster_state.current_roster_by_team`) joined by exact name match
+against both season projection files. A rostered player missing from
+both sources gets VOR 0 for that source rather than being dropped —
+surfaced separately as a data-quality expander, same transparency
+pattern as League Rosters' "no projection found for" warning, since
+silently zeroing an unprojected player would bias need/surplus around
+them without the manager knowing why. Bye weeks (for an informational
+"also helps bye-week risk" bonus note only — never a ranking factor,
+since a bye-driven trade is "only good for one week in and of itself" as
+the manager put it) come from the waiver wire's own captured BYE column
+rather than needing a new capture.
+
+**Bug caught while writing this module's own tests** (not a page bug):
+`TeamPlayer` is an unhashable `@dataclass` (default `eq=True`), so
+`dict.fromkeys()` for de-duping a dual-eligible player across two
+qualifying positions raised — fixed with a manual identity-based
+(`id()`-keyed) dedup helper instead.
+
+10 new tests in `tests/test_trade_recommendations.py` (engine) + 3 in
+`tests/test_trade_finder_page.py` (AppTest smoke tests against the real
+committed data — draft complete, no "not captured yet" state to fake).
+Full suite: 400 passed.
+
 ### 2026-09-09 — Waiver Wire page: top pickup recommendations, CBS + FantasyPoints, source toggle
 New `pages/9_Waiver_Wire.py`, per league-manager request: "a page that
 recommends the top 3 players that I could pick up off waivers," with an
