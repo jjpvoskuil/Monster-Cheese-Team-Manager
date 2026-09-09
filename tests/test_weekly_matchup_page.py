@@ -148,6 +148,54 @@ def test_download_button_present(synthetic_week):
     assert "csv" in at.download_button[0].label.lower() or "download" in at.download_button[0].label.lower()
 
 
+def test_start_recommendation_and_bye_highlight():
+    # Deliberately its own week number (997) rather than the shared
+    # synthetic_week fixture, same reasoning as test_missing_fantasypoints_
+    # data_shows_warning below: a distinct week avoids any st.cache_data
+    # mtime-collision risk with another test's fixture.
+    config = _load_config()
+    my_team = config["league"]["team_name"]
+    year, week = 2026, 997
+
+    rows = [
+        {"year": year, "week": week, "away_team": "Ball Busters", "home_team": my_team,
+         "team": "Ball Busters", "roster_group": "starter", "slot": "Quarterbacks",
+         "slot_index": 1, "order": 1, "player_name": "Away Starter", "position": "QB",
+         "nfl_team": "AAA", "matchup_desc": "AAA vs BBB", "cbs_points": 10.0},
+        # A weak starting QB that a much stronger bench QB should replace.
+        {"year": year, "week": week, "away_team": "Ball Busters", "home_team": my_team,
+         "team": my_team, "roster_group": "starter", "slot": "Quarterbacks",
+         "slot_index": 1, "order": 1, "player_name": "Weak Starter QB", "position": "QB",
+         "nfl_team": "CCC", "matchup_desc": "CCC vs DDD", "cbs_points": 5.0},
+        {"year": year, "week": week, "away_team": "Ball Busters", "home_team": my_team,
+         "team": my_team, "roster_group": "bench", "slot": "Bench",
+         "slot_index": 0, "order": 1, "player_name": "Strong Bench QB", "position": "QB",
+         "nfl_team": "EEE", "matchup_desc": "EEE vs FFF", "cbs_points": 25.0},
+        # A starter whose team is on a bye -- can't legally start regardless
+        # of their projection, should be flagged as both "bye" and "bench".
+        {"year": year, "week": week, "away_team": "Ball Busters", "home_team": my_team,
+         "team": my_team, "roster_group": "starter", "slot": "Running Backs",
+         "slot_index": 1, "order": 2, "player_name": "Bye Starter RB", "position": "RB",
+         "nfl_team": "GGG", "matchup_desc": "BYE", "cbs_points": 15.0},
+    ]
+    os.makedirs(MATCHUP_DIR, exist_ok=True)
+    pd.DataFrame(rows).to_csv(_matchup_csv_path(year, week), index=False)
+
+    try:
+        at = AppTest.from_file(os.path.join(ROOT, "app.py"))
+        at.run(timeout=60)
+        at = _open_page(at)
+
+        assert at.selectbox[0].value == (year, week)
+        assert not at.exception
+
+        captions = " ".join(c.value for c in at.caption)
+        assert "should be in your starting lineup" in captions
+        assert "on a bye" in captions
+    finally:
+        os.remove(_matchup_csv_path(year, week))
+
+
 def test_missing_fantasypoints_data_shows_warning():
     # Deliberately a DIFFERENT week number from the synthetic_week fixture
     # (998, not 999) and no FantasyPoints CSV ever written for it -- using

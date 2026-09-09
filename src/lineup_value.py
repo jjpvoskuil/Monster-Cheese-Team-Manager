@@ -52,13 +52,28 @@ def expand_slots(starters: list[dict]) -> list[dict]:
     return expanded
 
 
-def optimal_lineup_points(players: list[LineupPlayer], starters: list[dict]) -> float:
-    """Best-possible total projected points for a legal starting lineup
-    assembled from `players`, given `starters` slot definitions. Returns
-    0.0 if there are no slots or no players."""
+def _is_eligible(position: str, eligible: set[str]) -> bool:
+    """True if `position` qualifies for a slot whose eligible set is
+    `eligible`. Handles a COMPOUND position label like "WR-TE" (what CBS's
+    Scoring Preview prints for a player it has slotted into a flex spot --
+    see src/data_sources/weekly_matchup.py's module docstring, "KNOWN
+    LIMITATION" -- CBS doesn't say whether that player is really a WR or a
+    TE) by treating it as eligible for a slot if EITHER half matches, e.g.
+    "WR-TE" satisfies a WR_TE_FLEX slot (eligible={"WR","TE"}) the same as
+    a real "WR" or "TE" would. A plain single-word position (the normal
+    case -- QB, RB, WR, TE, K, DST) is unaffected: splitting "RB" on "-"
+    just yields ["RB"], same as before."""
+    return any(part in eligible for part in position.split("-"))
+
+
+def _solve_assignment(players: list[LineupPlayer], starters: list[dict]):
+    """Shared setup + scipy solve for both optimal_lineup_points() and
+    optimal_lineup_assignment() below -- returns (slots, padded_players,
+    cost_matrix, row_ind, col_ind), or None if there's nothing to solve
+    (no slots or no players)."""
     slots = expand_slots(starters)
     if not slots or not players:
-        return 0.0
+        return None
 
     n_slots = len(slots)
     players = list(players)
@@ -78,10 +93,22 @@ def optimal_lineup_points(players: list[LineupPlayer], starters: list[dict]) -> 
     for i, slot in enumerate(slots):
         eligible = set(slot["eligible"])
         for j, p in enumerate(players):
-            if p.position in eligible:
+            if _is_eligible(p.position, eligible):
                 cost[i, j] = -p.points
 
     row_ind, col_ind = linear_sum_assignment(cost)
+    return slots, players, cost, row_ind, col_ind
+
+
+def optimal_lineup_points(players: list[LineupPlayer], starters: list[dict]) -> float:
+    """Best-possible total projected points for a legal starting lineup
+    assembled from `players`, given `starters` slot definitions. Returns
+    0.0 if there are no slots or no players."""
+    solved = _solve_assignment(players, starters)
+    if solved is None:
+        return 0.0
+    _slots, _players, cost, row_ind, col_ind = solved
+
     total = 0.0
     for r, c in zip(row_ind, col_ind):
         if cost[r, c] < INELIGIBLE_PENALTY:
@@ -89,3 +116,29 @@ def optimal_lineup_points(players: list[LineupPlayer], starters: list[dict]) -> 
         # else: no eligible player left for this slot instance -- an empty
         # slot contributes 0, rather than being forced into an illegal fill.
     return total
+
+
+@dataclass
+class SlotAssignment:
+    slot: str
+    player: LineupPlayer | None  # None if no eligible player was left for this slot instance
+
+
+def optimal_lineup_assignment(players: list[LineupPlayer], starters: list[dict]) -> list[SlotAssignment]:
+    """Like optimal_lineup_points(), but returns WHICH player fills each
+    slot instance instead of just the total -- used to highlight "you
+    should be starting X instead of Y" (pages/8_Weekly_Matchup.py) rather
+    than only reporting a hypothetical best-case score. One SlotAssignment
+    per expand_slots(starters) row, in that same order; `player` is None
+    for a slot instance no remaining eligible player could fill (see
+    optimal_lineup_points' "empty slot" note -- same rule here)."""
+    solved = _solve_assignment(players, starters)
+    if solved is None:
+        return [SlotAssignment(slot=s["slot"], player=None) for s in expand_slots(starters)]
+    slots, padded_players, cost, row_ind, col_ind = solved
+
+    assignment: list[SlotAssignment | None] = [None] * len(slots)
+    for r, c in zip(row_ind, col_ind):
+        player = padded_players[c] if cost[r, c] < INELIGIBLE_PENALTY else None
+        assignment[r] = SlotAssignment(slot=slots[r]["slot"], player=player)
+    return assignment

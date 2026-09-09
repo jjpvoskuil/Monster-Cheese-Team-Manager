@@ -800,6 +800,63 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-09-09 — Weekly Matchup: layout/totals fixes + start/bench and bye-week highlighting
+Follow-up league-manager feedback on the Weekly Matchup page added earlier
+the same day (see the next entry below for the page's original build).
+
+1. **Andy Dalton confusion, resolved (not a bug)**: league manager asked
+   "where did Andy Dalton come from, he's not on our roster" — confirmed
+   via the captured CBS data (`data/weekly_matchups/2026_week1.csv`) that
+   Andy Dalton is Ball Busters' (the *opponent's*) bench QB, not Monster
+   Cheese's — the page's per-team sectioning was already correct, this was
+   the league manager reading the opponent's bench as if it were their own.
+
+2. **Horizontal-scroll fix**: replaced the two-`st.columns`-side-by-side
+   layout (each team getting half page width) with full-width stacked
+   sections — my team's tables, then the opponent's below, divided by
+   `st.divider()` — plus explicit `st.column_config` width settings per
+   column so the Points column never gets pushed off-screen.
+
+3. **Team point totals next to team names**: added `_team_total()` and
+   surfaced the starting-lineup total directly in each team's section
+   header (`#### {team} — {total:.1f} pts ({source})`) and in the top
+   matchup-summary caption.
+
+4. **Start/bench highlighting** (the actual ask: "highlight the players we
+   should start based on the highest possible scoring starters for the
+   week"): extended `src/lineup_value.py` (previously only used by
+   `scripts/simulate_draft.py`) with `optimal_lineup_assignment()` — same
+   `linear_sum_assignment` optimal-assignment solver as
+   `optimal_lineup_points()`, but returns the actual best player-to-slot
+   mapping instead of just a total — plus a compound-position-aware
+   `_is_eligible()` helper (CBS's Scoring Preview labels a flex-slotted
+   player `"WR-TE"` rather than resolving which one they really are — see
+   `weekly_matchup.py`'s own "KNOWN LIMITATION" docstring note — so
+   eligibility now checks either half of a `"-"`-split position string).
+   The Weekly Matchup page runs this over Monster Cheese's full roster
+   (starters ∪ bench, whichever projection source is toggled) on every
+   render and highlights green any benched player who belongs in the
+   optimal 12, red any current starter who doesn't. Opponent's tables
+   don't get this treatment — no "should start" advice to give about
+   someone else's roster.
+
+5. **Bye-week highlighting** (same feedback message, follow-up ask): a
+   player whose `matchup_desc` reads as a bye is flagged amber wherever
+   they show up and is excluded entirely from the start/bench solver's
+   player pool (so a currently-started bye player always also shows red —
+   can't be legally started no matter their projection). Caveat: no real
+   captured week has actually contained a bye yet (Week 1 has none), so
+   the "bye" text-match hasn't been cross-validated against a live CBS
+   capture — worth re-checking the first time a captured week has one.
+
+Verified against the real captured Week 1 data that Monster Cheese's
+CBS-set lineup is already optimal (132.0 pts either way — no highlighting
+fires), and added synthetic-data tests
+(`tests/test_weekly_matchup_page.py::test_start_recommendation_and_bye_highlight`,
+4 new tests in `tests/test_lineup_value.py`) so both features have
+regression coverage beyond that one real-data spot check. Full suite:
+362 passed.
+
 ### 2026-09-09 — Weekly Matchup page: CBS-sourced lineups, CBS/FantasyPoints projection toggle
 Continuation of the same day's work below (roster tracking / cloud-mirror
 fix) plus the "are projections frozen" research: confirmed both CBS and
