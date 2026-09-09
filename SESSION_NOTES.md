@@ -7,7 +7,12 @@ the top of the log (below "How to use this file") — newest entry first.
 Keep entries short: what happened, what's true now, what's next. Don't
 rewrite history further down; just append.
 
-Draft day: **Sunday 2026-08-30, 2:30pm ET.**
+Draft day was **Sunday 2026-08-30, 2:30pm ET** — the 2026 draft is
+complete (220 picks, backfilled and verified against CBS's own results).
+As of 2026-09-09 the project's focus has shifted from draft-day tooling
+to **in-season team management** — see the 2026-09-09 log entry and
+`NEXT_SEASON_SETUP.md` for the draft-day/offseason-refresh material,
+which is now reference material rather than the active focus.
 
 ## How to use this file
 
@@ -674,22 +679,36 @@ Draft day: **Sunday 2026-08-30, 2:30pm ET.**
 
 ## Git push access — read this if `git push` 403s
 
+**AMENDED 2026-09-09 — do not follow the PAT workaround below anymore.**
+Earlier sessions had Claude ask the user to paste a GitHub PAT into chat
+each session so Claude could configure push access directly (both for
+this cloud clone and, in one project doc, framed as a "fresh temporary
+PAT" for the user's local Mac clone too). **This is retired — Claude
+should never ask for, accept, or use a GitHub credential on the user's
+behalf, even a short-lived one the user offers unprompted.** If a user
+pastes one anyway, don't use it; tell them not to share it here and to
+revoke/regenerate it since it's now in chat history.
+
+The actual working pattern going forward: the user's own Mac already has
+working push credentials (confirmed — they've pushed successfully from
+their own Terminal without any help from Claude). So Claude edits code,
+runs tests, and commits locally — either via the device bridge straight
+into the user's local clone if one is connected, or by handing back
+changed files (e.g. `SendUserFile`) for the user to save/commit if not —
+and the USER runs `git push` themselves from their own Terminal whenever
+something's ready to publish. Claude should say when there's something
+worth pushing, not push it itself.
+
+The technical detail below (why a cloud-sandbox `git push` can 403, and
+the `extraheader` mechanism) is kept for historical/diagnostic context
+only — it is NOT something to re-enable by asking the user for a token.
+
 Sessions are sometimes started without this repo attached as a source,
 which makes `git push` fail with a proxy 403 ("not in this session's
 authorized repository set") even though `git clone`/read access works
-fine. Workaround (confirmed working, no need to restart the session):
-
-```
-cd <repo>
-PAT='<github PAT with repo scope, ask the user>'
-AUTH=$(printf 'x-access-token:%s' "$PAT" | base64 -w0)
-git config --local http.https://github.com/.extraheader "Authorization: Basic $AUTH"
-```
-
-After that, ordinary `git push`/`pull`/`fetch` work for the rest of the
-session — the proxy's allowlist doesn't intercept requests that already
-carry their own Authorization header. Ask the user for a fresh PAT each
-time; don't assume an old one from the log below is still valid.
+fine. If this happens, that cloud clone simply can't push this session —
+fall back to the SendUserFile → user-commits-and-pushes pattern above
+rather than working around the 403.
 
 ## Local clone access via the device bridge (correction to 2026-08-26's dry-run entry)
 
@@ -732,6 +751,35 @@ editing/reading files in the clone directly; keep clone-from-scratch,
 venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
+
+### 2026-09-09 — Project pivots to in-season team management; retired the PAT-paste git workflow
+User is starting a new chat to begin the next phase: turning this from a
+draft-day tool into a season-long team manager (roster tracking for
+every team including transactions/trades/injuries, weekly starting
+-lineup recommendations, trade suggestions/evaluation, bye-week gap
+coverage, ongoing team-needs assessment). See the session-starter prompt
+in the attached Claude Project (`claude/new-session-prompt.md` and
+`Session Prompt.txt`) for the actual kickoff message used, and the
+project's "MFL Team Manager" description for scope. Nothing built yet
+for this phase — the first task for the new session is turning the
+rough feature list into an actual plan with the user before writing
+code.
+
+Also, prompted by the user asking whether a fresh "temporary" PAT would
+be OK for Claude to push with (framed as safer since it's short-lived):
+declined — this is a hard rule regardless of how the token is scoped or
+who offers it. Discovered while addressing this that an earlier
+session's project docs had already normalized exactly this pattern
+("I'll paste a fresh GitHub PAT... use it to set up push access"),
+presumably why the user assumed it was fine. Retired it everywhere it
+was found: amended this file's "Git push access" section above, and
+rewrote both `claude/new-session-prompt.md` and `Session Prompt.txt` in
+the Project to remove the paste-a-PAT instruction. Going forward: the
+user's Mac already has working push credentials on its own (confirmed —
+they've pushed successfully without any help from Claude); Claude edits/
+commits (via the device bridge into the local clone, or by handing back
+files if no bridge is connected) and the user pushes it themselves from
+their own Terminal.
 
 ### 2026-09-02 — Draft-grades Word report for the league; found and fixed two real scoring bugs along the way
 User asked for an objective, shareable Word-doc grading of the real
