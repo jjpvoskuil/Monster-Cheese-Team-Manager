@@ -120,7 +120,9 @@ st.caption(
     "(the source trusted for this analysis), and the other team's gain by CBS projections "
     "(what most other teams are assumed to use) — a trade only shows up here when BOTH sides "
     "come out ahead under their own trusted source. Value is VOR (value over this league's "
-    "real replacement level at that position), same framework as the Draft Board."
+    "real replacement level at that position), same framework as the Draft Board. Players are "
+    "only offered/requested when they'd actually be worth starting for the receiving team — "
+    "not just added bench depth — unless that team's depth at the position is genuinely thin."
 )
 
 config = get_config()

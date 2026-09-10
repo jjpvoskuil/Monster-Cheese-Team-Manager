@@ -800,6 +800,41 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-09-10 — Trade Finder tuning: require a real starting-lineup upgrade, count empty positions as holes
+Follow-up league-manager feedback on the Trade Finder page added the day
+before (see the next entry below for the page's original build):
+
+1. **"Both sides are usually looking for a starter and adding another
+   player to the mix if they aren't going to play them, isn't all that
+   attractive (unless their depth is really weak)."** Previously a
+   "need" position (numeric shortage OR a below-replacement starter) let
+   ANY surplus player fill it, even one that wouldn't actually outvalue
+   the weakest existing starter there — i.e. just more bench depth
+   dressed up as a fix. Added `_is_true_upgrade()` in
+   `src/trade_recommendations.py`: a candidate player only counts as
+   filling a need if the position is numerically short of bodies at all
+   (the "depth is really weak" exception) or the player outvalues the
+   weakest current starter there, in the receiving team's own trusted
+   lens. Filters `give_pool`/`get_pool` before combos are tried; a team
+   with no players clearing this bar on either side now correctly
+   produces no trade with that team. This is also what naturally cuts
+   most pairings down to "no trade basis" — confirmed against real data:
+   went from 7 proposed trades to 2 on the real 10-team league.
+
+2. **"Make sure to look at the holes in the other teams roster that
+   matches surpluses we have."** `_position_groups()` previously only
+   ever considered positions that already had at least one rostered
+   player — a position with ZERO rostered players (a dropped kicker, a
+   streamed DST) never appeared in the profile dict at all, so it could
+   never register as a need. Now seeds every position with a required
+   starter slot up front, so a totally-empty position surfaces as a
+   `missing`-count hole like any other numeric shortage.
+
+3 new tests in `tests/test_trade_recommendations.py` covering both
+fixes (a bench-only offer correctly rejected, the same offer accepted
+once it would genuinely start, and a totally-unrostered position
+correctly treated as a hole). Full suite: 403 passed.
+
 ### 2026-09-09 — Trade Finder page: multi-player trade recommendations, dual CBS/FantasyPoints lens
 New `pages/10_Trade_Finder.py` + `src/trade_recommendations.py`, per
 league-manager request: "create a page that recommends trades with other

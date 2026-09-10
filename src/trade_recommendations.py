@@ -63,6 +63,35 @@ get side's most-FantasyPoints-valuable surplus players first, since
 those are what each side would actually want to include), and keep the
 best-scoring combination where BOTH my FantasyPoints-based gain AND
 their CBS-based gain are positive.
+
+REFINEMENTS per league-manager feedback (2026-09-10):
+
+  "both sides are usually looking for a starter and adding another
+  player to the mix if they aren't going to play them, isn't all that
+  attractive (unless their depth is really weak)."
+
+  A surplus player only counts as fillable for a "need" position if
+  they would actually be worth starting there for the RECEIVING team,
+  in that team's own trusted lens -- either that position is
+  numerically short of bodies at all (real thinness -- exactly the
+  "depth is really weak" exception) or the incoming player outvalues
+  the weakest player currently starting there. Otherwise a "need"
+  match is real on paper (a below-replacement starter exists) but the
+  specific player offered wouldn't actually unseat them, so it's just
+  bench churn dressed up as an upgrade -- filtered out via
+  `_is_true_upgrade` before combos are even tried. This is also what
+  naturally narrows most pairings down to "no trade basis" rather than
+  a shallow match with almost every other team.
+
+  "make sure to look at the holes in the other teams roster that
+  matches surpluses we have."
+
+  A position can BE a hole even with zero rostered players there at
+  all (a dropped kicker or streamed DST, say) -- `_position_groups` now
+  seeds every position with a required starter slot (not just positions
+  that happen to already have a rostered player) so a totally-empty
+  position still surfaces as a `missing`-count need instead of silently
+  never appearing.
 """
 
 from __future__ import annotations
@@ -115,12 +144,17 @@ class PositionProfile:
     starters: list[TeamPlayer]
     surplus: list[TeamPlayer]   # sorted, most valuable first (by the value_key used to build it)
     is_need: bool
+    missing: int = 0            # numeric shortage of rostered bodies vs. required starter count
 
 
 def _position_groups(
     roster: list[TeamPlayer], required_by_position: dict[str, int], value_key: str,
 ) -> dict[str, PositionProfile]:
-    by_pos: dict[str, list[TeamPlayer]] = {}
+    # Seed every position this league actually starts, even ones with
+    # zero rostered players -- a totally-empty position (a dropped
+    # kicker, a streamed DST) is a real hole and must still surface as
+    # a `missing`-count need, not silently vanish for lack of a key.
+    by_pos: dict[str, list[TeamPlayer]] = {pos: [] for pos in required_by_position}
     for p in roster:
         for pos in _eligible_positions(p.position):
             by_pos.setdefault(pos, []).append(p)
@@ -132,8 +166,31 @@ def _position_groups(
         starters, surplus = ranked[:required], ranked[required:]
         missing = required - len(starters)
         weak_starter = any(getattr(p, value_key) < 0 for p in starters)
-        profiles[pos] = PositionProfile(starters=starters, surplus=surplus, is_need=(missing > 0 or weak_starter))
+        profiles[pos] = PositionProfile(
+            starters=starters, surplus=surplus, is_need=(missing > 0 or weak_starter), missing=missing,
+        )
     return profiles
+
+
+def _is_true_upgrade(player: TeamPlayer, positions: set[str], profiles: dict[str, PositionProfile], value_key: str) -> bool:
+    """Would `player` actually be worth starting for the team `profiles`
+    belongs to, at one of `positions`, in that team's own value lens?
+    True when that position is numerically short of bodies at all (the
+    "depth is really weak" exception) or `player` outvalues the weakest
+    player currently starting there. False means this specific player
+    wouldn't unseat anyone -- a "need" that's real on paper but not one
+    this player fills, so offering/receiving them is just bench churn."""
+    for pos in positions:
+        if pos not in _eligible_positions(player.position):
+            continue
+        prof = profiles.get(pos)
+        if prof is None:
+            continue
+        if prof.missing > 0:
+            return True
+        if prof.starters and getattr(player, value_key) > min(getattr(s, value_key) for s in prof.starters):
+            return True
+    return False
 
 
 @dataclass
@@ -245,6 +302,15 @@ def find_trades(
         # sort (TeamPlayer isn't hashable, so dict.fromkeys won't work).
         give_pool = _dedup_by_identity(give_pool)
         get_pool = _dedup_by_identity(get_pool)
+
+        # Only keep players who'd actually be worth starting for the
+        # receiving side -- otherwise a "need" position is real on paper
+        # but this particular player is just more bench, not a fix (see
+        # module docstring's 2026-09-10 refinement).
+        give_pool = [p for p in give_pool if _is_true_upgrade(p, give_positions, their_profiles, "cbs_vor")]
+        get_pool = [p for p in get_pool if _is_true_upgrade(p, get_positions, my_profiles, "fp_vor")]
+        if not give_pool or not get_pool:
+            continue
 
         combo = _best_combo(give_pool, get_pool, max_players_per_side)
         if combo is None:

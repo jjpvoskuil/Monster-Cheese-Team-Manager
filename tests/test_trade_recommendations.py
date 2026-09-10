@@ -201,3 +201,82 @@ def test_dual_eligible_position_counts_for_either_slot():
 def test_empty_rosters_do_not_crash():
     assert find_trades("Me", {}, STARTERS) == []
     assert find_trades("Me", {"Me": []}, STARTERS) == []
+
+
+def test_bench_only_add_is_not_proposed_as_a_fix():
+    # League-manager feedback (2026-09-10): a "need" that's real on
+    # paper (a below-replacement starter) shouldn't be filled by just
+    # any surplus player if that player wouldn't actually crack the
+    # starting lineup -- here I already roster 2 RBs (so RB isn't
+    # numerically short), both below replacement, and the rival's
+    # offered RB Spare is worse than BOTH of them under my own
+    # (FantasyPoints) lens -- it would sit on my bench, not start, so
+    # this shouldn't be proposed even though "RB is a need" is true.
+    my_roster = [
+        TeamPlayer("QB Starter", "QB", "AAA", fp_vor=50.0, cbs_vor=50.0),
+        TeamPlayer("QB Spare", "QB", "BBB", fp_vor=10.0, cbs_vor=15.0),
+        TeamPlayer("RB Starter", "RB", "CCC", fp_vor=-5.0, cbs_vor=-5.0),
+        TeamPlayer("RB Bench", "RB", "DDD", fp_vor=-6.0, cbs_vor=-6.0),
+    ]
+    rival_roster = [
+        TeamPlayer("Weak QB", "QB", "EEE", fp_vor=-10.0, cbs_vor=-10.0),
+        TeamPlayer("RB1", "RB", "FFF", fp_vor=20.0, cbs_vor=40.0),
+        TeamPlayer("RB2", "RB", "GGG", fp_vor=15.0, cbs_vor=30.0),
+        TeamPlayer("RB Spare", "RB", "HHH", fp_vor=-7.0, cbs_vor=5.0),
+    ]
+    rosters = {"Me": my_roster, "Rival": rival_roster}
+    assert find_trades("Me", rosters, STARTERS) == []
+
+
+def test_true_upgrade_add_still_proposed_when_it_would_start():
+    # Same shape as above, but this time the offered RB Spare actually
+    # outvalues my weakest current RB starter under FantasyPoints, so
+    # it would genuinely crack my starting lineup -- should still be
+    # proposed.
+    my_roster = [
+        TeamPlayer("QB Starter", "QB", "AAA", fp_vor=50.0, cbs_vor=50.0),
+        TeamPlayer("QB Spare", "QB", "BBB", fp_vor=10.0, cbs_vor=15.0),
+        TeamPlayer("RB Starter", "RB", "CCC", fp_vor=-5.0, cbs_vor=-5.0),
+        TeamPlayer("RB Bench", "RB", "DDD", fp_vor=-6.0, cbs_vor=-6.0),
+    ]
+    rival_roster = [
+        TeamPlayer("Weak QB", "QB", "EEE", fp_vor=-10.0, cbs_vor=-10.0),
+        TeamPlayer("RB1", "RB", "FFF", fp_vor=20.0, cbs_vor=40.0),
+        TeamPlayer("RB2", "RB", "GGG", fp_vor=15.0, cbs_vor=30.0),
+        TeamPlayer("RB Spare", "RB", "HHH", fp_vor=15.0, cbs_vor=5.0),
+    ]
+    rosters = {"Me": my_roster, "Rival": rival_roster}
+    trades = find_trades("Me", rosters, STARTERS)
+    assert len(trades) == 1
+    assert [p.name for p in trades[0].get] == ["RB Spare"]
+
+
+def test_totally_unrostered_position_still_counts_as_a_hole():
+    # League-manager feedback (2026-09-10): "look at the holes in the
+    # other teams roster that matches surpluses we have" -- a position
+    # with ZERO rostered players (a dropped/streamed spot) must still
+    # register as a need, not silently vanish for lack of any player to
+    # rank. The rival here rosters no TE at all.
+    starters = [
+        {"slot": "QB", "count": 1, "eligible": ["QB"]},
+        {"slot": "RB", "count": 2, "eligible": ["RB"]},
+        {"slot": "TE", "count": 1, "eligible": ["TE"]},
+    ]
+    my_roster = [
+        TeamPlayer("QB Starter", "QB", "AAA", fp_vor=50.0, cbs_vor=50.0),
+        TeamPlayer("RB Starter", "RB", "BBB", fp_vor=-5.0, cbs_vor=-5.0),
+        TeamPlayer("TE Starter", "TE", "CCC", fp_vor=10.0, cbs_vor=10.0),
+        TeamPlayer("TE Spare", "TE", "DDD", fp_vor=3.0, cbs_vor=20.0),
+    ]
+    rival_roster = [
+        TeamPlayer("Weak QB", "QB", "EEE", fp_vor=-10.0, cbs_vor=-10.0),
+        TeamPlayer("RB1", "RB", "FFF", fp_vor=20.0, cbs_vor=40.0),
+        TeamPlayer("RB2", "RB", "GGG", fp_vor=15.0, cbs_vor=30.0),
+        TeamPlayer("RB Spare", "RB", "HHH", fp_vor=60.0, cbs_vor=5.0),
+        # No TE at all on this roster.
+    ]
+    rosters = {"Me": my_roster, "Rival": rival_roster}
+    trades = find_trades("Me", rosters, starters)
+    assert len(trades) == 1
+    assert [p.name for p in trades[0].give] == ["TE Spare"]
+    assert [p.name for p in trades[0].get] == ["RB Spare"]
