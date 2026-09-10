@@ -88,6 +88,7 @@ import pandas as pd
 import streamlit as st
 
 from src.data_sources.weekly_projections import build_lookup, match_key
+from src.injury_status import build_injury_lookup, capture_summary, injury_icon, load_injury_table, render_injury_notes_expander
 from src.lineup_value import LineupPlayer, optimal_lineup_assignment
 from src.scoring import load_config
 
@@ -115,6 +116,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
 MATCHUP_DIR = os.path.join(ROOT, "data", "weekly_matchups")
 PROJECTIONS_DIR = os.path.join(ROOT, "data", "weekly_projections")
+INJURY_CSV = os.path.join(ROOT, "data", "injury_report", "current.csv")
 
 MATCHUP_FILE_RE = re.compile(r"^(\d{4})_week(\d+)\.csv$")
 
@@ -143,6 +145,12 @@ def _available_weeks() -> list[tuple[int, int]]:
 @st.cache_data
 def _load_matchup(year: int, week: int, _mtime: float) -> pd.DataFrame:
     return pd.read_csv(os.path.join(MATCHUP_DIR, f"{year}_week{week}.csv"))
+
+
+@st.cache_data
+def _injury_lookup(_mtime: float) -> tuple[dict, str | None]:
+    df = load_injury_table(INJURY_CSV)
+    return build_injury_lookup(df), capture_summary(df)
 
 
 @st.cache_data
@@ -332,11 +340,24 @@ def _pad_bench_rows(
     return bench_display, pd.Series(names)
 
 
+def _display_name(name: str, injury_lookup: dict) -> str:
+    """Abbreviated display name with a trailing injury-status icon
+    (src.injury_status.injury_icon) when flagged -- no room for a
+    separate "Inj" column in this page's deliberately narrow
+    side-by-side layout (see module docstring), so the icon rides
+    along in the Player cell itself, same compact-space pattern as
+    League Rosters' dense grid."""
+    icon = injury_icon(name, injury_lookup)
+    base = _abbreviate_player_name(name)
+    return f"{base} {icon}" if icon else base
+
+
 def _render_team_tables(
     df: pd.DataFrame, team: str, source: str, fp_lookup: dict,
     recommend: bool = False, starters_config: list[dict] | None = None,
-    bench_max: int | None = None,
+    bench_max: int | None = None, injury_lookup: dict | None = None,
 ) -> float:
+    injury_lookup = injury_lookup or {}
     team_df = df[df["team"] == team].copy()
     team_df["Points"] = _points_column(team_df, source, fp_lookup)
     bye_names = _bye_names(team_df)
@@ -363,7 +384,7 @@ def _render_team_tables(
 
     starters_display = pd.DataFrame({
         "Slot": starters["slot"].map(_abbreviate_slot),
-        "Player": starters["player_name"].map(_abbreviate_player_name),
+        "Player": starters["player_name"].map(lambda n: _display_name(n, injury_lookup)),
         "Pos/Tm": starters["position"] + "·" + starters["nfl_team"],
         "Opp": [
             _abbreviate_matchup(desc, team)
@@ -388,7 +409,7 @@ def _render_team_tables(
     bench_label = f"Bench ({len(bench)} of {bench_max})" if bench_max else f"Bench ({len(bench)})"
     with st.expander(bench_label, expanded=bench_flagged):
         bench_display = pd.DataFrame({
-            "Player": bench["player_name"].map(_abbreviate_player_name),
+            "Player": bench["player_name"].map(lambda n: _display_name(n, injury_lookup)),
             "Pos/Tm": bench["position"] + "·" + bench["nfl_team"],
             "Opp": [
                 _abbreviate_matchup(desc, team)
@@ -492,7 +513,12 @@ st.divider()
 # team's section below starts with nothing but its header, then its grid.
 st.caption(
     "🟩 should be in your starting lineup this week · 🟥 bench this player instead "
-    "· 🟨 on a bye — can't legally start (either team's grid, whichever applies)"
+    "· 🟨 on a bye — can't legally start (either team's grid, whichever applies) · "
+    "🚑❌❓⚠️ injury/practice-report flag (see notes below)"
+)
+
+injury_lookup, injury_as_of = _injury_lookup(
+    os.path.getmtime(INJURY_CSV) if os.path.exists(INJURY_CSV) else 0.0
 )
 
 # Side by side (league-manager request, 2026-09-09, reverting the earlier
@@ -504,13 +530,17 @@ with my_col:
     my_total = _render_team_tables(
         df, my_team_display, source, fp_lookup,
         recommend=True, starters_config=config["roster"]["starters"],
-        bench_max=config["roster"]["bench_max"],
+        bench_max=config["roster"]["bench_max"], injury_lookup=injury_lookup,
     )
 with opp_col:
     opp_total = _render_team_tables(
         df, opp_display, source, fp_lookup,
-        bench_max=config["roster"]["bench_max"],
+        bench_max=config["roster"]["bench_max"], injury_lookup=injury_lookup,
     )
+
+render_injury_notes_expander(df["player_name"].dropna().unique().tolist(), injury_lookup)
+if injury_as_of:
+    st.caption(injury_as_of)
 
 st.divider()
 diff = my_total - opp_total

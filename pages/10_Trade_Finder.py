@@ -51,6 +51,7 @@ import streamlit as st
 
 from src.data_sources.transactions import load_transactions
 from src.draft_state import DraftState
+from src.injury_status import build_injury_lookup, capture_summary, injury_badge, load_injury_table, render_injury_notes_expander
 from src.roster_state import current_roster_by_team
 from src.scoring import load_config
 from src.season_scoring import load_scored_season_source
@@ -63,6 +64,7 @@ DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
 TRANSACTIONS_CSV = os.path.join(ROOT, "data", "transactions", "transactions.csv")
 PROJECTIONS_DIR = os.path.join(ROOT, "data", "projections")
 WAIVER_DIR = os.path.join(ROOT, "data", "waiver_wire")
+INJURY_CSV = os.path.join(ROOT, "data", "injury_report", "current.csv")
 
 MAX_PLAYERS_PER_SIDE = 3
 
@@ -75,6 +77,12 @@ def get_config():
 @st.cache_data
 def _scored_season(path: str, source: str, _mtime: float) -> pd.DataFrame:
     return load_scored_season_source(path, source, get_config())
+
+
+@st.cache_data
+def _injury_lookup(_mtime: float) -> tuple[dict, str | None]:
+    df = load_injury_table(INJURY_CSV)
+    return build_injury_lookup(df), capture_summary(df)
 
 
 @st.cache_data
@@ -144,6 +152,9 @@ waiver_mtime = max(
     default=0.0,
 )
 bye_weeks = _nfl_bye_weeks(waiver_mtime)
+injury_lookup, injury_as_of = _injury_lookup(
+    os.path.getmtime(INJURY_CSV) if os.path.exists(INJURY_CSV) else 0.0
+)
 
 real_team_order = config.get("draft", {}).get("team_order") or []
 using_real_team_order = bool(real_team_order) and my_team in real_team_order
@@ -204,6 +215,7 @@ else:
                 st.dataframe(
                     pd.DataFrame([
                         {"Player": p.name, "Pos": p.position, "Team": p.nfl_team,
+                         "Inj": injury_badge(p.name, injury_lookup),
                          "FantasyPoints VOR": round(p.fp_vor, 1), "CBS VOR": round(p.cbs_vor, 1)}
                         for p in trade.give
                     ]),
@@ -214,6 +226,7 @@ else:
                 st.dataframe(
                     pd.DataFrame([
                         {"Player": p.name, "Pos": p.position, "Team": p.nfl_team,
+                         "Inj": injury_badge(p.name, injury_lookup),
                          "FantasyPoints VOR": round(p.fp_vor, 1), "CBS VOR": round(p.cbs_vor, 1)}
                         for p in trade.get
                     ]),
@@ -256,12 +269,20 @@ with st.expander("All rosters (VOR used above)"):
         for p in players:
             rows.append({
                 "Team": team, "Player": p.name, "Pos": p.position, "NFL Team": p.nfl_team,
-                "Bye": p.bye_week, "FantasyPoints VOR": round(p.fp_vor, 1), "CBS VOR": round(p.cbs_vor, 1),
+                "Bye": p.bye_week, "Inj": injury_badge(p.name, injury_lookup),
+                "FantasyPoints VOR": round(p.fp_vor, 1), "CBS VOR": round(p.cbs_vor, 1),
             })
     st.dataframe(
         pd.DataFrame(rows), hide_index=True, use_container_width=True,
         column_config={"Team": team_text_column("Team", list(rosters.keys()))},
     )
+
+trade_player_names = {p.name for trade in trades for p in (trade.give + trade.get)}
+render_injury_notes_expander(
+    list({p.name for p in rosters.get(my_team, [])} | trade_player_names), injury_lookup,
+)
+if injury_as_of:
+    st.caption(injury_as_of)
 
 st.divider()
 st.page_link("pages/4_My_Roster.py", label="← Back to My Roster", icon="📋")

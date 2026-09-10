@@ -1,0 +1,354 @@
+# Raw capture: CBS "Player News" feed (the /players report), POSITION =
+# ALL, TEAM = ALL PLAYERS -- page 1 of the paginated feed (47 pages
+# existed at capture time; CBS's own "PAGES: 1 2 3 ... 47 All" footer).
+# https://maniacfl.football.cbssports.com/players
+# Captured: 2026-09-10, via Claude_Browser (logged-in league-manager session)
+#
+# WHY THIS SOURCE: this is a real-time, whole-NFL news ticker (every
+# team, not just this league's rostered players), refreshed every few
+# minutes by CBS's RotoWire feed -- the closest thing CBS exposes to an
+# "injury report" for fantasy purposes. Most entries are individual
+# defensive players (DB/DL/LB) this league's DST-only format never
+# rosters -- that's fine and expected: src/data_sources/injury_report.py
+# parses every entry it can, and it's the downstream name-match against
+# an actual roster (src/injury_status.py) that decides which entries
+# matter to any given page. Entries are also tagged "ROSTERED BY <TEAM>"
+# or "FREE AGENT" right in this feed, which is a handy cross-check but
+# NOT relied on for matching (this league's own roster_state is the
+# authority on who's on which team) -- it's dropped during parsing.
+#
+# STALENESS: unlike the season-projection files, this is a live ticker,
+# not a stable season snapshot -- treat it as "as of the capture
+# timestamp above" and re-capture it (repeat this same navigation,
+# save the new page's text here or as a dated sibling file) whenever
+# fresher injury news is wanted. src/injury_status.py surfaces the
+# capture time in the UI so a stale file doesn't quietly look current.
+#
+# CAPTURE PROCEDURE: log in, navigate to
+# https://maniacfl.football.cbssports.com/players (the "Players" nav
+# item defaults to Player Stats; this specific News/ticker view is
+# reached via the "Player News" link, or by going to
+# /players/all-player-updates first and following its own "More Player
+# News" link, which lands on this same paginated /players view) --
+# extract the page's visible text (Claude_Browser__get_page_text) and
+# save it verbatim below the marker. Page through PAGES 2, 3, ... for
+# more history if a wider capture is ever wanted; one page (~20 entries)
+# was enough to cover this league's currently-relevant injury notes at
+# capture time.
+#
+# ENTRY FORMAT (see src/data_sources/injury_report.py's docstring for
+# the exact parsing regexes): each entry is a few "<Name> <POS> • <TEAM>"
+# / "ROSTERED BY <TEAM>" | "FREE AGENT" header line pairs (one pair per
+# alternate name CBS shows for that story -- the team DST, the team
+# defense as a unit, and the individual player, in that order for a
+# defensive story; just the one player for an offensive story), then the
+# real headline line "<Team>' <Player Name>: <Headline>" (or, when no
+# team owns the story, just "<Player Name>: <Headline>"), then a
+# "BY <SOURCE> | <SOURCE>" attribution line, a blank line, "<N> mins/
+# hours ago", and the first body sentence on its own line (kept as this
+# entry's `note` -- a longer second paragraph of color/context follows
+# and is intentionally NOT captured into the parsed data, to avoid
+# storing more of RotoWire's copyrighted analysis text than the app
+# actually needs).
+# ===== RAW TEXT BELOW =====
+Title: Maniac Football League - CBSSports.com
+URL: https://maniacfl.football.cbssports.com
+Source element: <body>
+---
+League
+My Team
+Players
+Scores
+Standings
+Advice
+2
+Customize a free private pick'em or survivor pool with your league.
+Monster Cheese
+(0-0-0)
+Player News
+
+ADD/DROP
+3
+
+TRADES
+3 / 10
+WAIVER #
+POSITION
+ALL
+TEAM
+ALL PLAYERS
+Giants DST • NYG
+FREE AGENT
+Giants D • NYG
+FREE AGENT
+Andru Phillips DB • NYG
+FREE AGENT
+Giants' Dru Phillips: Fades injury report
+BY ROTOWIRE | ROTOWIRE
+
+11 mins ago
+Phillips (knee) is not listed on Wednesday's injury report.
+
+Phillips missed two of the Giants' three preseason games due to a knee injury, but the fact that he was not listed on Wednesday's injury report indicates that he'll play against the Cowboys in Sunday's regular-season opener. Phillips appeared in all 17 regular-season games last year, finishing with 66 tackles (49 solo), 12 pass defenses (including two interceptions) and one fumble recovery.
+
+Texans DST • HOU
+ROSTERED BY MISSISSIPPI SWAMP ASS
+Texans D • HOU
+FREE AGENT
+Dominique Robinson DL • HOU
+FREE AGENT
+Texans' Dominique Robinson: Practices on Wednesday
+BY ROTOWIRE | ROTOWIRE
+
+13 mins ago
+Robinson (calf) was a full participant in Wednesday's practice.
+
+Robinson injured his calf during the Texans' preseason contest with the Raiders in mid-August. The defensive end was released by the Texans on Aug. 30 but promptly re-signed with the team on a one-year, $4 million deal. The 28-year-old has recovered from the calf injury just in time for Sunday's home opener against the Bills.
+
+Seahawks TQB • SEA
+FREE AGENT
+Sam Darnold QB • SEA
+ROSTERED BY THE DEMONS
+Seahawks' Sam Darnold: Questionable to return
+BY ROTOWIRE | ROTOWIRE
+
+15 mins ago
+Darnold (hip) left Wednesday night's contest against the Patriots in the first quarter, Curtis Crabtree of Fox 13 Seattle reports.
+
+Darnold suffered a hip injury on the Seahawks' opening possession, and he is now considered questionable to return to the contest, per Adam Schefter of ESPN. Drew Lock has entered the contest at quarterback for Seattle.
+
+Giants DST • NYG
+FREE AGENT
+Giants D • NYG
+FREE AGENT
+Paulson Adebo DB • NYG
+FREE AGENT
+Giants' Paulson Adebo: Not listed on injury report
+BY ROTOWIRE | ROTOWIRE
+
+15 mins ago
+Adebo (hamstring) was not listed on the Giants' injury report Wednesday.
+
+Adebo was working through a hamstring issue during training camp, but his absence from the Giants' injury report following Wednesday's practice indicates that he'll play in Sunday's regular-season opener against the Cowboys. Adebo is entering the second year of a three-year, $54 million contract that he signed with the Giants in March of 2025, though he may be limited to a rotational role in the secondary behind fellow outside corners Greg Newsome and Deonte Banks. Adebo recorded 73 tackles (56 solo) and eight pass defenses (including an interception) across 12 regular-season games last year.
+
+Texans DST • HOU
+ROSTERED BY MISSISSIPPI SWAMP ASS
+Texans D • HOU
+FREE AGENT
+Jake Hansen LB • HOU
+FREE AGENT
+Texans' Jake Hansen: Returns to practice Wednesday
+BY ROTOWIRE | ROTOWIRE
+
+18 mins ago
+Hansen (ankle) was a full participant in Wednesday's practice.
+
+Hansen was carted off the field at the start of training camp in late July with an ankle issue. The linebacker was listed as week-to-week as he managed the injury and has finally recovered just in time for the Texans' Week 1 showdown with the Bills.
+
+Cowboys DST • DAL
+ROSTERED BY PIMP DADDY
+Cowboys D • DAL
+FREE AGENT
+Jonathan Bullard DL • DAL
+FREE AGENT
+Cowboys' Jonathan Bullard: Full practice participant Wednesday
+BY ROTOWIRE | ROTOWIRE
+
+19 mins ago
+Bullard (hamstring) was a full participant in Wednesday's practice.
+
+Bullard was limited to side work during most of training camp and did not play in any of the Cowboys' three preseason games while recovering from a hamstring injury in early August. The rehab work has evidently paid off, and the veteran nose tackle is on track to play in Sunday's regular-season opener against the Giants. Bullard appeared in 15 regular-season games for the Saints in 2025, finishing with 26 tackles (12 solo) and two pass defenses.
+
+Ravens DST • BAL
+ROSTERED BY LEGION OF DOOM
+Ravens D • BAL
+FREE AGENT
+Aeneas Peebles DL • BAL
+FREE AGENT
+Ravens' Aeneas Peebles: All set for practice
+BY ROTOWIRE | ROTOWIRE
+
+23 mins ago
+Peebles (undisclosed) was a full participant in Wednesday's practice.
+
+Peebles dealt with a persistent undisclosed issue throughout training camp. The defensive tackle has cleared himself of the injury just in time for the beginning of the regular season and should be all set to suit up for Sunday's Week 1 game against the Colts.
+
+Bengals DST • CIN
+FREE AGENT
+Bengals D • CIN
+FREE AGENT
+Shemar Stewart DL • CIN
+FREE AGENT
+Bengals' Shemar Stewart: Gets in full practice Wednesday
+BY ROTOWIRE | ROTOWIRE
+
+26 mins ago
+Stewart (knee) was a full participant at practice Wednesday.
+
+Stewart hyperextended his knee late in July, but all signs are now pointing towards him suiting up in Week 1 versus the Buccaneers. He'll be looking to earn a larger share of snaps on the edge in his second season as a pro.
+
+Cardinals DST • ARI
+FREE AGENT
+Cardinals D • ARI
+FREE AGENT
+Will Johnson DB • ARI
+FREE AGENT
+Cardinals' Will Johnson: Logs full practice Wednesday
+BY ROTOWIRE | ROTOWIRE
+
+26 mins ago
+Johnson (lower body) was a full participant in Wednesday's practice, Bo Brack of GoPHNX.com reports.
+
+Johnson was working through a lower-body injury toward the end of training camp. However, his full participation in Wednesday's practice puts the 2025 second-rounder on track to play in Sunday's regular-season opener against the Chargers. Johnson logged 37 tackles (27 solo), 10 pass defenses and one forced fumble across 12 regular-season games during his rookie campaign.
+
+Bears DST • CHI
+ROSTERED BY BALL BUSTERS
+Bears D • CHI
+FREE AGENT
+Keyshaun Elliott LB • CHI
+FREE AGENT
+Bears' Keyshaun Elliott: No longer on injury report
+BY ROTOWIRE | ROTOWIRE
+
+27 mins ago
+Elliott (undisclosed) wasn't listed on Chicago's injury report Wednesday.
+
+Elliott is healthy again after missing the entirety of training camp with an undisclosed injury. Due to the time he missed, the rookie fifth-round pick will likely be limited to special teams and a reserve defender role to open the campaign.
+
+Eagles DST • PHI
+ROSTERED BY MONSTER CHEESE
+Eagles D • PHI
+FREE AGENT
+Jonathan Greenard LB • PHI
+FREE AGENT
+Eagles' Jonathan Greenard: Practices in limited capacity Wednesday
+BY ROTOWIRE | ROTOWIRE
+
+28 mins ago
+Greenard (pectoral) was limited during Wednesday's practice, Tim McManus of ESPN.com reports.
+
+Greenard was activated off the active/PUP list Aug. 30, though that doesn't necessarily mean he will be available for Week 1 versus the Commanders. The 29-year-old, who was acquired by Philadelphia from Minnesota in April, appeared in 12 regular-season games for the Vikings in 2025, accumulating 38 total tackles, 3.0 sacks and one forced fumble.
+
+Ravens DST • BAL
+ROSTERED BY LEGION OF DOOM
+Ravens D • BAL
+FREE AGENT
+Jay Higgins LB • BAL
+FREE AGENT
+Ravens' Jay Higgins: Clears concussion protocol
+BY ROTOWIRE | ROTOWIRE
+
+29 mins ago
+Higgins (concussion) was a full participant in Wednesday's practice.
+
+Higgins suffered a concussion in the Ravens' Aug. 15 preseason contest against the Eagles. The linebacker fully progressed through the NFL's five-step concussion protocol and has been cleared by an independent neurologist. Higgins is now all set to suit up for Sunday's Week 1 contest with the Colts.
+
+Bears DST • CHI
+ROSTERED BY BALL BUSTERS
+Bears D • CHI
+FREE AGENT
+Elijah Hicks DB • CHI
+FREE AGENT
+Bears' Elijah Hicks: Not on injury report
+BY ROTOWIRE | ROTOWIRE
+
+32 mins ago
+Hicks (shin) wasn't listed on Chicago's injury report Wednesday.
+
+Hicks has now moved past the shin injury that forced him to spend nearly a month on the team's active/PUP list during the summer. Now healthy, the 26-year-old should contribute as a depth defender and special teamer during the upcoming campaign.
+
+Jets DST • NYJ
+FREE AGENT
+Jets D • NYJ
+FREE AGENT
+Qwan'tez Stiggers DB • NYJ
+FREE AGENT
+Jets' Qwan'tez Stiggers: Clears concussion protocol
+BY ROTOWIRE | ROTOWIRE
+
+33 mins ago
+Stiggers (concussion) was a full participant in Wednesday's practice, Rich Cimini of ESPN.com reports.
+
+Stiggers suffered a concussion during a joint practice on Aug. 11. The cornerback has since recovered from the injury and has been cleared by an independent neurologist. Stiggers is all set to suit up for Sunday's regular-season opener against the Titans.
+
+Steelers DST • PIT
+ROSTERED BY SALTY DOGS
+Steelers D • PIT
+FREE AGENT
+Brandin Echols DB • PIT
+FREE AGENT
+Steelers' Brandin Echols: On pace to play vs. Falcons
+BY ROTOWIRE | ROTOWIRE
+
+37 mins ago
+Echols (ankle) was not listed on Pittsburgh's official injury report Wednesday, Teresa Varley of the Steelers' official site reports.
+
+Echols was tending to an issue with his ankle back in August, but he's now back up to full strength ahead of Week 1. The size of his role in Week 1 could depend somewhat on the availability of Joey Porter (back).
+
+Jeremiyah Love RB • ARI
+ROSTERED BY PIMP DADDY
+Cardinals' Jeremiyah Love: Limited at Wednesday's practice
+BY ROTOWIRE | ROTOWIRE
+
+39 mins ago
+Love (ankle) was a limited practice participant Wednesday, Bo Brack of GoPHNX.com reports.
+
+Love's status for Week 1 has been murky since he emerged from the Cardinals' preseason opener with a high-ankle sprain, which coach Mike LaFleur downplayed for most of the past month. When LaFleur discussed Love ahead of Wednesday's session, he told PHNX Sports "don't look too far into that" when discussing the rookie's listing as the No. 2 RB on the team's unofficial depth chart, while at the same time telling Brack that "there's no limit on our end" to Love's activity level. Considering Love's listing of "limited" Wednesday, he still has some work to do to be available for Sunday's game at the Chargers. Tyler Allgeier would serve as Arizona's lead back Week 1 if Love is operating with a cap on his reps or not suited up, while Bam Knight would be in line for some work as well.
+
+Commanders DST • WAS
+FREE AGENT
+Commanders D • WAS
+FREE AGENT
+T.J. Maguranyanga DL • WAS
+FREE AGENT
+T.J. Maguranyanga: Visits Vikings on Monday
+BY ROTOWIRE | ROTOWIRE
+
+41 mins ago
+Maguranyanga (undisclosed) visited the Vikings on Monday, Aaron Wilson of KPRC 2 Houston reports.
+
+Maguranyanga was recently waived from injured reserve with an injury settlement by the Commanders. While it's unknown how far talks have gone between the two sides, the latest at least suggests Maguranyanga is healthy. He appeared in one regular-season game for the Commanders in 2025, amassing one assisted tackle.
+
+Broncos DST • DEN
+ROSTERED BY MOJO
+Broncos D • DEN
+FREE AGENT
+Jaden Robinson DB • DEN
+FREE AGENT
+Jaden Robinson: Tries out with Giants
+BY ROTOWIRE | ROTOWIRE
+
+42 mins ago
+Robinson (undisclosed) tried out with the Giants on Monday, Aaron Wilson of KPRC 2 Houston reports.
+
+Robinson has now recovered from the undisclosed injury that led to Denver waiving him with an injury designation in August. The 2025 undrafted free agent will look to catch on with the Giants or another team and make his regular-season debut once the 2026 campaign gets underway.
+
+Texans DST • HOU
+ROSTERED BY MISSISSIPPI SWAMP ASS
+Texans D • HOU
+FREE AGENT
+Wade Woodaz LB • HOU
+FREE AGENT
+Texans' Wade Woodaz: Manages full practice Wednesday
+BY ROTOWIRE | ROTOWIRE
+
+43 mins ago
+Woodaz (thumb) was a full participant at practice Wednesday.
+
+Woodaz broke his thumb during the Texans' preseason game at Las Vegas in August, but it doesn't look like that will keep him out in Week 1 versus the Bills. The rookie fourth-rounder projects to start his career in a rotational role at linebacker.
+
+Panthers DST • CAR
+FREE AGENT
+Panthers D • CAR
+FREE AGENT
+Akayleb Evans DB • CAR
+FREE AGENT
+Panthers' Akayleb Evans: Not listed on injury report
+BY ROTOWIRE | ROTOWIRE
+
+45 mins ago
+Evans (neck) was not listed on Wednesday's injury report.
+
+Evans was held out of the Panthers' preseason finale against the Texans on Aug. 28 after aggravating a neck injury during practice. However, his absence from the first injury report of Week 1 prep indicates that he'll be available to play against the Bears on Sunday. Evans contributed mostly on special teams during the 2025 regular season, finishing with 12 tackles (six solo) across 16 games.
+
+PAGES: 1 2 3 4 5 6 7 ... 47 All

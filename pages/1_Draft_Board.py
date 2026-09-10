@@ -24,6 +24,7 @@ from src.data_sources.draft_history import load_draft_history
 from src.data_sources.manual_import import load_many
 from src.data_sources.simulation_results import format_adp_as_round_pick, load_adp, load_team_points
 from src.draft_state import DraftState
+from src.injury_status import build_injury_lookup, capture_summary, injury_badge, load_injury_table, render_injury_notes_expander
 from src.live_sync import read_sync_status
 from src.pick_suggestion import suggest_position, top_available_players
 from src.projections import build_draft_board, compute_tiers, load_source_weights
@@ -33,6 +34,7 @@ from src.ui_text import team_text_column
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
+INJURY_CSV = os.path.join(ROOT, "data", "injury_report", "current.csv")
 # Only match actual data files here — a bare "*.*" glob also picks up
 # data/projections/README.md and hands it to pd.read_csv(), which throws
 # a ParserError (README.md isn't a CSV). Restrict to the extensions
@@ -107,6 +109,12 @@ def load_players() -> tuple[pd.DataFrame, bool]:
         df, _ = get_ranked_players(SAMPLE_DATA_DIR, mtimes, weights_mtime)
         return df, True
     return pd.DataFrame(), False
+
+
+@st.cache_data
+def get_injury_lookup(_mtime: float) -> tuple[dict, str | None]:
+    df = load_injury_table(INJURY_CSV)
+    return build_injury_lookup(df), capture_summary(df)
 
 
 @st.cache_data
@@ -354,6 +362,9 @@ def render_live_board() -> None:
         reverse_last_n_rounds=config["draft"].get("reverse_last_n_rounds", 0),
     )
     players_df, is_sample = load_players()
+    injury_lookup, injury_as_of = get_injury_lookup(
+        os.path.getmtime(INJURY_CSV) if os.path.exists(INJURY_CSV) else 0.0
+    )
 
     simulated_adp = load_simulated_adp_df()
     if not players_df.empty:
@@ -551,6 +562,9 @@ def render_live_board() -> None:
                             f"VOR {row['vor']:.1f} (rank #{int(row['vor_rank'])}) · "
                             f"{row['score_total']:.1f} proj pts"
                         )
+                        badge = injury_badge(row["name"], injury_lookup)
+                        if badge:
+                            st.caption(badge)
                         if st.button(
                             "Draft this player",
                             key=f"suggest_draft_{row['name']}",
@@ -595,6 +609,10 @@ def render_live_board() -> None:
         "score_total": "Proj Pts", "vor": "VOR", "tier": "Tier", "num_sources": "# Sources",
         "sim_adp": "ADP",
     })
+    display_view.insert(
+        display_view.columns.get_loc("Team") + 1, "Inj",
+        display_view["Player"].apply(lambda n: injury_badge(n, injury_lookup)),
+    )
     # Punch-list item #9: show ADP as "round.pick" (e.g. "5.3" for round 5,
     # 3rd pick in that round) instead of a raw overall-pick number like
     # 43.2 -- applied here, after sorting/filtering, so sort_by above still
@@ -650,6 +668,12 @@ def render_live_board() -> None:
                 st.session_state.grid_pick_nonce += 1
                 st.toast(f"Logged: {pick.team} took {pick.player_name} (Rd {pick.round}, Pick {pick.overall_pick})")
                 st.rerun()
+
+    render_injury_notes_expander(
+        available["name"].tolist(), injury_lookup, label="🚑 Injury / practice-report notes (available players)",
+    )
+    if injury_as_of:
+        st.caption(injury_as_of)
 
     st.divider()
     with st.expander("Full pick log"):

@@ -212,6 +212,32 @@ def test_league_rosters_page_as_drafted_view_excludes_transaction_adds():
     assert "Post Draft Add" not in _grid_html(at)
 
 
+def test_league_rosters_page_flags_injured_player_and_lists_note():
+    # Uses the REAL committed data/injury_report/current.csv (2026-09-10
+    # capture), which really does flag "Sam Darnold" as Questionable --
+    # log a pick for that exact name so the grid has a real name to
+    # cross-match against, then confirm both the compact grid icon and
+    # the shared notes expander pick it up.
+    ds, config = _log_picks(rounds_to_log=0)
+    teams = config["draft"]["team_order"]
+    ds.log_pick_on_the_clock("Sam Darnold", position="QB")
+    for _ in range(len(teams) - 1):
+        ds.log_pick_on_the_clock("Filler", position="RB")
+
+    at = AppTest.from_file(os.path.join(ROOT, "app.py"))
+    at.run(timeout=60)
+    at = _open_page(at)
+
+    grid_html = _grid_html(at)
+    assert "Sam Darnold ❓" in grid_html
+
+    expander_texts = " ".join(e.label for e in at.expander)
+    assert "Injury / practice-report notes" in expander_texts
+    captions = " ".join(c.value for c in at.caption)
+    assert "Sam Darnold" in captions
+    assert "Questionable" in captions
+
+
 def test_league_rosters_page_no_longer_has_a_separate_summary_dataframe():
     """The first revision of this page had a separate league-wide summary
     st.dataframe above per-team expanders; the league manager asked for

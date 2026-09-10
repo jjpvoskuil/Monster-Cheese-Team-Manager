@@ -49,6 +49,7 @@ import streamlit as st
 from src.data_sources.manual_import import load_many
 from src.data_sources.transactions import load_transactions
 from src.draft_state import DraftState
+from src.injury_status import build_injury_lookup, capture_summary, injury_icon, load_injury_table, render_injury_notes_expander
 from src.league_grid import LeagueGrid, build_league_grid
 from src.projections import build_draft_board, load_source_weights
 from src.roster_state import current_roster_by_team
@@ -59,6 +60,7 @@ CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
 DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
 SOURCE_WEIGHTS_FILE = os.path.join(ROOT, "data", "source_weights.json")
 TRANSACTIONS_CSV = os.path.join(ROOT, "data", "transactions", "transactions.csv")
+INJURY_CSV = os.path.join(ROOT, "data", "injury_report", "current.csv")
 # Same extension allowlist as the Draft Board -- keeps out
 # data/projections/README.md, which isn't a data file.
 DATA_EXTENSIONS = (".csv", ".tsv", ".xlsx", ".xlsm", ".xltx", ".xls")
@@ -88,6 +90,12 @@ GRID_CSS = """
 @st.cache_resource
 def get_config():
     return load_config(CONFIG_PATH)
+
+
+@st.cache_data
+def _injury_lookup(_mtime: float) -> tuple[dict, str | None]:
+    df = load_injury_table(INJURY_CSV)
+    return build_injury_lookup(df), capture_summary(df)
 
 
 def _data_files(data_dir: str) -> list[str]:
@@ -147,7 +155,7 @@ def _esc(text) -> str:
     return html.escape(str(text))
 
 
-def render_grid_html(grid: LeagueGrid, my_team: str) -> str:
+def render_grid_html(grid: LeagueGrid, my_team: str, injury_lookup: dict) -> str:
     n_teams = len(grid.columns)
     parts: list[str] = ['<div class="league-grid-wrap"><table class="league-grid">']
 
@@ -178,7 +186,8 @@ def render_grid_html(grid: LeagueGrid, my_team: str) -> str:
             player = col.starter_players[i]
             pts = col.starter_pts[i]
             if player:
-                row.append(f"<td>{_esc(player)}</td>")
+                icon = injury_icon(player, injury_lookup)
+                row.append(f"<td>{_esc(player)}{' ' + icon if icon else ''}</td>")
             else:
                 row.append('<td class="empty">—</td>')
             row.append(f'<td class="num">{_fmt(pts)}</td>')
@@ -191,7 +200,8 @@ def render_grid_html(grid: LeagueGrid, my_team: str) -> str:
             row = [f'<td class="rowlabel">Bench {i + 1}</td>']
             for col in grid.columns:
                 if i < len(col.bench_players):
-                    row.append(f"<td>{_esc(col.bench_players[i])}</td>")
+                    icon = injury_icon(col.bench_players[i], injury_lookup)
+                    row.append(f"<td>{_esc(col.bench_players[i])}{' ' + icon if icon else ''}</td>")
                     row.append(f'<td class="num">{_fmt(col.bench_pts[i])}</td>')
                 else:
                     row.append('<td class="empty">—</td><td></td>')
@@ -303,9 +313,22 @@ def render_league_rosters() -> None:
         rosters = draft_state.roster_by_team()
 
     grid = build_league_grid(rosters, teams, starters, points_by_name)
+    injury_lookup, injury_as_of = _injury_lookup(
+        os.path.getmtime(INJURY_CSV) if os.path.exists(INJURY_CSV) else 0.0
+    )
 
     st.markdown(GRID_CSS, unsafe_allow_html=True)
-    st.markdown(render_grid_html(grid, my_team), unsafe_allow_html=True)
+    st.markdown(render_grid_html(grid, my_team, injury_lookup), unsafe_allow_html=True)
+    if injury_lookup:
+        st.caption("🚑 IR · ❌ Out · ❓ Doubtful/Questionable · ⚠️ Limited practice — " + (injury_as_of or ""))
+
+    all_names = sorted({
+        name
+        for col in grid.columns
+        for name in list(col.starter_players) + list(col.bench_players)
+        if name
+    })
+    render_injury_notes_expander(all_names, injury_lookup, label="🚑 Injury / practice-report notes (whole league)")
 
     all_missing = sorted({
         f"{name} ({col.team})"

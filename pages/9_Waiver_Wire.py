@@ -65,6 +65,7 @@ import streamlit as st
 
 from src.data_sources.transactions import load_transactions
 from src.draft_state import DraftState
+from src.injury_status import build_injury_lookup, capture_summary, injury_badge, load_injury_table, render_injury_notes_expander
 from src.roster_needs import assign_roster_slots
 from src.roster_state import current_roster_by_team, current_roster_for_team
 from src.scoring import load_config
@@ -83,6 +84,7 @@ TRANSACTIONS_CSV = os.path.join(ROOT, "data", "transactions", "transactions.csv"
 WAIVER_DIR = os.path.join(ROOT, "data", "waiver_wire")
 MATCHUP_DIR = os.path.join(ROOT, "data", "weekly_matchups")
 PROJECTIONS_DIR = os.path.join(ROOT, "data", "projections")
+INJURY_CSV = os.path.join(ROOT, "data", "injury_report", "current.csv")
 
 WEEK_FILE_RE = re.compile(r"^(\d{4})_week(\d+)\.csv$")
 
@@ -110,6 +112,12 @@ def _available_weeks() -> list[tuple[int, int]]:
 @st.cache_data
 def _load_csv(path: str, _mtime: float) -> pd.DataFrame:
     return pd.read_csv(path)
+
+
+@st.cache_data
+def _injury_lookup(_mtime: float) -> tuple[dict, str | None]:
+    df = load_injury_table(INJURY_CSV)
+    return build_injury_lookup(df), capture_summary(df)
 
 
 @st.cache_data
@@ -234,10 +242,12 @@ def _fantasypoints_free_agents(cbs_free_agents: list[FreeAgent], fp_season_df: p
     return out
 
 
-def _render_recommendation_row(rec) -> dict:
+def _render_recommendation_row(rec, injury_lookup: dict) -> dict:
+    add_badge = injury_badge(rec.add_name, injury_lookup)
+    drop_badge = injury_badge(rec.drop_name, injury_lookup) if rec.drop_name else ""
     return {
-        "Add": f"{rec.add_name} ({rec.add_position} · {rec.add_team})",
-        "Drop": rec.drop_name or "—",
+        "Add": f"{rec.add_name} ({rec.add_position} · {rec.add_team})" + (f" {add_badge}" if add_badge else ""),
+        "Drop": (rec.drop_name + (f" {drop_badge}" if drop_badge else "")) if rec.drop_name else "—",
         "Source": rec.source,
         "Value": round(rec.add_value, 1),
         "Why": rec.reason,
@@ -346,6 +356,9 @@ recommendations = build_recommendations(
     roster_by_source, free_agents_by_source,
     config["roster"]["starters"], config["roster"]["roster_total_max"],
 )
+injury_lookup, injury_as_of = _injury_lookup(
+    os.path.getmtime(INJURY_CSV) if os.path.exists(INJURY_CSV) else 0.0
+)
 
 st.divider()
 
@@ -374,6 +387,9 @@ else:
             st.markdown(f"**{rec.add_name}** ({rec.add_position} · {rec.add_team})")
             st.caption(CATEGORY_LABELS[rec.category])
             st.metric(f"{rec.source} projection", f"{rec.add_value:.1f}")
+            add_badge = injury_badge(rec.add_name, injury_lookup)
+            if add_badge:
+                st.caption(f"{add_badge} — see injury notes below")
             if rec.drop_name:
                 st.caption(f"↔️ Drop: {rec.drop_name}")
             st.caption(rec.reason)
@@ -389,7 +405,7 @@ else:
             continue
         with st.expander(f"{label} ({len(cat_recs)})", expanded=(category == "bye_gap")):
             st.dataframe(
-                pd.DataFrame([_render_recommendation_row(r) for r in cat_recs]),
+                pd.DataFrame([_render_recommendation_row(r, injury_lookup) for r in cat_recs]),
                 hide_index=True, use_container_width=True,
             )
 
@@ -399,6 +415,7 @@ with st.expander("Your current roster (values used above)"):
     for p in my_picks:
         roster_rows.append({
             "Player": p.player_name, "Pos": p.position, "NFL Team": p.nfl_team,
+            "Inj": injury_badge(p.player_name, injury_lookup),
             "Starter this week": is_starter_from_week.get(p.player_name, p.player_name in heuristic_starter_names),
             "Bye this week": p.player_name in bye_names,
             "CBS week pts": week_points.get(p.player_name),
@@ -409,6 +426,12 @@ with st.expander("Your current roster (values used above)"):
     st.caption(
         f"{len(my_picks)} of {config['roster']['roster_total_max']} roster spots used."
     )
+
+render_injury_notes_expander(
+    [p.player_name for p in my_picks] + [r.add_name for r in displayed], injury_lookup,
+)
+if injury_as_of:
+    st.caption(injury_as_of)
 
 st.divider()
 st.page_link("pages/4_My_Roster.py", label="← Back to My Roster", icon="📋")

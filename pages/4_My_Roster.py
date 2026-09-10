@@ -35,6 +35,7 @@ import streamlit as st
 
 from src.data_sources.transactions import load_transactions
 from src.draft_state import DraftState
+from src.injury_status import build_injury_lookup, capture_summary, injury_badge, load_injury_table, render_injury_notes_expander
 from src.roster_needs import assign_roster_slots
 from src.roster_state import current_roster_for_team
 from src.scoring import load_config
@@ -43,11 +44,18 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_PATH = os.path.join(ROOT, "config", "league_settings.yaml")
 DRAFT_STATE_FILE = os.path.join(ROOT, "data", "draft_state.json")
 TRANSACTIONS_CSV = os.path.join(ROOT, "data", "transactions", "transactions.csv")
+INJURY_CSV = os.path.join(ROOT, "data", "injury_report", "current.csv")
 
 
 @st.cache_resource
 def get_config():
     return load_config(CONFIG_PATH)
+
+
+@st.cache_data
+def _injury_lookup(_mtime: float) -> tuple[dict, str | None]:
+    df = load_injury_table(INJURY_CSV)
+    return build_injury_lookup(df), capture_summary(df)
 
 
 
@@ -62,6 +70,9 @@ def render_my_roster() -> None:
     into the JSON file.
     """
     config = get_config()
+    injury_lookup, injury_as_of = _injury_lookup(
+        os.path.getmtime(INJURY_CSV) if os.path.exists(INJURY_CSV) else 0.0
+    )
 
     # Same live-team-order resolution as the Draft Board / Draft Tendencies
     # pages, so DraftState's team list (and therefore my_team's snake slot)
@@ -153,6 +164,7 @@ def render_my_roster() -> None:
                     "Player": pick.player_name,
                     "Pos": pick.position,
                     "NFL Team": pick.nfl_team,
+                    "Inj": injury_badge(pick.player_name, injury_lookup),
                     "Rd": _rd_display(pick),
                     "Pick": pick.overall_pick,
                 })
@@ -162,11 +174,14 @@ def render_my_roster() -> None:
                     "Player": "— empty —",
                     "Pos": "/".join(slot["eligible"]),
                     "NFL Team": "",
+                    "Inj": "",
                     "Rd": None,
                     "Pick": None,
                 })
 
     st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+    if injury_as_of:
+        st.caption(injury_as_of)
 
     st.divider()
     st.subheader("Draft Requirements")
@@ -255,12 +270,15 @@ def render_my_roster() -> None:
             [
                 {
                     "Player": p.player_name, "Pos": p.position, "NFL Team": p.nfl_team,
+                    "Inj": injury_badge(p.player_name, injury_lookup),
                     "Rd": _rd_display(p), "Pick": p.overall_pick,
                 }
                 for p in sorted(bench, key=lambda p: p.overall_pick)
             ]
         )
         st.dataframe(bench_df, hide_index=True, use_container_width=True)
+
+    render_injury_notes_expander([p.player_name for p in my_picks], injury_lookup)
 
     st.divider()
     st.page_link("pages/1_Draft_Board.py", label="← Back to Draft Board", icon="🏈")

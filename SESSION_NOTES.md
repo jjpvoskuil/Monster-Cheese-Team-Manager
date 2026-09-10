@@ -800,6 +800,94 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-09-10 — Injury/practice-report status across every player-listing page
+League-manager request: "we need to make sure to identify players that
+are on the injury report or IR. this is obviously important with
+starting lineups, waivers, trades and also during the draft. Beyond an
+ID....it would be ideal to be able to click on that icon and get more
+details about the injury." Asked (via clarifying question) whether to
+build page-by-page or once, shared, rolled out everywhere together --
+chose the latter, plus "designation badge + latest blurb on demand"
+for the detail level (a true hover tooltip isn't a Streamlit table
+capability).
+
+**New data source**: `src/data_sources/injury_report.py` parses CBS's
+"Player News" feed (https://maniacfl.football.cbssports.com/players,
+POSITION=ALL, TEAM=ALL PLAYERS) -- a real-time, whole-NFL RotoWire news
+ticker, the closest thing CBS exposes to a standalone injury report.
+Captured one page (`data/injury_report/raw/2026_week1_page1.txt`, 20
+entries, documented capture procedure in that file's header) via the
+built-in browser pane (Claude in Chrome's extension wasn't connected
+this session). Parser anchors on each entry's "BY <SOURCE>" attribution
+line and walks outward from there (see that module's docstring) rather
+than assuming fixed line offsets, since a captured page's blank-line
+spacing can vary; deliberately takes the player's name from the
+headline line, not the header line above it, since RotoWire sometimes
+shortens it there (confirmed live: "Andru Phillips" header vs. "Dru
+Phillips" headline). `classify_designation()` is a best-effort keyword
+read of the headline+note text into IR/Out/Doubtful/Questionable/
+Limited/Cleared/Note, in that priority order -- explicitly NOT
+authoritative, which is exactly why the raw note text is kept
+alongside it for the "get more details" ask.
+
+`scripts/fetch_injury_report.py` combines every raw capture into
+`data/injury_report/current.csv`, deduping to one row per player (most
+recent, using each raw file's own "Captured:" header timestamp minus
+the parsed "N mins ago" age -- NOT wall-clock time when the script
+runs, since a raw file captured days ago still says "11 mins ago" as
+of ITS capture). Unlike every other data source in this app, this one
+is explicitly a live snapshot, not a stable per-week dataset --
+documented as needing periodic re-capture, with the capture timestamp
+surfaced in-app (`src.injury_status.capture_summary`) so a stale file
+doesn't quietly look current.
+
+**Shared display layer**: `src/injury_status.py` (streamlit-dependent
+by design, same as `src/ui_text.py`) is the ONE lookup + rendering
+helper every page below calls, rather than six separate reinventions.
+Key design call: only IR/Out/Doubtful/Questionable/Limited get a badge
+or show up in the notes expander -- "Cleared"/"Note" entries (the
+majority of any real capture; CBS's ticker mentions a player any time
+their practice status is reported, healthy or not) stay in the data
+but don't clutter every page with what would otherwise be a badge on
+nearly every player. `injury_badge()` (full text, e.g. "❓ Quest.") for
+pages with column room; `injury_icon()` (bare emoji) for the two pages
+that don't -- League Rosters' dense side-by-side grid and Weekly
+Matchup's deliberately narrow abbreviated columns -- where the icon
+rides inline in the Player cell instead of a new column.
+`render_injury_notes_expander()` is the shared "click for more detail"
+surface: one expander, most-severe-first, showing CBS's own blurb per
+flagged player -- renders nothing at all (not an empty expander) when
+nobody in scope is flagged.
+
+**Rolled out to all 6 player-listing pages** in one pass:
+  - `pages/4_My_Roster.py` -- Inj column on both the starting lineup
+    and bench tables, notes expander for the whole roster.
+  - `pages/6_League_Rosters.py` -- inline icon after each player's name
+    (no room for a new column in the compact multi-team grid), a
+    one-line legend, notes expander across every team's roster (not
+    just mine) since this page is explicitly for sizing up opponents.
+  - `pages/9_Waiver_Wire.py` -- badge on Add/Drop recommendation rows
+    and the top-3 cards, Inj column on the current-roster expander,
+    notes expander across roster + recommended adds.
+  - `pages/10_Trade_Finder.py` -- Inj column on both give/get trade
+    tables and the all-rosters expander, notes expander across my
+    roster + every player involved in a proposed trade.
+  - `pages/1_Draft_Board.py` -- Inj column on the main ranked-player
+    grid, badge on the Suggested Pick top-3 cards, notes expander
+    across currently-available (undrafted) players -- the "during the
+    draft" case from the request.
+  - `pages/8_Weekly_Matchup.py` -- same inline-icon treatment as League
+    Rosters (this page's columns are deliberately abbreviated to stay
+    side-by-side without horizontal scroll -- see its own module
+    docstring), legend line updated, notes expander across both teams.
+
+New tests: `tests/test_injury_report.py` (8, parser), `tests/
+test_injury_status.py` (6, lookup/badge/summary), plus a new League
+Rosters test using the REAL committed `current.csv` (which genuinely
+flags Sam Darnold as Questionable) to confirm the inline icon and
+notes-expander text actually render end-to-end, not just unit-level.
+Full suite: 418 passed.
+
 ### 2026-09-10 — Trade Finder tuning: require a real starting-lineup upgrade, count empty positions as holes
 Follow-up league-manager feedback on the Trade Finder page added the day
 before (see the next entry below for the page's original build):
