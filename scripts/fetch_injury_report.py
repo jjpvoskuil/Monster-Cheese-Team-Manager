@@ -6,12 +6,17 @@ data/injury_report/current.csv.
 
 Workflow to refresh injury data:
   1. Ask Claude to capture CBS's Player News feed -- see
-     data/injury_report/raw/2026_week1_page1.txt's header comment for
-     the exact URL, capture procedure, and entry format
-     src/data_sources/injury_report.py parses. Save each captured page
-     as data/injury_report/raw/<year>_week<N>_page<P>.txt (page number
-     only matters for keeping filenames unique across a multi-page
-     capture -- this script doesn't care about it beyond that).
+     data/injury_report/raw/2026_week1_all_pages.txt's header comment
+     for the exact URL, capture procedure, and entry format
+     src/data_sources/injury_report.py parses. Use the feed's own "All"
+     link (all ~47 pages' worth of entries in one page) rather than
+     capturing page 1 alone -- a single page only covers the last ~20
+     minutes of news and can miss a real, still-current designation
+     (this bit us 2026-09-10: Jakobi Meyers' Questionable status was a
+     few pages deep). Save each capture as
+     data/injury_report/raw/<year>_week<N>_<label>.txt (the label just
+     needs to keep filenames unique across captures -- this script
+     doesn't care about it beyond that).
   2. Run this script:
        python scripts/fetch_injury_report.py
      It re-parses every raw file found under that directory into one
@@ -25,13 +30,19 @@ setting a lineup or evaluating a trade/waiver move); there's no "current
 week" concept here the way there is for the other data sources.
 
 DEDUPLICATION: the same player can appear in more than one raw capture
-(re-captures over time, or overlapping pages). This script keeps only
-the single most recent note per player, using the parsed `age` string
-("N mins/hours ago") relative to each raw file's own capture timestamp
-(from its header comment's "Captured: YYYY-MM-DD" line) -- NOT relative
-to when this script happens to run, since a raw file captured days ago
-still says "11 mins ago" (as of ITS capture time, not now). A raw file
-without a parseable "Captured:" header falls back to treating its
+(re-captures over time, or overlapping pages), and even within a single
+capture of the full feed (a follow-up story bumps an older one further
+down). This script keeps only the single most recent note per player,
+using the parsed `age` string relative to each raw file's own capture
+timestamp (from its header comment's "Captured: YYYY-MM-DD" line) --
+NOT relative to when this script happens to run, since a raw file
+captured days ago still says "11 mins ago" (as of ITS capture time, not
+now). Two age formats show up (see src/data_sources/injury_report.py's
+docstring): a relative "N mins/hours/hrs/days ago", resolved against
+the raw file's capture date, and an absolute "<Month> <D>, <YYYY>
+<H>:<MM> AM/PM ET" for older stories, which is parsed directly and
+doesn't depend on the capture date at all. A raw file without a
+parseable "Captured:" header falls back to treating its relative-age
 entries as captured at the time this script runs, which is only
 approximately correct but strictly better than crashing.
 
@@ -58,15 +69,33 @@ OUTPUT_PATH = os.path.join(ROOT, "data", "injury_report", "current.csv")
 
 RAW_MARKER = "===== RAW TEXT BELOW =====\n"
 CAPTURED_RE = re.compile(r"^#\s*Captured:\s*(\d{4}-\d{2}-\d{2})", re.MULTILINE)
-AGE_VALUE_RE = re.compile(r"^(\d+)\s+(min|mins|hour|hours)\s+ago$")
+RELATIVE_AGE_RE = re.compile(r"^(\d+)\s+(min|mins|hour|hours|hr|hrs|day|days)\s+ago$")
+ABSOLUTE_AGE_RE = re.compile(r"^([A-Za-z]+ \d{1,2}, \d{4} \d{1,2}:\d{2} (?:AM|PM)) ET$")
 
 
-def _age_to_timedelta(age: str) -> timedelta:
-    m = AGE_VALUE_RE.match(age)
-    if not m:
-        return timedelta(0)
-    n, unit = int(m.group(1)), m.group(2)
-    return timedelta(hours=n) if unit.startswith("hour") else timedelta(minutes=n)
+def _effective_time(age: str, captured_at: datetime) -> datetime:
+    """Resolve a parsed InjuryNote.age string to an absolute timestamp
+    for sorting -- see src/data_sources/injury_report.py's docstring for
+    the two age formats this handles."""
+    rel_match = RELATIVE_AGE_RE.match(age)
+    if rel_match:
+        n, unit = int(rel_match.group(1)), rel_match.group(2)
+        if unit.startswith("hour") or unit.startswith("hr"):
+            delta = timedelta(hours=n)
+        elif unit.startswith("day"):
+            delta = timedelta(days=n)
+        else:
+            delta = timedelta(minutes=n)
+        return captured_at - delta
+
+    abs_match = ABSOLUTE_AGE_RE.match(age)
+    if abs_match:
+        try:
+            return datetime.strptime(abs_match.group(1), "%B %d, %Y %I:%M %p")
+        except ValueError:
+            pass
+
+    return captured_at
 
 
 def main() -> None:
@@ -90,7 +119,7 @@ def main() -> None:
         )
         text = full_text.split(RAW_MARKER, 1)[-1]
         for note in parse_player_news(text):
-            effective_time = captured_at - _age_to_timedelta(note.age)
+            effective_time = _effective_time(note.age, captured_at)
             all_rows.append({
                 "name": note.name, "nfl_team": note.nfl_team or "", "designation": note.designation,
                 "headline": note.headline, "note": note.note, "effective_time": effective_time,

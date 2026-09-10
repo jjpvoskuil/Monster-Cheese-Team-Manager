@@ -800,6 +800,58 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-09-10 — Injury data: capture the whole NFL news feed, not just page 1
+League manager caught a real gap the same day the injury feature shipped:
+"Why doesnt Meyers show up as injured anywhere? He is listed as
+questionable on CBS." Root cause: the original capture
+(`data/injury_report/raw/2026_week1_page1.txt`) only grabbed page 1 of
+CBS's 47-page Player News feed (~20 entries, the last ~20 minutes of
+news) — Jakobi Meyers' most recent note ("4 hrs ago" at capture time)
+had already rolled off page 1 onto a later page, so he never made it
+into `current.csv` even though the feature itself worked fine. Follow-up
+ask: "make sure to look for injuries across the entire list of NFL
+players."
+
+Fix: capture the feed's own "All" link
+(`/players/all/all?source_id=cbs&print_rows=9999`) instead of paging
+through it — one page, ~940 entries, every team. That page is too big
+for `Claude_Browser__get_page_text` (truncates at 50,000 characters);
+`document.body.innerText` via `Claude_Browser__javascript_tool` gets the
+whole thing, but the tool's oversized-result path returns it as a
+JSON-quoted string with a `(captured at origin ...)` annotation tacked
+on after the closing quote — strip that suffix and `json.loads()` the
+rest (a naive backslash-n find/replace mishandles escaped quotes in the
+page's own text; learned that the slow way before switching to
+`json.loads`). Saved as `data/injury_report/raw/2026_week1_all_pages.txt`
+(937 parseable entries, 675 unique players) — this is now the standard
+capture going forward, not a one-off; page1.txt is kept only for
+history.
+
+That capture also surfaced a second, real parsing gap: entries deep in
+the feed use age formats page 1 never has — relative "N hr(s)/day(s)
+ago" (not just "hour(s)/min(s)") and, once a story is old enough, an
+absolute "`<Month> <D>, <YYYY> <H>:<MM> AM/PM ET`" timestamp instead of
+a relative one at all. Widened `AGE_RE` in
+`src/data_sources/injury_report.py` and added `_effective_time()` to
+`scripts/fetch_injury_report.py` (replacing the old `_age_to_timedelta`)
+to resolve either format to an absolute timestamp for dedup — relative
+ages still resolve against the raw file's own capture date, absolute
+ones parse directly and don't need it. New tests in
+`tests/test_injury_report.py` (abbreviated-hour/day and absolute-date
+parsing) and a new `tests/test_fetch_injury_report.py` (loads the script
+by path since `scripts/` isn't a package; covers every age shape plus
+the specific property dedup relies on — a same-day relative age must
+resolve later than a days-old absolute one). Re-ran
+`scripts/fetch_injury_report.py`: Jakobi Meyers now shows up correctly
+(JAC, "Limited", from the 4-hrs-ago note; two older entries for him
+correctly lost the dedup). 675 unique players now in `current.csv`
+(up from 20). Full suite: 426 passed.
+
+Lesson for next capture: always use the feed's "All" link, never a
+single page — a page-1-only capture will look like it's working (it
+parses fine, tests pass) while quietly missing anyone whose news is
+more than ~20 minutes old.
+
 ### 2026-09-10 — Injury/practice-report status across every player-listing page
 League-manager request: "we need to make sure to identify players that
 are on the injury report or IR. this is obviously important with

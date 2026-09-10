@@ -112,6 +112,78 @@ def test_malformed_entry_is_skipped_not_raised():
     assert parse_player_news(broken) == []
 
 
+ABBREVIATED_AND_DATED_AGES = """
+Jaguars TQB • JAC
+FREE AGENT
+Jakobi Meyers WR • JAC
+ROSTERED BY MONSTER CHEESE
+Jaguars' Jakobi Meyers: Limited during Wednesday's practice
+BY ROTOWIRE | ROTOWIRE
+
+4 hrs ago
+Meyers (thumb) was listed as a limited participant in Wednesday's practice.
+
+Per Ryan O'Halloran of The Florida Times-Union, Meyers sported a non-contact jersey.
+
+Chiefs DST • KC
+FREE AGENT
+EJ Smith RB • KC
+FREE AGENT
+Chiefs' EJ Smith: Reverts to injured reserve
+BY ROTOWIRE | ROTOWIRE
+
+August 31, 2026 7:43 PM ET
+Smith (undisclosed) reverted to the Chiefs' injured reserve list Monday, Matt Derrick of ChiefsDigest.com reports.
+
+Smith was waived with an injury designation Sunday.
+
+Rams DST • LAR
+FREE AGENT
+Some Guy LB • LAR
+FREE AGENT
+Rams' Some Guy: Back at practice
+BY ROTOWIRE | ROTOWIRE
+
+1 hr ago
+Guy (calf) returned to practice Wednesday.
+
+He'd been out for two days.
+
+Bears DST • CHI
+FREE AGENT
+Another Guy DB • CHI
+FREE AGENT
+Bears' Another Guy: Still out
+BY ROTOWIRE | ROTOWIRE
+
+2 days ago
+Guy (ankle) remains out of practice.
+
+No timetable has been set for his return.
+"""
+
+
+def test_abbreviated_hour_and_day_ages_parse():
+    # A 47-page comprehensive capture (2026-09-10, "look for injuries
+    # across the entire list of NFL players") turned up age lines this
+    # module's original AGE_RE (page-1-only entries are always "N
+    # mins/hours ago") never had to handle: "hr"/"hrs" and "day"/"days".
+    notes = parse_player_news(ABBREVIATED_AND_DATED_AGES)
+    by_name = {n.name: n for n in notes}
+    assert by_name["Jakobi Meyers"].age == "4 hrs ago"
+    assert by_name["Some Guy"].age == "1 hr ago"
+    assert by_name["Another Guy"].age == "2 days ago"
+
+
+def test_absolute_dated_age_parses():
+    # Once a story rolls off the first page or so, CBS switches the age
+    # line from a relative "N ... ago" to an absolute timestamp instead.
+    notes = parse_player_news(ABBREVIATED_AND_DATED_AGES)
+    smith = next(n for n in notes if n.name == "EJ Smith")
+    assert smith.age == "August 31, 2026 7:43 PM ET"
+    assert smith.designation == "IR"
+
+
 def test_real_captured_files_all_parse_without_error():
     raw_dir = os.path.join(ROOT, "data", "injury_report", "raw")
     if not os.path.isdir(raw_dir):

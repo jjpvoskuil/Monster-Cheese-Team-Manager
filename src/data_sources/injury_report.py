@@ -13,8 +13,14 @@ ticker (RotoWire-sourced) covering every team, refreshed every few
 minutes. It's the closest thing CBS exposes to a standalone injury
 report for fantasy purposes, and it's what feeds the "Player News"
 widgets seen elsewhere in the league site. See data/injury_report/raw/
-2026_week1_page1.txt's header comment for the full capture procedure
-and a walkthrough of the entry format this module parses.
+2026_week1_all_pages.txt's header comment for the full capture
+procedure and a walkthrough of the entry format this module parses --
+2026_week1_page1.txt is an earlier, narrower capture (just the first
+of 47 pages) kept for history; a league-manager follow-up (2026-09-10,
+"make sure to look for injuries across the entire list of NFL
+players", prompted by Jakobi Meyers' Questionable designation not
+showing up anywhere -- his news was several pages deep) established
+capturing the whole feed at once as the standard going forward.
 
 Most entries are individual defensive players (DB/DL/LB) this league's
 DST-only format never rosters -- that's fine and expected. This module
@@ -36,11 +42,20 @@ ENTRY FORMAT (per news item, blank lines between sub-parts):
     <Team>' <Player Name>: <Headline text>     (or, when no team owns
     BY <SOURCE> | <SOURCE>                      the story, just
                                                  "<Player Name>: <text>")
-    <N> mins/hours ago
+    <age line -- see below>
     <first body sentence -- the actual status note>
 
     <second body paragraph of RotoWire color/context -- NOT captured;
      see the raw file's header comment for why>
+
+AGE LINE FORMATS: CBS shows recent entries (roughly the first page or
+so of the feed) as a relative age -- "<N> min(s)/hour(s)/hr(s)/day(s)
+ago" -- and older entries (once a story rolls off the first page or so)
+as an absolute timestamp instead -- "<Month> <D>, <YYYY> <H>:<MM> AM/PM
+ET". Both forms are handled here (`AGE_RE`) and by
+scripts/fetch_injury_report.py's effective-time calculation (relative
+ages are resolved against the raw file's own capture timestamp;
+absolute ones are parsed directly and don't need one).
 
 PARSING STRATEGY: anchor on the "BY <SOURCE>" attribution line (always
 present, always this exact shape) rather than trying to count fixed
@@ -71,7 +86,10 @@ ATTRIBUTION_RE = re.compile(r"^BY\s+\S")
 OWNERSHIP_RE = re.compile(r"^(ROSTERED BY .+|FREE AGENT)$")
 HEADER_RE = re.compile(r"^(?P<name>.+?)\s+(?P<pos>[A-Za-z/]+)\s*•\s*(?P<team>[A-Z]{2,4})\s*$")
 HEADLINE_RE = re.compile(r"^(?:[^']+'\s+)?(?P<name>.+?):\s+(?P<headline>.+)$")
-AGE_RE = re.compile(r"^\d+\s+(min|mins|hour|hours)\s+ago$")
+AGE_RE = re.compile(
+    r"^(\d+\s+(min|mins|hour|hours|hr|hrs|day|days)\s+ago"
+    r"|[A-Za-z]+ \d{1,2}, \d{4} \d{1,2}:\d{2} (AM|PM) ET)$"
+)
 
 # Checked in order against (headline + " " + note).lower() -- first match wins.
 _DESIGNATION_RULES: list[tuple[str, tuple[str, ...]]] = [
