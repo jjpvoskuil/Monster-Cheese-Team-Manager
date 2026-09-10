@@ -115,7 +115,11 @@ def _load_csv(path: str, _mtime: float) -> pd.DataFrame:
 
 
 @st.cache_data
-def _injury_lookup(_mtime: float) -> tuple[dict, str | None]:
+def _injury_lookup(mtime: float) -> tuple[dict, str | None]:
+    # NOTE: must NOT have a leading underscore -- Streamlit's cache_data
+    # silently excludes underscore-prefixed params from the cache key
+    # (see pages/10_Trade_Finder.py's _injury_lookup() for the full
+    # story of how this was found).
     df = load_injury_table(INJURY_CSV)
     return build_injury_lookup(df), capture_summary(df)
 

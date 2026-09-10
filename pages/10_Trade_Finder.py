@@ -80,7 +80,16 @@ def _scored_season(path: str, source: str, _mtime: float) -> pd.DataFrame:
 
 
 @st.cache_data
-def _injury_lookup(_mtime: float) -> tuple[dict, str | None]:
+def _injury_lookup(mtime: float) -> tuple[dict, str | None]:
+    # NOTE: must NOT have a leading underscore -- Streamlit's cache_data
+    # silently excludes underscore-prefixed params from the cache key
+    # entirely, which meant this cache never invalidated when
+    # data/injury_report/current.csv changed underneath an
+    # already-running app (same bug class as get_ranked_players() in
+    # pages/1_Draft_Board.py and pages/6_League_Rosters.py; found
+    # 2026-09-10 when a league-manager report -- a newly-flagged player
+    # showing on one page but not others in the same running app --
+    # turned out to be this, not a data or matching bug).
     df = load_injury_table(INJURY_CSV)
     return build_injury_lookup(df), capture_summary(df)
 

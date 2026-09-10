@@ -93,7 +93,11 @@ def get_config():
 
 
 @st.cache_data
-def _injury_lookup(_mtime: float) -> tuple[dict, str | None]:
+def _injury_lookup(mtime: float) -> tuple[dict, str | None]:
+    # NOTE: must NOT have a leading underscore -- same cache-key bug as
+    # get_ranked_players() below, applied to data/injury_report/
+    # current.csv this time (see pages/10_Trade_Finder.py's
+    # _injury_lookup() for the full story of how this was found).
     df = load_injury_table(INJURY_CSV)
     return build_injury_lookup(df), capture_summary(df)
 

@@ -9,10 +9,26 @@ during the draft. Beyond an ID....it would be ideal to be able to click
 on that icon and get more details about the injury."
 
 ONE lookup, everywhere: rather than each page re-reading the CSV and
-re-inventing a badge scheme, pages call `load_injury_lookup(path)` once
-(wrapped in their own @st.cache_data, same convention as
-src.season_scoring's callers) and pass the resulting dict to the two
-render helpers below.
+re-inventing a badge scheme, pages call `load_injury_table(path)` +
+`build_injury_lookup(df)` once each rerun (wrapped in their own
+@st.cache_data keyed on the CSV's mtime) and pass the resulting dict to
+the two render helpers below.
+
+CACHE-KEY GOTCHA (bit every single page once, 2026-09-10): the mtime
+parameter to that per-page cached wrapper function must NOT have a
+leading underscore. Streamlit's cache_data silently excludes
+underscore-prefixed parameters from the cache key entirely, so a
+wrapper like `def _injury_lookup(_mtime: float): ...` only ever runs
+ONCE per Streamlit process no matter how many times the mtime argument
+actually changes -- the cached (possibly stale, possibly built before
+any capture existed) result is returned forever after. This is exactly
+why a league-manager report ("Meyers shows on one page but not others,
+in the same running app") turned out to be a caching bug, not a data
+or name-matching bug: whichever pages a manager had open before a fresh
+`data/injury_report/current.csv` was dropped in stayed frozen on their
+last cached lookup; a page opened for the first time afterward read the
+new file correctly. See pages/1_Draft_Board.py's get_ranked_players()
+for the same anti-pattern found earlier against a different cache.
 
 FLAGGED vs. informational: most entries in the underlying feed are
 actually good news ("not listed on injury report", "full practice

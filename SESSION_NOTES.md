@@ -800,6 +800,47 @@ venv creation, and `streamlit run` in the user's own Terminal.
 
 ## Log
 
+### 2026-09-10 — Fix: injury cache never invalidated, so a fresh capture only showed up on pages not yet opened
+Follow-up to the same day's Meyers investigation: after re-capturing the
+whole NFL feed (see the entry right below this one) and confirming via
+tests that every page's underlying logic was correct, the league manager
+still reported "it shows up in the matchup page but not on the other
+pages" -- despite Meyers now genuinely being in `current.csv` and every
+page's code correctly wiring up the badge. Root cause: all six pages'
+per-page injury-lookup cache function
+(`_injury_lookup`/`get_injury_lookup`) is `@st.cache_data`-wrapped and
+takes the CSV's mtime as its ONLY argument -- but that argument was
+named `_mtime` (leading underscore). Streamlit's cache_data silently
+excludes underscore-prefixed parameters from the cache key, so the
+function only ever ran ONCE per Streamlit process, full stop -- no
+argument value could ever bust it. In a long-running local `streamlit
+run` session, whichever pages the manager had already opened before the
+new capture landed stayed frozen on their first (stale) cached lookup;
+Weekly Matchup happened to be opened fresh afterward, so it alone
+reflected the new data. This is the exact same anti-pattern
+`get_ranked_players()` (pages/1_Draft_Board.py, pages/6_League_Rosters.py)
+already had a comment warning about -- just not one every later
+cached-per-page-data function actually followed.
+
+Fix: renamed `_mtime` -> `mtime` in all six functions (pages/
+1_Draft_Board.py, 4_My_Roster.py, 6_League_Rosters.py,
+8_Weekly_Matchup.py, 9_Waiver_Wire.py, 10_Trade_Finder.py) and left a
+comment at each site plus a fuller explanation in
+src/injury_status.py's module docstring. New
+tests/test_injury_cache_invalidation.py reuses the SAME AppTest session
+across two `.run()` calls (a fresh AppTest per call would hide this bug
+entirely -- a new process always has an empty cache) to actually
+reproduce the long-running-server scenario: render with no flag, change
+the CSV, rerun the same session, confirm the badge now appears. Verified
+both new tests fail if the underscore is put back (confirmed by
+temporarily reverting and re-running before committing the real fix).
+Full suite: 428 passed.
+
+Lesson: "works in a fresh AppTest run" is NOT the same claim as "works
+in a long-running server" for anything behind `@st.cache_data` -- a
+regression test for a caching bug has to reuse one session across
+multiple reruns, or it can't see the bug at all.
+
 ### 2026-09-10 — Injury data: capture the whole NFL news feed, not just page 1
 League manager caught a real gap the same day the injury feature shipped:
 "Why doesnt Meyers show up as injured anywhere? He is listed as
